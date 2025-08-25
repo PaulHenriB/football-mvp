@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>NextPlay – Profile</title>
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="profile.css" />
+  <script src="profile.js" defer></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600&display=swap" rel="stylesheet" />
+  <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+</head>
+
+<body>
+  <!-- Navigation -->
+  <nav class="navbar">
+    <div class="logo">NextPlay</div>
+    <ul class="nav-links">
+      <li><a href="index.html">Home</a></li>
+      <li><a href="matches.html">Matches</a></li>
+      <li><a href="profile.html" class="active">Profile</a></li>
+      <li><a href="settings.html">Settings</a></li>
+      <li><a href="#">Logout</a></li>
+    </ul>
+  </nav>
+
+  <!-- Profile Content -->
+  <main class="profile-container">
+    <img src="avatar-placeholder.png" alt="User Avatar" class="profile-avatar" id="avatarPreview" />
+    <h1 id="userName">John Doe</h1>
+    <p><strong>Favorite Position:</strong> <span id="favPosition">Striker</span></p>
+
+    <button class="edit-btn" onclick="toggleEdit()">Edit Profile</button>
+
+    <!-- Hidden Form for Editing -->
+    <form id="editForm" style="display: none;">
+      <label for="nameInput">Name:</label>
+      <input type="text" id="nameInput" placeholder="Enter your name" />
+
+      <label for="positionInput">Favorite Position:</label>
+      <select id="positionInput">
+        <option value="Striker">Striker</option>
+        <option value="Midfielder">Midfielder</option>
+        <option value="Defender">Defender</option>
+        <option value="Goalkeeper">Goalkeeper</option>
+      </select>
+
+      <label for="avatarInput">Avatar:</label>
+      <input type="file" id="avatarInput" accept="image/*" />
+
+      <button type="button" onclick="saveProfile()">Save</button>
+    </form>
+
+    <section class="match-history">
+      <h2>Match History</h2>
+      <ul id="matchList">
+        <li>Match 1 – Won</li>
+        <li>Match 2 – Lost</li>
+      </ul>
+    </section>
+  </main>
+
+  <!-- Footer -->
+  <footer>
+    <p>&copy; 2025 NextPlay. All Rights Reserved.</p>
+  </footer>
+</body>
+</html>

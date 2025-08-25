@@ -1,0 +1,110 @@
+/* teambalancer.css */
+
+body {
+    font-family: 'Montserrat', sans-serif;
+    background-color: #f9f9f9;
+    color: #232323;
+    margin: 0;
+    padding: 0;
+  }
+  
+  .navbar {
+    background-color: #1e3a8a;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 2rem;
+    color: white;
+  }
+  
+  .navbar .logo {
+    font-weight: 600;
+    font-size: 1.5rem;
+  }
+  
+  .navbar .nav-links {
+    list-style: none;
+    display: flex;
+    gap: 1rem;
+  }
+  
+  .navbar .nav-links li a {
+    color: white;
+    text-decoration: none;
+    font-weight: 400;
+  }
+  
+  .navbar .nav-links li a.active,
+  .navbar .nav-links li a:hover {
+    text-decoration: underline;
+  }
+  
+  main.team-balancer-main {
+    max-width: 960px;
+    margin: 2rem auto;
+    padding: 1rem;
+  }
+  
+  .selector {
+    margin-bottom: 2rem;
+    text-align: center;
+  }
+  
+  .selector label {
+    font-weight: 600;
+    margin-right: 0.5rem;
+  }
+  
+  .selector select {
+    padding: 0.5rem;
+    font-size: 1rem;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+  }
+  
+  .teams-section {
+    display: flex;
+    gap: 2rem;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+  
+  .team-container {
+    background-color: #fff;
+    border: 1px solid #ddd;
+    border-radius: 12px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+    padding: 1rem;
+    width: 300px;
+  }
+  
+  .team-container h2 {
+    color: #1e3a8a;
+    font-size: 1.25rem;
+    margin-bottom: 0.5rem;
+    text-align: center;
+  }
+  
+  .team-list {
+    list-style: none;
+    padding: 0;
+  }
+  
+  .team-list li {
+    padding: 0.5rem;
+    border-bottom: 1px solid #eee;
+    font-size: 0.95rem;
+  }
+  
+  .team-list li:last-child {
+    border-bottom: none;
+  }
+  
+  footer {
+    background-color: #1e3a8a;
+    color: white;
+    text-align: center;
+    padding: 1rem;
+    margin-top: 2rem;
+  }
+  

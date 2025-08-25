@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>NextPlay – Schedule Match</title>
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@3.3.2/dist/tailwind.min.css" rel="stylesheet">
+  <script src="/js/manager.js" defer></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600&display=swap" rel="stylesheet">
+</head>
+<body class="bg-gray-100 font-sans">
+
+  <!-- Navigation Bar -->
+  <nav class="bg-white shadow">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex justify-between h-16">
+        <div class="flex">
+          <a href="dashboard.html" class="flex-shrink-0 flex items-center text-xl font-bold text-blue-600">
+            NextPlay
+          </a>
+          <div class="hidden sm:-my-px sm:ml-6 sm:flex sm:space-x-8">
+            <a href="dashboard.html" class="border-b-2 border-transparent text-gray-500 hover:border-blue-500 hover:text-gray-700 inline-flex items-center px-1 pt-1 text-sm font-medium">Dashboard</a>
+            <a href="player-availability.html" class="border-b-2 border-transparent text-gray-500 hover:border-blue-500 hover:text-gray-700 inline-flex items-center px-1 pt-1 text-sm font-medium">Player Availability</a>
+            <a href="manager.html" class="border-b-2 border-blue-500 text-gray-900 inline-flex items-center px-1 pt-1 text-sm font-medium">Manager</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Main Content -->
+  <main class="max-w-3xl mx-auto mt-10 bg-white shadow rounded p-6">
+    <h2 class="text-2xl font-semibold mb-6 text-gray-800">Schedule a Match</h2>
+
+    <form id="schedule-match" class="space-y-6">
+      <div>
+        <label for="match-dateTime" class="block text-sm font-medium text-gray-700">Date & Time</label>
+        <input type="datetime-local" id="match-dateTime" name="dateTime" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+      </div>
+
+      <div>
+        <label for="match-location" class="block text-sm font-medium text-gray-700">Location</label>
+        <input type="text" id="match-location" name="location" placeholder="Location" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+      </div>
+
+      <div>
+        <label for="match-duration" class="block text-sm font-medium text-gray-700">Duration</label>
+        <input type="text" id="match-duration" name="duration" placeholder="e.g., 90 mins" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+      </div>
+
+      <div>
+        <label for="match-type" class="block text-sm font-medium text-gray-700">Match Type</label>
+        <select id="match-type" name="matchType" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+          <option value="" disabled selected>Select type</option>
+          <option value="Friendly">Friendly</option>
+          <option value="Tournament">Tournament</option>
+          <option value="Training">Training</option>
+        </select>
+      </div>
+
+      <div>
+        <label for="max-players" class="block text-sm font-medium text-gray-700">Max Players</label>
+        <input type="number" id="max-players" name="maxPlayers" min="1" max="50" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+      </div>
+
+      <div>
+        <label for="visibility" class="block text-sm font-medium text-gray-700">Visibility</label>
+        <select id="visibility" name="visibility" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+          <option value="public">Public – Anyone can request to join</option>
+          <option value="private">Private – Invite only</option>
+        </select>
+      </div>
+
+      <div>
+        <label for="notes" class="block text-sm font-medium text-gray-700">Optional Notes</label>
+        <textarea id="notes" name="notes" rows="3" placeholder="Extra information, rules, reminders..." class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"></textarea>
+      </div>
+
+      <div>
+        <button type="submit" class="w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500">Schedule Match</button>
+      </div>
+    </form>
+  </main>
+
+  <!-- Footer -->
+  <footer class="mt-10 text-center text-gray-500 text-sm">
+    &copy; 2025 NextPlay. All Rights Reserved.
+  </footer>
+
+</body>
+</html>

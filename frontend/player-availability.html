@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Player Availability</title>
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@3.3.2/dist/tailwind.min.css" rel="stylesheet">
+</head>
+<body class="bg-gray-100 font-sans">
+
+  <!-- Page Header -->
+  <header class="bg-white shadow p-4 mb-6">
+    <div class="max-w-4xl mx-auto flex justify-between items-center">
+      <h1 class="text-2xl font-bold text-gray-800">Player Availability</h1>
+      <a href="dashboard.html" class="text-blue-600 hover:underline">Back to Dashboard</a>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <main class="max-w-3xl mx-auto bg-white shadow rounded p-6">
+    <h2 class="text-xl font-semibold mb-4 text-gray-700">Upcoming Matches</h2>
+
+    <ul id="availability-list" class="divide-y divide-gray-200 space-y-4">
+      <!-- Match items rendered by JS -->
+    </ul>
+  </main>
+
+  <!-- Toast Notification -->
+  <div id="toast" class="fixed bottom-6 right-6 bg-green-500 text-white px-4 py-3 rounded-lg shadow-lg opacity-0 transition-opacity duration-300 pointer-events-none z-50">
+    Availability updated!
+  </div>
+
+  <!-- Confirmation Modal -->
+  <div id="confirmation-modal" class="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50 hidden">
+    <div class="bg-white p-6 rounded-xl shadow-xl w-full max-w-md">
+      <h3 class="text-xl font-semibold mb-4 text-gray-800">Confirm Unavailability</h3>
+      <p class="mb-6 text-gray-600">Are you sure you want to mark yourself as <strong>unavailable</strong> for this match?</p>
+      <div class="flex justify-end gap-4">
+        <button id="modal-cancel-btn" class="bg-gray-300 hover:bg-gray-400 text-gray-800 px-4 py-2 rounded">Cancel</button>
+        <button id="modal-yes-btn" class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded">Yes, mark as unavailable</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="/js/availability.js" type="module"></script>
+</body>
+</html>

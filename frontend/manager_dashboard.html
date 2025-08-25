@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Manager Dashboard - NextPlay</title>
+
+  <!-- Styles -->
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="dashboard.css" />
+
+  <!-- Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600&display=swap" rel="stylesheet"/>
+
+  <!-- JS -->
+  <script src="dashboard.js" defer></script>
+</head>
+<body>
+  <nav class="navbar">
+    <ul>
+      <li><a href="index.html">Home</a></li>
+      <li><a href="matches.html">Matches</a></li>
+      <li><a href="availability.html">Availability</a></li>
+      <li><a href="manager-dashboard.html" class="active">Dashboard</a></li>
+      <li><a href="profile.html">Profile</a></li>
+    </ul>
+  </nav>
+
+  <main class="container">
+    <h1>Manager Dashboard</h1>
+
+    <section id="match-scheduling" class="card">
+      <h2>Schedule a Match</h2>
+      <form id="match-form" class="form-grid">
+        <label for="match-date">Date:</label>
+        <input type="date" id="match-date" required />
+
+        <label for="match-time">Time:</label>
+        <input type="time" id="match-time" required />
+
+        <label for="match-location">Location:</label>
+        <input type="text" id="match-location" required />
+
+        <button type="submit" class="primary-btn">Schedule Match</button>
+      </form>
+      <div id="scheduled-matches"></div>
+    </section>
+
+    <section id="team-balancing" class="card">
+      <h2>Team Balancing</h2>
+      <button id="balance-teams" class="secondary-btn">Auto Balance Teams</button>
+      <div id="team-results" class="team-results"></div>
+    </section>
+
+    <section id="player-management" class="card">
+      <h2>Manage Players</h2>
+      <ul id="player-list" class="player-list">
+        <!-- Players will be dynamically listed here -->
+      </ul>
+    </section>
+  </main>
+
+  <footer>
+    <p>&copy; 2025 NextPlay. All Rights Reserved.</p>
+  </footer>
+</body>
+</html>

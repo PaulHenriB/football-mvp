@@ -1,0 +1,154 @@
+/* playerrating.css */
+
+body {
+    font-family: 'Montserrat', sans-serif;
+    background-color: #f9f9f9;
+    margin: 0;
+    padding: 0;
+    color: #232323;
+  }
+  
+  .navbar {
+    background-color: #1e3a8a;
+    padding: 1rem 2rem;
+  }
+  
+  .nav-links {
+    list-style: none;
+    display: flex;
+    justify-content: space-around;
+    padding: 0;
+    margin: 0;
+  }
+  
+  .nav-links li a {
+    color: white;
+    text-decoration: none;
+    font-weight: 600;
+    transition: color 0.3s ease;
+  }
+  
+  .nav-links li a:hover,
+  .nav-links li a:focus {
+    color: #ffcc00;
+  }
+  
+  .rating-container {
+    max-width: 800px;
+    margin: 2rem auto;
+    background: white;
+    border-radius: 1rem;
+    padding: 2rem;
+    box-shadow: 0 0 15px rgba(0,0,0,0.08);
+  }
+  
+  h1 {
+    text-align: center;
+    color: #1e3a8a;
+  }
+  
+  .instructions {
+    text-align: center;
+    margin-bottom: 2rem;
+    font-size: 1rem;
+    color: #555;
+  }
+  
+  .player-rating-card {
+    border: 1px solid #e0e0e0;
+    padding: 1rem;
+    border-radius: 1rem;
+    margin-bottom: 1.5rem;
+    background-color: #fefefe;
+    box-shadow: 0 1px 5px rgba(0,0,0,0.04);
+  }
+  
+  .player-rating-card h3 {
+    margin: 0 0 0.5rem;
+    color: #1e3a8a;
+  }
+  
+  .player-rating-card label {
+    font-weight: 500;
+  }
+  
+  .player-rating-card input[type='range'] {
+    width: 100%;
+    margin-top: 0.5rem;
+  }
+  
+  .player-rating-card textarea {
+    width: 100%;
+    margin-top: 0.5rem;
+    padding: 0.5rem;
+    border-radius: 0.5rem;
+    border: 1px solid #ccc;
+    resize: vertical;
+    font-family: 'Montserrat', sans-serif;
+  }
+  
+  .submit-btn {
+    display: block;
+    width: 100%;
+    padding: 0.75rem;
+    font-size: 1rem;
+    background-color: #28a745;
+    color: white;
+    border: none;
+    border-radius: 0.75rem;
+    cursor: pointer;
+    transition: background 0.3s ease, transform 0.1s ease;
+  }
+  
+  .submit-btn:hover {
+    background-color: #218838;
+    transform: translateY(-1px);
+  }
+  
+  .submit-btn:disabled {
+    background-color: #94d3a2;
+    cursor: not-allowed;
+  }
+  
+  .confirmation-message {
+    text-align: center;
+    color: #28a745;
+    margin-top: 1rem;
+    display: none;
+  }
+  
+  .footer {
+    text-align: center;
+    padding: 1rem;
+    background-color: #1e3a8a;
+    color: white;
+    margin-top: 3rem;
+  }
+  
+  /* ✅ TOAST STYLES */
+  .toast {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    background-color: #28a745; /* Success Green */
+    color: white;
+    padding: 12px 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+    opacity: 0;
+    transition: opacity 0.5s ease-in-out;
+    z-index: 1000;
+    font-size: 14px;
+    max-width: 300px;
+    text-align: center;
+    pointer-events: none;
+  }
+  
+  .toast.success {
+    background-color: #28a745;
+  }
+  
+  .toast.error {
+    background-color: #dc3545;
+  }
+  

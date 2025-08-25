@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Rate Players | NextPlay</title>
+
+  <!-- Fonts & Styles -->
+  <link rel="stylesheet" href="playerrating.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600&display=swap" rel="stylesheet" />
+
+  <!-- Scripts -->
+  <script src="script.js" defer></script>
+  <script src="playerrating.js" defer></script>
+</head>
+<body>
+
+  <!-- Navigation -->
+  <nav class="navbar">
+    <ul class="nav-links">
+      <li><a href="index.html">Home</a></li>
+      <li><a href="dashboard.html">Dashboard</a></li>
+      <li><a href="matches.html">Matches</a></li>
+      <li><a href="spacemanager.html">Space Manager</a></li>
+      <li><a href="profile.html">Profile</a></li>
+    </ul>
+  </nav>
+
+  <!-- Main Content -->
+  <main class="rating-container">
+    <h1>Rate Players from Your Last Match</h1>
+    <p class="instructions">Please rate your teammates and opponents based on their performance (0 = Poor, 10 = Excellent).</p>
+
+    <form id="rating-form">
+      <div id="players-list">
+        <!-- Dynamically filled -->
+      </div>
+
+      <button type="submit" class="submit-btn">Submit Ratings</button>
+      <p id="confirmation" class="confirmation-message">✅ Thanks for your ratings!</p>
+    </form>
+  </main>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <p>&copy; 2025 NextPlay. All Rights Reserved.</p>
+  </footer>
+
+</body>
+</html>

@@ -1,0 +1,69 @@
+.settings-container {
+    max-width: 800px;
+    margin: 40px auto;
+    padding: 30px;
+    background: #ffffff;
+    border-radius: 12px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    font-family: 'Montserrat', sans-serif;
+  }
+  
+  .settings-container h1,
+  .settings-container h2 {
+    color: #1e3a8a;
+    margin-bottom: 20px;
+  }
+  
+  .settings-container section {
+    margin-bottom: 40px;
+    padding: 20px;
+    border: 1px solid #e0e0e0;
+    border-radius: 10px;
+    background-color: #f9f9f9;
+  }
+  
+  .settings-container label {
+    display: block;
+    margin-top: 10px;
+    font-weight: 600;
+  }
+  
+  .settings-container input[type="text"],
+  .settings-container select {
+    width: 100%;
+    padding: 10px;
+    margin-top: 5px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    font-size: 1rem;
+  }
+  
+  .settings-container input[type="checkbox"] {
+    margin-right: 10px;
+  }
+  
+  #saveSettings {
+    background-color: #1e3a8a;
+    color: white;
+    padding: 12px 20px;
+    font-size: 1rem;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+  
+  #saveSettings:hover {
+    background-color: #163072;
+  }
+  
+  @media (max-width: 600px) {
+    .settings-container {
+      padding: 20px;
+    }
+    .settings-container input,
+    .settings-container select {
+      font-size: 0.9rem;
+    }
+  }
+  

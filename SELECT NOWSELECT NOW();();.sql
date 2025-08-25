@@ -1,0 +1,2 @@
+SELECT NOWSELECT NOW();();
+

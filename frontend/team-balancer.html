@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Team Balancer | NextPlay</title>
+  <link rel="stylesheet" href="css/teambalancer.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600&display=swap" rel="stylesheet" />
+  <script src="js/script.js" defer></script>
+  <script src="js/teambalancer.js" defer></script>
+</head>
+<body>
+  <nav class="navbar">
+    <div class="logo">NextPlay</div>
+    <ul class="nav-links">
+      <li><a href="index.html">Home</a></li>
+      <li><a href="dashboard.html">Dashboard</a></li>
+      <li><a href="matches.html">Matches</a></li>
+      <li><a href="space-manager.html">Space Manager</a></li>
+      <li><a href="team-balancer.html" class="active">Team Balancer</a></li>
+    </ul>
+  </nav>
+
+  <main class="team-balancer-main">
+    <h1>Team Balancer</h1>
+
+    <div class="selector">
+      <label for="match-select">Select a Match:</label>
+      <select id="match-select" required>
+        <option value="" disabled selected>Select a match</option>
+        <!-- Matches populated dynamically -->
+      </select>
+    </div>
+
+    <section id="teams-display" class="teams-section">
+      <div class="team-container" id="team-1">
+        <h2>Team 1</h2>
+        <ul class="team-list"></ul>
+      </div>
+
+      <div class="team-container" id="team-2">
+        <h2>Team 2</h2>
+        <ul class="team-list"></ul>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <p>&copy; 2025 NextPlay. All Rights Reserved.</p>
+  </footer>
+</body>
+</html>
