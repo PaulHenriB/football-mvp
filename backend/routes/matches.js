@@ -1,146 +1,108 @@
-const express = require('express');
+const express = require("express");
 const router = express.Router();
-const { PrismaClient } = require('@prisma/client');
-const prisma = new PrismaClient();
+const Match = require("../models/Match"); // Sequelize model
+const PlayerMatch = require("../models/PlayerMatch"); // Junction table (if exists)
+const Rating = require("../models/Rating"); // For ratings
 
-// Middleware to ensure user is authenticated
-function isAuthenticated(req, res, next) {
-  if (!req.session || !req.session.userId) {
-    return res.status(401).json({ error: 'Unauthorized access' });
-  }
-  next();
-}
-
-// GET: Fetch all matches (public list or admin view)
-router.get('/', async (req, res) => {
+// ==========================
+// GET /matches/open → all upcoming matches
+// ==========================
+router.get("/open", async (req, res) => {
   try {
-    const matches = await prisma.match.findMany({
-      orderBy: { dateTime: 'asc' },
+    const matches = await Match.findAll({
+      where: {
+        dateTime: { [require("sequelize").Op.gte]: new Date() }
+      },
+      order: [["dateTime", "ASC"]],
+      include: ["players"] // if you defined associations
     });
 
     res.json({
-      message: '✅ Matches fetched successfully',
-      matches,
+      message: "✅ Open matches fetched successfully",
+      matches
     });
   } catch (error) {
-    console.error('❌ Error fetching matches:', error);
-    res.status(500).json({
-      error: 'Error fetching matches',
-      details: error.message,
-    });
+    console.error("❌ Error fetching matches:", error);
+    res.status(500).json({ error: "Error fetching matches" });
   }
 });
 
-// POST: Create match with referee assignment
-router.post('/create', isAuthenticated, async (req, res) => {
+// ==========================
+// POST /matches/create → create a match
+// ==========================
+router.post("/create", async (req, res) => {
   try {
-    const {
+    const { matchType, dateTime, location, duration, maxPlayers, visibility, notes } = req.body;
+
+    if (!matchType || !dateTime || !location || !duration || !maxPlayers || !visibility) {
+      return res.status(400).json({ error: "Missing required fields" });
+    }
+
+    const match = await Match.create({
       matchType,
       dateTime,
       location,
       duration,
       maxPlayers,
       visibility,
-      notes,
-      refereeId, // 👈 New
-    } = req.body;
-
-    if (!matchType || !dateTime || !location || !duration || !maxPlayers || !visibility) {
-      return res.status(400).json({ error: 'Missing required fields' });
-    }
-
-    const match = await prisma.match.create({
-      data: {
-        matchType,
-        dateTime: new Date(dateTime),
-        location,
-        duration,
-        maxPlayers,
-        visibility,
-        notes,
-        refereeId: refereeId || null, // 👈 Optional
-      },
+      notes
     });
 
     res.status(201).json({
-      message: '✅ Match created successfully',
-      match,
+      message: "✅ Match created successfully",
+      match
     });
   } catch (error) {
-    console.error('❌ Error creating match:', error);
-    res.status(500).json({
-      error: 'Error creating match',
-      details: error.message,
-    });
+    console.error("❌ Error creating match:", error);
+    res.status(500).json({ error: "Error creating match" });
   }
 });
 
-// GET: Referee fetch their assigned match
-router.get('/referee/my-match', isAuthenticated, async (req, res) => {
+// ==========================
+// POST /matches/:id/join → join a match
+// ==========================
+router.post("/:id/join", async (req, res) => {
   try {
-    const refereeId = req.session.userId;
+    const { playerId } = req.body;
+    const matchId = req.params.id;
 
-    const match = await prisma.match.findFirst({
-      where: {
-        refereeId: refereeId,
-        dateTime: {
-          gte: new Date(new Date().setDate(new Date().getDate() - 1)) // Optional: match must be recent
-        }
-      },
-      include: {
-        players: true,
-      },
-    });
+    if (!playerId) return res.status(400).json({ error: "Player ID is required" });
 
-    if (!match) {
-      return res.status(404).json({ error: 'No assigned match found for this referee' });
-    }
+    // Add player to match (assumes junction table PlayerMatch exists)
+    await PlayerMatch.create({ matchId, playerId });
 
-    res.json({
-      message: '✅ Referee match fetched',
-      match,
-    });
+    res.json({ message: "✅ Player joined match successfully" });
   } catch (error) {
-    console.error('❌ Error fetching referee match:', error);
-    res.status(500).json({ error: 'Error fetching referee match', details: error.message });
+    console.error("❌ Error joining match:", error);
+    res.status(500).json({ error: "Error joining match" });
   }
 });
 
-// POST: Submit match result (only by assigned referee)
-router.post('/:matchId/submit-result', isAuthenticated, async (req, res) => {
+// ==========================
+// POST /matches/:id/rate → rate a match/player
+// ==========================
+router.post("/:id/rate", async (req, res) => {
   try {
-    const { matchId } = req.params;
-    const refereeId = req.session.userId;
-    const { finalScoreA, finalScoreB } = req.body;
+    const { playerId, score } = req.body;
+    const matchId = req.params.id;
 
-    const match = await prisma.match.findUnique({
-      where: { id: Number(matchId) },
-    });
-
-    if (!match) {
-      return res.status(404).json({ error: 'Match not found' });
+    if (!playerId || !score) {
+      return res.status(400).json({ error: "Player ID and score are required" });
     }
 
-    if (match.refereeId !== refereeId) {
-      return res.status(403).json({ error: 'You are not authorized to submit this match result' });
-    }
-
-    const updatedMatch = await prisma.match.update({
-      where: { id: Number(matchId) },
-      data: {
-        finalScoreA,
-        finalScoreB,
-        resultSubmitted: true,
-      },
+    const rating = await Rating.create({
+      matchId,
+      playerId,
+      score
     });
 
     res.json({
-      message: '✅ Match result submitted',
-      match: updatedMatch,
+      message: "✅ Rating submitted successfully",
+      rating
     });
   } catch (error) {
-    console.error('❌ Error submitting match result:', error);
-    res.status(500).json({ error: 'Error submitting result', details: error.message });
+    console.error("❌ Error rating match:", error);
+    res.status(500).json({ error: "Error rating match" });
   }
 });
 
