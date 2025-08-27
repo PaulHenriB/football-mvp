@@ -1,20 +1,27 @@
-// db.js
-import { PrismaClient } from '@prisma/client';
+const pgp = require("pg-promise")();
+require("dotenv").config();
 
-const globalForPrisma = globalThis;
+// Database connection settings
+const dbConfig = {
+  host: process.env.PG_HOST || "localhost",
+  port: process.env.PG_PORT || 5432,
+  database: process.env.PG_DATABASE || "football_mvp",
+  user: process.env.PG_USER || "postgres",
+  password: process.env.PG_PASSWORD || "04141822",
+  max: 30, // Set a connection pool limit
+};
 
-/**
- * Avoid creating multiple instances of PrismaClient in development
- * (due to hot reloading in tools like Next.js, Nodemon, etc.)
- */
-const prisma =
-  globalForPrisma.prisma ||
-  new PrismaClient({
-    log: ['query', 'info', 'warn', 'error'], // optional: helpful during dev
-  });
+const db = pgp(dbConfig);
 
-if (process.env.NODE_ENV !== 'production') {
-  globalForPrisma.prisma = prisma;
-}
+// Test database connection
+(async () => {
+  try {
+    await db.connect();
+    console.log("✅ Connected to PostgreSQL");
+  } catch (err) {
+    console.error("❌ PostgreSQL connection error:", err.message || err);
+    process.exit(1); // Stop the server if the database connection fails
+  }
+})();
 
-export default prisma;
+module.exports = db;
