@@ -1,108 +1,64 @@
-const express = require("express");
+// backend/routes/matches.js
+const express = require('express');
 const router = express.Router();
-const Match = require("../models/Match"); // Sequelize model
-const PlayerMatch = require("../models/PlayerMatch"); // Junction table (if exists)
-const Rating = require("../models/Rating"); // For ratings
+const { PrismaClient } = require('@prisma/client');
+const teamBalancer = require('../utils/teamBalancer'); // your existing balancer
 
-// ==========================
-// GET /matches/open → all upcoming matches
-// ==========================
-router.get("/open", async (req, res) => {
-  try {
-    const matches = await Match.findAll({
-      where: {
-        dateTime: { [require("sequelize").Op.gte]: new Date() }
-      },
-      order: [["dateTime", "ASC"]],
-      include: ["players"] // if you defined associations
-    });
+const prisma = new PrismaClient();
 
-    res.json({
-      message: "✅ Open matches fetched successfully",
-      matches
-    });
-  } catch (error) {
-    console.error("❌ Error fetching matches:", error);
-    res.status(500).json({ error: "Error fetching matches" });
+// Strict rating-balanced algorithm
+function ratingBalanced(players) {
+  // Sort players by rating (highest first)
+  const sorted = [...players].sort((a, b) => b.rating - a.rating);
+
+  let teamA = [];
+  let teamB = [];
+  let totalA = 0;
+  let totalB = 0;
+
+  // Greedy assign: always put next best player in weaker team
+  for (let p of sorted) {
+    if (totalA <= totalB) {
+      teamA.push(p);
+      totalA += p.rating;
+    } else {
+      teamB.push(p);
+      totalB += p.rating;
+    }
   }
-});
 
-// ==========================
-// POST /matches/create → create a match
-// ==========================
-router.post("/create", async (req, res) => {
+  return { teamA, teamB, avgA: totalA / teamA.length, avgB: totalB / teamB.length };
+}
+
+// Example route using both algorithms
+router.post('/:matchId/balance', async (req, res) => {
+  const { matchId } = req.params;
+  const { mode } = req.query; // pass ?mode=ratingBalanced for strict mode
+
   try {
-    const { matchType, dateTime, location, duration, maxPlayers, visibility, notes } = req.body;
+    const match = await prisma.match.findUnique({
+      where: { id: matchId },
+      include: { players: true },
+    });
 
-    if (!matchType || !dateTime || !location || !duration || !maxPlayers || !visibility) {
-      return res.status(400).json({ error: "Missing required fields" });
+    if (!match) {
+      return res.status(404).json({ error: 'Match not found' });
     }
 
-    const match = await Match.create({
-      matchType,
-      dateTime,
-      location,
-      duration,
-      maxPlayers,
-      visibility,
-      notes
-    });
-
-    res.status(201).json({
-      message: "✅ Match created successfully",
-      match
-    });
-  } catch (error) {
-    console.error("❌ Error creating match:", error);
-    res.status(500).json({ error: "Error creating match" });
-  }
-});
-
-// ==========================
-// POST /matches/:id/join → join a match
-// ==========================
-router.post("/:id/join", async (req, res) => {
-  try {
-    const { playerId } = req.body;
-    const matchId = req.params.id;
-
-    if (!playerId) return res.status(400).json({ error: "Player ID is required" });
-
-    // Add player to match (assumes junction table PlayerMatch exists)
-    await PlayerMatch.create({ matchId, playerId });
-
-    res.json({ message: "✅ Player joined match successfully" });
-  } catch (error) {
-    console.error("❌ Error joining match:", error);
-    res.status(500).json({ error: "Error joining match" });
-  }
-});
-
-// ==========================
-// POST /matches/:id/rate → rate a match/player
-// ==========================
-router.post("/:id/rate", async (req, res) => {
-  try {
-    const { playerId, score } = req.body;
-    const matchId = req.params.id;
-
-    if (!playerId || !score) {
-      return res.status(400).json({ error: "Player ID and score are required" });
+    let result;
+    if (mode === 'ratingBalanced') {
+      result = ratingBalanced(match.players);
+    } else {
+      result = teamBalancer(match.players); // your existing balancer
     }
 
-    const rating = await Rating.create({
-      matchId,
-      playerId,
-      score
-    });
-
     res.json({
-      message: "✅ Rating submitted successfully",
-      rating
+      message: `✅ Teams balanced using ${mode || 'default'} algorithm`,
+      result,
     });
   } catch (error) {
-    console.error("❌ Error rating match:", error);
-    res.status(500).json({ error: "Error rating match" });
+    console.error('❌ Error balancing teams:', error);
+    res.status(500).json({ error: 'Error balancing teams', details: error.message });
   }
 });
 
