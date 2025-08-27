@@ -8,9 +8,9 @@ const { PrismaClient } = require("@prisma/client");
 const prisma = new PrismaClient();
 
 // Import routes
-const authRoutes = require("./routes/auth");       // handles /auth/register + /auth/login
-const matchRoutes = require("./routes/matches");   // handles /matches/create, /matches/:id/join, /matches/:id/rate, /matches/open
-const playerRoutes = require("./routes/players"); // handles /players/:id
+const authRoutes = require("./routes/auth");       // /auth/register, /auth/login
+const matchRoutes = require("./routes/matches");   // /matches/create, /matches/:id/join, etc.
+const playerRoutes = require("./routes/players"); // /players/:id
 
 const app = express();
 
@@ -20,11 +20,12 @@ app.use(express.json());
 app.use(morgan("dev"));
 
 // === Routes ===
+// You can add "/api" as a prefix if you want → app.use("/api/auth", authRoutes);
 app.use("/auth", authRoutes);
 app.use("/matches", matchRoutes);
 app.use("/players", playerRoutes);
 
-// === Health Check (optional) ===
+// === Health Check ===
 app.get("/", (req, res) => {
   res.json({ message: "NextPlay API is running 🚀" });
 });
@@ -37,14 +38,27 @@ app.use((err, req, res, next) => {
   });
 });
 
-// === Start Server ===
+// === Start Server & DB Connection ===
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, async () => {
-  console.log(`✅ Server running on http://localhost:${PORT}`);
+
+async function startServer() {
   try {
     await prisma.$connect();
     console.log("✅ Connected to PostgreSQL with Prisma");
+
+    app.listen(PORT, () => {
+      console.log(`✅ Server running on http://localhost:${PORT}`);
+    });
   } catch (err) {
     console.error("❌ Database connection error:", err);
+    process.exit(1);
   }
+}
+
+// Graceful shutdown
+process.on("SIGINT", async () => {
+  await prisma.$disconnect();
+  process.exit(0);
 });
+
+startServer();
