@@ -1,3 +1,4 @@
+// backend/routes/players.js
 const express = require("express");
 const router = express.Router();
 const { PrismaClient } = require("@prisma/client");
@@ -9,7 +10,16 @@ const prisma = new PrismaClient();
 // ==========================
 router.get("/", async (req, res) => {
   try {
-    const players = await prisma.player.findMany();
+    const players = await prisma.player.findMany({
+      include: {
+        user: true,
+        matches: {
+          include: {
+            match: true,
+          },
+        },
+      },
+    });
     res.json({
       message: "✅ Players retrieved successfully",
       players,
@@ -28,7 +38,14 @@ router.get("/:id", async (req, res) => {
   try {
     const player = await prisma.player.findUnique({
       where: { id: parseInt(id) },
-      include: { user: true, matches: true }, // adjust if relations exist
+      include: {
+        user: true,
+        matches: {
+          include: {
+            match: true,
+          },
+        },
+      },
     });
 
     if (!player) {
