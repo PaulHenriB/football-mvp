@@ -68,15 +68,21 @@ router.post('/:matchId/players', async (req, res) => {
     const match = await prisma.match.findUnique({ where: { id: parseInt(matchId) } });
     if (!match) return res.status(404).json({ error: 'Match not found' });
 
-    // Connect players to match
+    // Connect players to match via PlayerMatch
     const updatedMatch = await prisma.match.update({
       where: { id: parseInt(matchId) },
       data: {
         players: {
-          connect: playerIds.map((id) => ({ id })),
+          create: playerIds.map((id) => ({
+            player: { connect: { id } },
+          })),
         },
       },
-      include: { players: true },
+      include: {
+        players: {
+          include: { player: true },
+        },
+      },
     });
 
     res.json({ message: '✅ Players assigned successfully', match: updatedMatch });
@@ -96,18 +102,25 @@ router.post('/:matchId/balance', async (req, res) => {
   try {
     const match = await prisma.match.findUnique({
       where: { id: parseInt(matchId) },
-      include: { players: true },
+      include: {
+        players: {
+          include: { player: true },
+        },
+      },
     });
 
     if (!match) {
       return res.status(404).json({ error: 'Match not found' });
     }
 
+    // Extract actual Player objects
+    const actualPlayers = match.players.map((pm) => pm.player);
+
     let result;
     if (mode === 'ratingBalanced') {
-      result = ratingBalanced(match.players);
+      result = ratingBalanced(actualPlayers);
     } else {
-      result = teamBalancer(match.players);
+      result = teamBalancer(actualPlayers);
     }
 
     res.json({
