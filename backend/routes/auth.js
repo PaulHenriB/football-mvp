@@ -2,7 +2,7 @@ const express = require("express");
 const router = express.Router();
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
-const pool = require("../db/db"); // PostgreSQL connection
+const { prisma } = require("../config/prisma");
 
 // =====================
 // REGISTER
@@ -21,36 +21,37 @@ router.post("/register", async (req, res) => {
 
   try {
     // Check if user already exists
-    const existingUser = await pool.query(
-      "SELECT * FROM users WHERE email = $1",
-      [email]
-    );
-    if (existingUser.rows.length > 0) {
+    const existingUser = await prisma.user.findUnique({
+      where: { email },
+    });
+
+    if (existingUser) {
       return res.status(400).json({ error: "User already exists" });
     }
 
     // Hash password
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    // Insert new user
-    const result = await pool.query(
-      `INSERT INTO users 
-        (first_name, last_name, dob, favorite_foot, favorite_position, phone_number, email, password_hash) 
-       VALUES ($1, $2, $3, $4, $5, $6, $7, $8) 
-       RETURNING id, first_name, last_name, email`,
-      [
-        first_name,
-        last_name,
-        dob,
-        favorite_foot,
-        favorite_position,
-        phone_number,
+    // Create new user in Prisma
+    const newUser = await prisma.user.create({
+      data: {
+        firstName: first_name,
+        lastName: last_name,
+        dob: new Date(dob),
+        favoriteFoot: favorite_foot,
+        favoritePosition: favorite_position, // must match enum "Position"
+        phoneNumber: phone_number,
         email,
-        hashedPassword,
-      ]
-    );
+        passwordHash: hashedPassword,
+      },
+      select: {
+        id: true,
+        firstName: true,
+        lastName: true,
+        email: true,
+      },
+    });
 
-    const newUser = result.rows[0];
     res.status(201).json({ message: "User registered", user: newUser });
   } catch (error) {
     console.error("Registration error:", error.message);
@@ -66,17 +67,16 @@ router.post("/login", async (req, res) => {
 
   try {
     // Find user
-    const result = await pool.query("SELECT * FROM users WHERE email = $1", [
-      email,
-    ]);
-    if (result.rows.length === 0) {
+    const user = await prisma.user.findUnique({
+      where: { email },
+    });
+
+    if (!user) {
       return res.status(400).json({ error: "Invalid credentials" });
     }
 
-    const user = result.rows[0];
-
     // Compare password
-    const isMatch = await bcrypt.compare(password, user.password_hash);
+    const isMatch = await bcrypt.compare(password, user.passwordHash);
     if (!isMatch) {
       return res.status(400).json({ error: "Invalid credentials" });
     }
@@ -93,8 +93,8 @@ router.post("/login", async (req, res) => {
       token,
       user: {
         id: user.id,
-        first_name: user.first_name,
-        last_name: user.last_name,
+        first_name: user.firstName,
+        last_name: user.lastName,
         email: user.email,
       },
     });
