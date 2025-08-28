@@ -6,9 +6,10 @@ const teamBalancer = require('../utils/teamBalancer'); // your existing balancer
 
 const prisma = new PrismaClient();
 
-// Strict rating-balanced algorithm
+/**
+ * Strict rating-balanced algorithm
+ */
 function ratingBalanced(players) {
-  // Sort players by rating (highest first)
   const sorted = [...players].sort((a, b) => b.rating - a.rating);
 
   let teamA = [];
@@ -16,7 +17,6 @@ function ratingBalanced(players) {
   let totalA = 0;
   let totalB = 0;
 
-  // Greedy assign: always put next best player in weaker team
   for (let p of sorted) {
     if (totalA <= totalB) {
       teamA.push(p);
@@ -27,17 +27,75 @@ function ratingBalanced(players) {
     }
   }
 
-  return { teamA, teamB, avgA: totalA / teamA.length, avgB: totalB / teamB.length };
+  return {
+    teamA,
+    teamB,
+    avgA: teamA.length ? totalA / teamA.length : 0,
+    avgB: teamB.length ? totalB / teamB.length : 0,
+  };
 }
 
-// Example route using both algorithms
+/**
+ * Create a match
+ */
+router.post('/', async (req, res) => {
+  try {
+    const { city, date } = req.body;
+
+    const match = await prisma.match.create({
+      data: {
+        city,
+        date: new Date(date),
+      },
+    });
+
+    res.json({ message: '✅ Match created successfully', match });
+  } catch (error) {
+    console.error('❌ Error creating match:', error);
+    res.status(500).json({ error: 'Error creating match', details: error.message });
+  }
+});
+
+/**
+ * Assign players to a match
+ */
+router.post('/:matchId/players', async (req, res) => {
+  const { matchId } = req.params;
+  const { playerIds } = req.body; // Expecting [1, 2, 3...]
+
+  try {
+    // Validate match exists
+    const match = await prisma.match.findUnique({ where: { id: parseInt(matchId) } });
+    if (!match) return res.status(404).json({ error: 'Match not found' });
+
+    // Connect players to match
+    const updatedMatch = await prisma.match.update({
+      where: { id: parseInt(matchId) },
+      data: {
+        players: {
+          connect: playerIds.map((id) => ({ id })),
+        },
+      },
+      include: { players: true },
+    });
+
+    res.json({ message: '✅ Players assigned successfully', match: updatedMatch });
+  } catch (error) {
+    console.error('❌ Error assigning players:', error);
+    res.status(500).json({ error: 'Error assigning players', details: error.message });
+  }
+});
+
+/**
+ * Balance teams
+ */
 router.post('/:matchId/balance', async (req, res) => {
   const { matchId } = req.params;
   const { mode } = req.query; // pass ?mode=ratingBalanced for strict mode
 
   try {
     const match = await prisma.match.findUnique({
-      where: { id: matchId },
+      where: { id: parseInt(matchId) },
       include: { players: true },
     });
 
@@ -49,7 +107,7 @@ router.post('/:matchId/balance', async (req, res) => {
     if (mode === 'ratingBalanced') {
       result = ratingBalanced(match.players);
     } else {
-      result = teamBalancer(match.players); // your existing balancer
+      result = teamBalancer(match.players);
     }
 
     res.json({
