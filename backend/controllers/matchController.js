@@ -7,7 +7,7 @@ const { balanceTeams } = require('../utils/teamBalancer');
 const getMatches = async (req, res) => {
   try {
     const matches = await prisma.match.findMany({
-      include: { players: { include: { player: true } } }
+      include: { players: { include: { player: true } }, teams: true, ratings: true }
     });
     res.json(matches);
   } catch (error) {
@@ -76,10 +76,7 @@ const ratePlayer = async (req, res) => {
   const { playerId, score, comment } = req.body;
 
   try {
-    const rating = await prisma.rating.create({
-      data: { playerId, matchId, score, comment }
-    });
-
+    const rating = await prisma.rating.create({ data: { playerId, matchId, score, comment } });
     res.status(201).json(rating);
   } catch (error) {
     console.error('Error rating player:', error);
@@ -89,26 +86,16 @@ const ratePlayer = async (req, res) => {
 
 // POST /api/matches/:id/availability
 const setAvailability = async (req, res) => {
-  const matchId = parseInt(req.params.id);
-  const { isAvailable } = req.body;
-  const playerId = req.user.id; // assumes player is tied to user
+  const { matchDate, isAvailable, playerId } = req.body; // playerId must be provided
+
+  if (!playerId) return res.status(400).json({ error: 'playerId is required' });
 
   try {
     const availability = await prisma.availability.upsert({
-      where: {
-        playerId_matchDate: {
-          playerId,
-          matchDate: new Date(req.body.matchDate)
-        }
-      },
+      where: { playerId_matchDate: { playerId, matchDate: new Date(matchDate) } },
       update: { isAvailable },
-      create: {
-        playerId,
-        matchDate: new Date(req.body.matchDate),
-        isAvailable
-      }
+      create: { playerId, matchDate: new Date(matchDate), isAvailable }
     });
-
     res.json(availability);
   } catch (error) {
     console.error('Error setting availability:', error);
@@ -146,12 +133,4 @@ const getBalancedTeams = async (req, res) => {
   }
 };
 
-module.exports = {
-  getMatches,
-  createMatch,
-  updateMatch,
-  getMatchPlayers,
-  ratePlayer,
-  setAvailability,
-  getBalancedTeams
-};
+module.exports = { getMatches, createMatch, updateMatch, getMatchPlayers, ratePlayer, setAvailability, getBalancedTeams };
