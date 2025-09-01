@@ -13,9 +13,7 @@ const register = async (req, res) => {
   try {
     // Check if user already exists
     const existingUser = await prisma.user.findUnique({ where: { email } });
-    if (existingUser) {
-      return res.status(400).json({ error: 'User already exists with this email' });
-    }
+    if (existingUser) return res.status(400).json({ error: 'User already exists with this email' });
 
     const hashedPassword = await bcrypt.hash(password, 10);
 
@@ -32,7 +30,6 @@ const register = async (req, res) => {
       }
     });
 
-    // Generate JWT
     const token = jwt.sign({ id: user.id, email: user.email }, JWT_SECRET, { expiresIn: '7d' });
 
     res.status(201).json({ token, user });
@@ -67,7 +64,7 @@ const me = async (req, res) => {
   try {
     const user = await prisma.user.findUnique({
       where: { id: req.user.id },
-      include: { players: true }
+      include: { players: true, groups: true } // include groups as well
     });
     if (!user) return res.status(404).json({ error: 'User not found' });
 
@@ -78,8 +75,4 @@ const me = async (req, res) => {
   }
 };
 
-module.exports = {
-  register,
-  login,
-  me
-};
+module.exports = { register, login, me };
