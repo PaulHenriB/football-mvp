@@ -28,9 +28,7 @@ model User {
 
   // Relations
   players Player[]
-
-  // FIX: back relation to Group
-  groups Group[] @relation("UserGroups")
+  groups  Group[] @relation("UserGroups")
 }
 
 model Player {
@@ -46,9 +44,9 @@ model Player {
   availability Availability[]
   matches      PlayerMatch[]
   ratings      Rating[]
-  teams        Team[]
+  teams        Team[]       @relation("PlayerTeams")
 
-  // FIXED relation to User
+  // Relation to User (many players per user)
   userId Int?
   user   User? @relation(fields: [userId], references: [id])
 }
@@ -66,7 +64,7 @@ model Match {
   // Relations
   players PlayerMatch[]
   teams   Team[]
-  ratings Rating[] // FIX: back relation to Rating
+  ratings Rating[]
 }
 
 model PlayerMatch {
@@ -107,7 +105,7 @@ model Team {
 
   // Relations
   match  Match  @relation(fields: [matchId], references: [id])
-  player Player @relation(fields: [playerId], references: [id])
+  player Player @relation("PlayerTeams", fields: [playerId], references: [id])
 }
 
 model Rating {
