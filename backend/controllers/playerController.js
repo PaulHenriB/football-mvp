@@ -2,13 +2,15 @@
 const { PrismaClient } = require('@prisma/client');
 const prisma = new PrismaClient();
 
-// ✅ GET /api/players → List all players
+// GET /api/players → List all players
 const getPlayers = async (req, res) => {
   try {
     const players = await prisma.player.findMany({
       include: {
         availability: true,
-        matches: true
+        matches: true,
+        teams: true,
+        user: true
       }
     });
     res.json(players);
@@ -18,14 +20,11 @@ const getPlayers = async (req, res) => {
   }
 };
 
-// ✅ GET /api/players/available?date=YYYY-MM-DD
-// Return players who marked themselves available for a given date
+// GET /api/players/available?date=YYYY-MM-DD
 const getAvailablePlayers = async (req, res) => {
   try {
     const { date } = req.query;
-    if (!date) {
-      return res.status(400).json({ error: 'Match date is required (use ?date=YYYY-MM-DD)' });
-    }
+    if (!date) return res.status(400).json({ error: 'Match date is required (use ?date=YYYY-MM-DD)' });
 
     const matchDate = new Date(date);
 
@@ -39,10 +38,7 @@ const getAvailablePlayers = async (req, res) => {
       name: a.player.name,
       position: a.player.position,
       rating: a.player.rating,
-      availability: {
-        matchDate: a.matchDate,
-        isAvailable: a.isAvailable
-      }
+      availability: { matchDate: a.matchDate, isAvailable: a.isAvailable }
     }));
 
     res.json(availablePlayers);
@@ -52,14 +48,12 @@ const getAvailablePlayers = async (req, res) => {
   }
 };
 
-// ✅ POST /api/players → Create a new player
+// POST /api/players → Create a new player
 const createPlayer = async (req, res) => {
   const { name, email, position, rating, userId } = req.body;
 
   try {
-    const player = await prisma.player.create({
-      data: { name, email, position, rating, userId }
-    });
+    const player = await prisma.player.create({ data: { name, email, position, rating, userId } });
     res.status(201).json(player);
   } catch (error) {
     console.error('Error creating player:', error);
@@ -67,16 +61,13 @@ const createPlayer = async (req, res) => {
   }
 };
 
-// ✅ PUT /api/players/:id → Update player info
+// PUT /api/players/:id → Update player info
 const updatePlayer = async (req, res) => {
   const playerId = parseInt(req.params.id);
   const { name, email, position, rating } = req.body;
 
   try {
-    const player = await prisma.player.update({
-      where: { id: playerId },
-      data: { name, email, position, rating }
-    });
+    const player = await prisma.player.update({ where: { id: playerId }, data: { name, email, position, rating } });
     res.json(player);
   } catch (error) {
     console.error('Error updating player:', error);
@@ -84,7 +75,7 @@ const updatePlayer = async (req, res) => {
   }
 };
 
-// ✅ DELETE /api/players/:id → Remove player
+// DELETE /api/players/:id → Remove player
 const deletePlayer = async (req, res) => {
   const playerId = parseInt(req.params.id);
 
@@ -97,10 +88,4 @@ const deletePlayer = async (req, res) => {
   }
 };
 
-module.exports = {
-  getPlayers,
-  getAvailablePlayers,
-  createPlayer,
-  updatePlayer,
-  deletePlayer
-};
+module.exports = { getPlayers, getAvailablePlayers, createPlayer, updatePlayer, deletePlayer };
