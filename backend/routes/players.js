@@ -1,65 +1,27 @@
 // backend/routes/players.js
-const express = require("express");
+const express = require('express');
 const router = express.Router();
-const { PrismaClient } = require("@prisma/client");
+const {
+  getPlayers,
+  getAvailablePlayers,
+  createPlayer,
+  updatePlayer,
+  deletePlayer,
+} = require('../controllers/playerController');
 
-const prisma = new PrismaClient();
+// GET /api/players → list all players
+router.get('/', getPlayers);
 
-// ==========================
-// GET /players → list all players
-// ==========================
-router.get("/", async (req, res) => {
-  try {
-    const players = await prisma.player.findMany({
-      include: {
-        user: true,
-        matches: {
-          include: {
-            match: true,
-          },
-        },
-      },
-    });
-    res.json({
-      message: "✅ Players retrieved successfully",
-      players,
-    });
-  } catch (error) {
-    console.error("❌ Error retrieving players:", error);
-    res.status(500).json({ error: "Error retrieving players" });
-  }
-});
+// GET /api/players/available?date=YYYY-MM-DD
+router.get('/available', getAvailablePlayers);
 
-// ==========================
-// GET /players/:id → fetch one player profile
-// ==========================
-router.get("/:id", async (req, res) => {
-  const { id } = req.params;
-  try {
-    const player = await prisma.player.findUnique({
-      where: { id: parseInt(id) },
-      include: {
-        user: true,
-        matches: {
-          include: {
-            match: true,
-          },
-        },
-      },
-    });
+// POST /api/players → create a new player
+router.post('/', createPlayer);
 
-    if (!player) {
-      return res.status(404).json({ error: "Player not found" });
-    }
+// PUT /api/players/:id → update a player
+router.put('/:id', updatePlayer);
 
-    res.json({
-      message: "✅ Player profile retrieved successfully",
-      player,
-    });
-  } catch (error) {
-    console.error("❌ Error retrieving player:", error);
-    res.status(500).json({ error: "Error retrieving player" });
-  }
-});
+// DELETE /api/players/:id → delete a player
+router.delete('/:id', deletePlayer);
 
 module.exports = router;
