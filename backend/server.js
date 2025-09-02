@@ -11,6 +11,7 @@ const prisma = new PrismaClient();
 const authRoutes = require("./routes/auth");       // /auth/register, /auth/login
 const matchRoutes = require("./routes/matches");   // /matches/create, /matches/:id/join, etc.
 const playerRoutes = require("./routes/players"); // /players/:id
+const userRoutes = require("./routes/user"); 
 
 const app = express();
 
@@ -24,6 +25,7 @@ app.use(morgan("dev"));
 app.use("/auth", authRoutes);
 app.use("/matches", matchRoutes);
 app.use("/players", playerRoutes);
+app.use("/user", userRoutes); 
 
 // === Health Check ===
 app.get("/", (req, res) => {
