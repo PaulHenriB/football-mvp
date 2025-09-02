@@ -1,47 +1,29 @@
-// public/js/login.js
-import { request, API_ENDPOINTS } from './api.js';
-import { setToken, parseJwt } from './auth-helper.js';
+import { apiRequest, API_ENDPOINTS } from "./api.js";
+import { setToken } from "./auth-helper.js";
 
-const form = document.getElementById('login-form');
+document.addEventListener("DOMContentLoaded", () => {
+  const form = document.getElementById("login-form");
 
-if (form) {
-  form.addEventListener('submit', async (e) => {
+  form.addEventListener("submit", async (e) => {
     e.preventDefault();
-
-    const email = form.querySelector('input[name="email"]').value.trim();
-    const password = form.querySelector('input[name="password"]').value;
+    const email = document.getElementById("email").value.trim();
+    const password = document.getElementById("password").value.trim();
 
     try {
-      const data = await request(API_ENDPOINTS.AUTH_LOGIN, {
-        method: 'POST',
-        body: { email, password }
+      const response = await apiRequest(API_ENDPOINTS.LOGIN, {
+        method: "POST",
+        body: JSON.stringify({ email, password }),
       });
 
-      // Expect backend to return { token: '...' }
-      if (data?.token) {
-        setToken(data.token);
-        // optional: parse for user info
-        const payload = parseJwt(data.token);
-        // redirect to dashboard
-        window.location.href = '/dashboard.html';
+      if (response.token) {
+        setToken(response.token);
+        window.location.href = "dashboard.html";
       } else {
-        throw new Error('No token returned from server');
+        alert("Invalid login. Please try again.");
       }
     } catch (err) {
       console.error(err);
-      showMessage(err.message || 'Login failed', 'error');
+      alert("Error logging in. Please try again later.");
     }
   });
-}
-
-/** simple UI helper */
-function showMessage(text, type = 'info') {
-  let el = document.getElementById('login-msg');
-  if (!el) {
-    el = document.createElement('div');
-    el.id = 'login-msg';
-    document.body.prepend(el);
-  }
-  el.textContent = text;
-  el.className = type;
-}
+});
