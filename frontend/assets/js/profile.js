@@ -1,31 +1,14 @@
-// profile.js
+// js/profile.js
+import { request, API_ENDPOINTS } from './api.js';
 
-function toggleEdit() {
-    const form = document.getElementById('editForm');
-    form.style.display = form.style.display === 'none' ? 'block' : 'none';
+async function loadProfile() {
+  try {
+    const user = await request(API_ENDPOINTS.AUTH_ME);
+    document.getElementById('profile-name').textContent = user.name || user.email;
+    // fill other profile fields...
+  } catch (err) {
+    console.error('Failed to load profile', err);
   }
-  
-  function saveProfile() {
-    const nameInput = document.getElementById('nameInput').value;
-    const positionInput = document.getElementById('positionInput').value;
-    const avatarInput = document.getElementById('avatarInput').files[0];
-  
-    if (nameInput) {
-      document.getElementById('userName').textContent = nameInput;
-    }
-  
-    if (positionInput) {
-      document.getElementById('favPosition').textContent = positionInput;
-    }
-  
-    if (avatarInput) {
-      const reader = new FileReader();
-      reader.onload = function (e) {
-        document.getElementById('avatarPreview').src = e.target.result;
-      };
-      reader.readAsDataURL(avatarInput);
-    }
-  
-    toggleEdit();
-  }
-  
+}
+
+document.addEventListener('DOMContentLoaded', loadProfile);
