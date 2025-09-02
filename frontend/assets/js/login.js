@@ -1,40 +1,47 @@
-document.addEventListener("DOMContentLoaded", () => {
-    const loginForm = document.getElementById("login-form");
-    const successMessage = document.getElementById("success-message");
+// public/js/login.js
+import { request, API_ENDPOINTS } from './api.js';
+import { setToken, parseJwt } from './auth-helper.js';
 
-    loginForm.addEventListener("submit", function (event) {
-        event.preventDefault(); // Prevent default form submission
+const form = document.getElementById('login-form');
 
-        let isValid = true;
-        const email = document.getElementById("email").value.trim();
-        const password = document.getElementById("password").value.trim();
-        const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+if (form) {
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
 
-        // Clear previous error messages
-        document.querySelectorAll(".error").forEach(error => error.style.display = "none");
+    const email = form.querySelector('input[name="email"]').value.trim();
+    const password = form.querySelector('input[name="password"]').value;
 
-        if (!emailPattern.test(email)) {
-            displayError("email-error", "Enter a valid email address.");
-            isValid = false;
-        }
-        if (password.length < 6) {
-            displayError("password-error", "Password must be at least 6 characters.");
-            isValid = false;
-        }
+    try {
+      const data = await request(API_ENDPOINTS.AUTH_LOGIN, {
+        method: 'POST',
+        body: { email, password }
+      });
 
-        if (isValid) {
-            // Simulate login process (Replace this with actual authentication)
-            successMessage.style.display = "block";
-            successMessage.textContent = "Login successful!";
-            setTimeout(() => {
-                window.location.href = "dashboard.html"; // Redirect to dashboard
-            }, 2000);
-        }
-    });
-
-    function displayError(id, message) {
-        const errorElement = document.getElementById(id);
-        errorElement.textContent = message;
-        errorElement.style.display = "block";
+      // Expect backend to return { token: '...' }
+      if (data?.token) {
+        setToken(data.token);
+        // optional: parse for user info
+        const payload = parseJwt(data.token);
+        // redirect to dashboard
+        window.location.href = '/dashboard.html';
+      } else {
+        throw new Error('No token returned from server');
+      }
+    } catch (err) {
+      console.error(err);
+      showMessage(err.message || 'Login failed', 'error');
     }
-});
+  });
+}
+
+/** simple UI helper */
+function showMessage(text, type = 'info') {
+  let el = document.getElementById('login-msg');
+  if (!el) {
+    el = document.createElement('div');
+    el.id = 'login-msg';
+    document.body.prepend(el);
+  }
+  el.textContent = text;
+  el.className = type;
+}
