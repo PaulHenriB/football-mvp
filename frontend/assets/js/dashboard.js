@@ -1,30 +1,17 @@
-// public/js/dashboard.js
-import { request, API_ENDPOINTS } from './api.js';
+import { enforceAuth } from "./auth-guard.js";
+import { apiRequest, API_ENDPOINTS } from "./api.js";
 
-async function load() {
+document.addEventListener("DOMContentLoaded", async () => {
+  await enforceAuth();
+
+  const container = document.getElementById("dashboard");
+
   try {
-    const matches = await request(API_ENDPOINTS.MATCHES_LIST);
-    // matches expected to be an array
-    const container = document.getElementById('upcoming-matches');
-    if (container) {
-      container.innerHTML = matches.length
-        ? matches.map(m => renderMatchCard(m)).join('')
-        : '<p>No upcoming matches</p>';
-    }
+    const user = await apiRequest(API_ENDPOINTS.ME, { method: "GET" });
+    container.innerHTML = `<h2>Welcome, ${user.name}</h2>
+      <p>Email: ${user.email}</p>`;
   } catch (err) {
-    console.error('Failed to load dashboard data', err);
+    console.error("Error loading dashboard:", err);
+    container.innerHTML = "<p>Error loading dashboard.</p>";
   }
-}
-
-function renderMatchCard(m) {
-  // adapt fields to your match model
-  return `
-    <div class="card match">
-      <h3>${new Date(m.date).toLocaleString()}</h3>
-      <p>${m.location || ''}</p>
-      <a href="/matchdetails.html?id=${m.id}">Details</a>
-    </div>
-  `;
-}
-
-document.addEventListener('DOMContentLoaded', load);
+});
