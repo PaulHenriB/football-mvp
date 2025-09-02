@@ -1,51 +1,48 @@
-document.addEventListener("DOMContentLoaded", () => {
-    const signUpForm = document.getElementById("signup-form");
-    const successMessage = document.getElementById("success-message");
+// public/js/signup.js
+import { request, API_ENDPOINTS } from './api.js';
+import { setToken } from './auth-helper.js';
 
-    signUpForm.addEventListener("submit", function (event) {
-        event.preventDefault(); // Prevent form submission
+const form = document.getElementById('signup-form');
 
-        let isValid = true;
-        const name = document.getElementById("name").value.trim();
-        const email = document.getElementById("email").value.trim();
-        const password = document.getElementById("password").value.trim();
-        const confirmPassword = document.getElementById("confirm-password").value.trim();
+if (form) {
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
 
-        const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    const formData = new FormData(form);
+    // convert formData to object
+    const body = {};
+    for (const [k, v] of formData.entries()) body[k] = v;
 
-        // Clear previous error messages
-        document.querySelectorAll(".error").forEach(error => error.style.display = "none");
+    try {
+      const data = await request(API_ENDPOINTS.AUTH_REGISTER, {
+        method: 'POST',
+        body
+      });
 
-        if (name === "") {
-            displayError("name-error", "Name is required.");
-            isValid = false;
-        }
-        if (!emailPattern.test(email)) {
-            displayError("email-error", "Enter a valid email address.");
-            isValid = false;
-        }
-        if (password.length < 6) {
-            displayError("password-error", "Password must be at least 6 characters long.");
-            isValid = false;
-        }
-        if (password !== confirmPassword) {
-            displayError("confirm-password-error", "Passwords do not match.");
-            isValid = false;
-        }
+      // If backend returns token on registration, save and redirect
+      if (data?.token) {
+        setToken(data.token);
+        window.location.href = '/dashboard.html';
+        return;
+      }
 
-        if (isValid) {
-            // Simulate sign-up process (Replace this with backend integration)
-            successMessage.style.display = "block";
-            successMessage.textContent = "Sign-up successful!";
-            setTimeout(() => {
-                window.location.href = "login.html"; // Redirect to login page
-            }, 2000);
-        }
-    });
-
-    function displayError(id, message) {
-        const errorElement = document.getElementById(id);
-        errorElement.textContent = message;
-        errorElement.style.display = "block";
+      showMessage('Account created. Please login.', 'success');
+      // optionally redirect after a delay:
+      // setTimeout(() => window.location.href = '/login.html', 1200);
+    } catch (err) {
+      console.error(err);
+      showMessage(err.body?.message || err.message || 'Registration failed', 'error');
     }
-});
+  });
+}
+
+function showMessage(text, type = 'info') {
+  let el = document.getElementById('signup-msg');
+  if (!el) {
+    el = document.createElement('div');
+    el.id = 'signup-msg';
+    document.body.prepend(el);
+  }
+  el.textContent = text;
+  el.className = type;
+}
