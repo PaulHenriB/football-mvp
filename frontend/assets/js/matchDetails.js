@@ -1,39 +1,24 @@
-document.addEventListener("DOMContentLoaded", () => {
-    // Handle rating changes
-    const ratingSelects = document.querySelectorAll(".rating-select");
-  
-    ratingSelects.forEach(select => {
-      select.addEventListener("change", (event) => {
-        const playerId = event.target.dataset.playerId;
-        const ratingValue = event.target.value;
-  
-        if (ratingValue) {
-          updatePlayerRating(playerId, ratingValue);
-        }
-      });
-    });
-  
-    // Handle match status update
-    const matchStatus = document.getElementById("match-status");
-    const updateStatusBtn = document.getElementById("update-status-btn");
-  
-    if (updateStatusBtn) {
-      updateStatusBtn.addEventListener("click", () => {
-        const newStatus = prompt("Enter new match status (e.g., Scheduled, In Progress, Completed):");
-        if (newStatus) {
-          matchStatus.textContent = newStatus;
-          // Later: Send to backend to update in database
-        }
-      });
-    }
-  
-    // Simulated rating update (local display only)
-    function updatePlayerRating(playerId, ratingValue) {
-      const ratingDisplay = document.getElementById(`player-rating-${playerId}`);
-      if (ratingDisplay) {
-        ratingDisplay.textContent = `Rating: ${ratingValue}/5`;
-      }
-      // Later: Send to backend to persist rating
-    }
-  });
+// asset/js/matchdetails.js
+import { request, API_ENDPOINTS } from './api.js';
+
+function getQueryParam(name) {
+  return new URLSearchParams(window.location.search).get(name);
+}
+
+async function loadDetails() {
+  const id = getQueryParam('id');
+  if (!id) return;
+
+  try {
+    const match = await request(API_ENDPOINTS.MATCH_DETAILS(id));
+    document.getElementById('match-title').textContent = `Match on ${new Date(match.date).toLocaleString()}`;
+    // populate other fields...
+  } catch (err) {
+    console.error(err);
+    document.getElementById('match-title').textContent = 'Failed to load match';
+  }
+}
+
+document.addEventListener('DOMContentLoaded', loadDetails);
+
   
