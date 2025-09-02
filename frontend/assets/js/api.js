@@ -1,54 +1,23 @@
-// public/js/api.js
-import { getToken, removeToken } from './auth-helper.js';
+// asset/js/api.js
+
+const API_BASE_URL = "http://localhost:5000/api"; // adjust if backend runs elsewhere
 
 export const API_ENDPOINTS = {
-  // -- Replace these defaults with your actual backend endpoints --
-  AUTH_LOGIN: '/auth/login',
-  AUTH_REGISTER: '/auth/register',
-  AUTH_ME: '/auth/me',
-  MATCHES_LIST: '/matches',                // GET
-  MATCH_CREATE: '/matches/create',         // POST
-  MATCH_DETAILS: (id) => `/matches/${id}`, // GET
-  PLAYER_PROFILE: (id) => `/players/${id}`,
-  // add other endpoints here...
+  // === AUTH / USERS ===
+  REGISTER: `${API_BASE_URL}/users/register`,
+  LOGIN: `${API_BASE_URL}/users/login`,
+  ME: `${API_BASE_URL}/users/me`,
+
+  // === MATCHES ===
+  MATCHES: `${API_BASE_URL}/matches`,              // GET all, POST create
+  MATCH_BY_ID: (id) => `${API_BASE_URL}/matches/${id}`, // PUT update
+  MATCH_PLAYERS: (id) => `${API_BASE_URL}/matches/${id}/players`,
+  MATCH_RATE_PLAYER: (id) => `${API_BASE_URL}/matches/${id}/rate`,
+  MATCH_AVAILABILITY: (id) => `${API_BASE_URL}/matches/${id}/availability`,
+  MATCH_TEAMS: (id) => `${API_BASE_URL}/matches/${id}/teams`,
+
+  // === PLAYERS ===
+  PLAYERS: `${API_BASE_URL}/players`,              // GET all, POST create
+  PLAYER_BY_ID: (id) => `${API_BASE_URL}/players/${id}`, // PUT update, DELETE remove
+  AVAILABLE_PLAYERS: (date) => `${API_BASE_URL}/players/available?date=${date}`,
 };
-
-/**
- * Generic fetch wrapper that adds Authorization header when a token is present,
- * handles JSON parsing, and basic error handling (401 -> remove token).
- */
-export async function request(path, opts = {}) {
-  const token = getToken();
-  const headers = opts.headers ? { ...opts.headers } : {};
-
-  // Set JSON headers by default for body sending
-  if (opts.body && !(opts.body instanceof FormData)) {
-    headers['Content-Type'] = 'application/json';
-    if (typeof opts.body !== 'string') opts.body = JSON.stringify(opts.body);
-  }
-
-  if (token) headers['Authorization'] = `Bearer ${token}`;
-
-  const res = await fetch(path, { ...opts, headers, credentials: 'same-origin' });
-
-  // Logout on 401
-  if (res.status === 401) {
-    removeToken();
-    // optional: redirect to login page if desired
-    // window.location = '/login.html';
-    throw new Error('Unauthorized (401)');
-  }
-
-  // Try parse JSON, but some endpoints may return empty 204
-  const text = await res.text();
-  const data = text ? JSON.parse(text) : null;
-
-  if (!res.ok) {
-    const err = new Error(data?.message || res.statusText || 'API Error');
-    err.status = res.status;
-    err.body = data;
-    throw err;
-  }
-
-  return data;
-}
