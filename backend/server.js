@@ -1,4 +1,3 @@
-// backend/server.js
 const express = require("express");
 const cors = require("cors");
 const morgan = require("morgan");
@@ -8,10 +7,9 @@ const { PrismaClient } = require("@prisma/client");
 const prisma = new PrismaClient();
 
 // Import routes
-const authRoutes = require("./routes/auth");       // /auth/register, /auth/login
-const matchRoutes = require("./routes/matches");   // /matches/create, /matches/:id/join, etc.
-const playerRoutes = require("./routes/players"); // /players/:id
-const userRoutes = require("./routes/user"); 
+const userRoutes = require("./routes/userRoutes");   // Handles register, login, /me
+const matchRoutes = require("./routes/matches");     // /matches/create, /matches/:id/join, etc.
+const playerRoutes = require("./routes/players");   // /players/:id
 
 const app = express();
 
@@ -21,11 +19,9 @@ app.use(express.json());
 app.use(morgan("dev"));
 
 // === Routes ===
-// You can add "/api" as a prefix if you want → app.use("/api/auth", authRoutes);
-app.use("/auth", authRoutes);
+app.use("/users", userRoutes);   // register, login, /me
 app.use("/matches", matchRoutes);
 app.use("/players", playerRoutes);
-app.use("/user", userRoutes); 
 
 // === Health Check ===
 app.get("/", (req, res) => {
