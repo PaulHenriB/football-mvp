@@ -7,7 +7,7 @@ const { PrismaClient } = require("@prisma/client");
 const prisma = new PrismaClient();
 
 // Import routes
-const userRoutes = require("./routes/userRoutes");   // Handles register, login, /me
+const userRoutes = require("./routes/user");   // Handles register, login, /me
 const matchRoutes = require("./routes/matches");     // /matches/create, /matches/:id/join, etc.
 const playerRoutes = require("./routes/players");   // /players/:id
 
@@ -19,7 +19,7 @@ app.use(express.json());
 app.use(morgan("dev"));
 
 // === Routes ===
-app.use("/users", userRoutes);   // register, login, /me
+app.use("/user", userRoutes);   // register, login, /me
 app.use("/matches", matchRoutes);
 app.use("/players", playerRoutes);
 
