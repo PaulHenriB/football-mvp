@@ -1,17 +1,18 @@
-// asset/js/matches.js
-import { request, API_ENDPOINTS } from './api.js';
+import { enforceAuth } from "./auth-guard.js";
+import { apiRequest, API_ENDPOINTS } from "./api.js";
 
-async function loadMatches() {
+document.addEventListener("DOMContentLoaded", async () => {
+  await enforceAuth();
+
+  const container = document.getElementById("matches-list");
+
   try {
-    const matches = await request(API_ENDPOINTS.MATCHES_LIST);
-    const list = document.getElementById('matches-list');
-    list.innerHTML = matches.length
-      ? matches.map(m => `<li><a href="/matchdetails.html?id=${m.id}">${new Date(m.date).toLocaleString()} - ${m.location}</a></li>`).join('')
-      : '<li>No matches</li>';
+    const matches = await apiRequest(API_ENDPOINTS.MATCHES, { method: "GET" });
+    container.innerHTML = matches.map(
+      m => `<li><a href="matchdetails.html?id=${m.id}">${m.name} (${m.date})</a></li>`
+    ).join("");
   } catch (err) {
-    console.error(err);
-    document.getElementById('matches-list').innerHTML = '<li>Error loading matches</li>';
+    console.error("Error loading matches:", err);
+    container.innerHTML = "<p>Error loading matches.</p>";
   }
-}
-
-document.addEventListener('DOMContentLoaded', loadMatches);
+});
