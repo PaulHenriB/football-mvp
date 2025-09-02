@@ -1,21 +1,17 @@
-// matches.js
+// asset/js/matches.js
+import { request, API_ENDPOINTS } from './api.js';
 
-document.addEventListener("DOMContentLoaded", function () {
-    const filter = document.getElementById("matchFilter");
-    const allSections = document.querySelectorAll(".match-section");
-  
-    filter.addEventListener("change", () => {
-      const selected = filter.value;
-  
-      allSections.forEach(section => {
-        if (selected === "all") {
-          section.style.display = "block";
-        } else if (section.classList.contains(selected)) {
-          section.style.display = "block";
-        } else {
-          section.style.display = "none";
-        }
-      });
-    });
-  });
-  
+async function loadMatches() {
+  try {
+    const matches = await request(API_ENDPOINTS.MATCHES_LIST);
+    const list = document.getElementById('matches-list');
+    list.innerHTML = matches.length
+      ? matches.map(m => `<li><a href="/matchdetails.html?id=${m.id}">${new Date(m.date).toLocaleString()} - ${m.location}</a></li>`).join('')
+      : '<li>No matches</li>';
+  } catch (err) {
+    console.error(err);
+    document.getElementById('matches-list').innerHTML = '<li>Error loading matches</li>';
+  }
+}
+
+document.addEventListener('DOMContentLoaded', loadMatches);
