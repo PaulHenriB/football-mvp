@@ -1,48 +1,32 @@
-// public/js/signup.js
-import { request, API_ENDPOINTS } from './api.js';
-import { setToken } from './auth-helper.js';
+import { apiRequest, API_ENDPOINTS } from "./api.js";
+import { setToken } from "./auth-helper.js";
 
-const form = document.getElementById('signup-form');
+document.addEventListener("DOMContentLoaded", () => {
+  const form = document.getElementById("signup-form");
 
-if (form) {
-  form.addEventListener('submit', async (e) => {
+  form.addEventListener("submit", async (e) => {
     e.preventDefault();
 
-    const formData = new FormData(form);
-    // convert formData to object
-    const body = {};
-    for (const [k, v] of formData.entries()) body[k] = v;
+    const name = document.getElementById("name").value.trim();
+    const email = document.getElementById("email").value.trim();
+    const password = document.getElementById("password").value.trim();
 
     try {
-      const data = await request(API_ENDPOINTS.AUTH_REGISTER, {
-        method: 'POST',
-        body
+      const response = await apiRequest(API_ENDPOINTS.REGISTER, {
+        method: "POST",
+        body: JSON.stringify({ name, email, password }),
       });
 
-      // If backend returns token on registration, save and redirect
-      if (data?.token) {
-        setToken(data.token);
-        window.location.href = '/dashboard.html';
-        return;
+      if (response.token) {
+        setToken(response.token);
+        window.location.href = "dashboard.html";
+      } else {
+        alert("Signup failed. Try again.");
       }
-
-      showMessage('Account created. Please login.', 'success');
-      // optionally redirect after a delay:
-      // setTimeout(() => window.location.href = '/login.html', 1200);
     } catch (err) {
       console.error(err);
-      showMessage(err.body?.message || err.message || 'Registration failed', 'error');
+      alert("Error signing up. Please try again later.");
     }
   });
-}
+});
 
-function showMessage(text, type = 'info') {
-  let el = document.getElementById('signup-msg');
-  if (!el) {
-    el = document.createElement('div');
-    el.id = 'signup-msg';
-    document.body.prepend(el);
-  }
-  el.textContent = text;
-  el.className = type;
-}
