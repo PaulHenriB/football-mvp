@@ -18,10 +18,15 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   try {
     const match = await apiRequest(API_ENDPOINTS.MATCH_BY_ID(id), { method: "GET" });
+
     container.innerHTML = `
       <h2>${match.name}</h2>
-      <p>Date: ${match.date}</p>
-      <p>Location: ${match.location}</p>
+      <p><strong>Date:</strong> ${match.date}</p>
+      <p><strong>Time:</strong> ${match.time || "TBD"}</p>
+      <p><strong>Venue:</strong> ${match.venue || "TBD"}</p>
+      <p><strong>Team A:</strong> ${match.teamA?.join(", ") || "TBD"}</p>
+      <p><strong>Team B:</strong> ${match.teamB?.join(", ") || "TBD"}</p>
+      ${match.result ? `<p><strong>Result:</strong> ${match.result}</p>` : ""}
     `;
   } catch (err) {
     console.error("Error loading match details:", err);
@@ -29,4 +34,3 @@ document.addEventListener("DOMContentLoaded", async () => {
   }
 });
 
-  
