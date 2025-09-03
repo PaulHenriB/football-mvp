@@ -1,109 +1,44 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Match Details | NextPlay</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-</head>
-<body class="bg-gray-100 text-gray-800 font-sans">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Match Details</title>
+  <link rel="stylesheet" href="matchdetails.css">
 
-  <!-- Navbar -->
-  <header class="bg-white shadow">
-    <nav class="container mx-auto px-4 py-4 flex justify-between items-center">
-      <div class="text-xl font-bold text-blue-800">NextPlay</div>
-      <ul class="flex space-x-6 text-sm font-medium">
-        <li><a href="index.html" class="hover:text-blue-600">Home</a></li>
-        <li><a href="dashboard.html" class="hover:text-blue-600">Dashboard</a></li>
-        <li><a href="matches.html" class="hover:text-blue-600">Matches</a></li>
-        <li><a href="profile.html" class="hover:text-blue-600">Profile</a></li>
-        <li><a href="login.html" class="hover:text-blue-600">Login</a></li>
-        <li><a href="signup.html" class="hover:text-blue-600">Sign Up</a></li>
+  <!-- Base API config -->
+  <script>
+    window.__API_BASE__ = 'http://localhost:3001/';
+  </script>
+
+  <!-- Global helpers -->
+  <script src="/js/api.js" defer></script>
+  <script src="/js/auth.js" defer></script>
+  <script src="/js/matchdetails.js" defer></script>
+</head>
+<body>
+  <header>
+    <h1>Weplay</h1>
+    <nav>
+      <ul>
+        <li><a href="index.html">home</a></li>
+        <li><a href="matches.html">Matches</a></li>
+        <li><a href="profile.html">Profile</a></li>
+        <li><a href="login.html">Logout</a></li>
       </ul>
     </nav>
   </header>
 
-  <!-- Match Details Section -->
-  <main class="container mx-auto px-4 py-10">
-    <section class="bg-white p-6 rounded-lg shadow-lg">
-      <h1 class="text-2xl font-bold mb-6 text-gray-900">Match Details</h1>
-
-      <!-- Match Info -->
-      <div class="mb-6">
-        <p><strong>Date:</strong> <span id="match-date">March 30, 2025</span></p>
-        <p><strong>Time:</strong> <span id="match-time">18:00</span></p>
-        <p><strong>Location:</strong> <span id="match-location">City Arena</span></p>
-        <p><strong>Status:</strong> <span id="match-status">Upcoming</span></p>
-        <button id="update-status-btn" class="mt-2 text-sm text-white bg-blue-600 hover:bg-blue-700 px-3 py-1 rounded">
-          Update Status
-        </button>
-      </div>
-
-      <!-- Teams Section -->
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-        <div class="bg-gray-50 p-4 rounded-lg">
-          <h2 class="text-lg font-semibold mb-2">Team A</h2>
-          <ul id="team-a-list" class="list-disc list-inside">
-            <li>Player 1</li>
-            <li>Player 2</li>
-            <li>Player 3</li>
-          </ul>
-        </div>
-        <div class="bg-gray-50 p-4 rounded-lg">
-          <h2 class="text-lg font-semibold mb-2">Team B</h2>
-          <ul id="team-b-list" class="list-disc list-inside">
-            <li>Player 4</li>
-            <li>Player 5</li>
-            <li>Player 6</li>
-          </ul>
-        </div>
-      </div>
-
-      <!-- Player Ratings -->
-      <div class="bg-gray-50 p-4 rounded-lg">
-        <h2 class="text-lg font-semibold mb-4">Rate Players</h2>
-        <ul id="ratings-list" class="space-y-4">
-          <li>
-            <span>Player 1:</span>
-            <select class="rating-select border rounded px-2 py-1" data-player-id="1">
-              <option value="">Rate</option>
-              <option value="1">1</option>
-              <option value="2">2</option>
-              <option value="3">3</option>
-              <option value="4">4</option>
-              <option value="5">5</option>
-            </select>
-            <span id="player-rating-1" class="ml-2 text-sm text-gray-600">Rating: Not rated</span>
-          </li>
-          <li>
-            <span>Player 2:</span>
-            <select class="rating-select border rounded px-2 py-1" data-player-id="2">
-              <option value="">Rate</option>
-              <option value="1">1</option>
-              <option value="2">2</option>
-              <option value="3">3</option>
-              <option value="4">4</option>
-              <option value="5">5</option>
-            </select>
-            <span id="player-rating-2" class="ml-2 text-sm text-gray-600">Rating: Not rated</span>
-          </li>
-          <li>
-            <span>Player 3:</span>
-            <select class="rating-select border rounded px-2 py-1" data-player-id="3">
-              <option value="">Rate</option>
-              <option value="1">1</option>
-              <option value="2">2</option>
-              <option value="3">3</option>
-              <option value="4">4</option>
-              <option value="5">5</option>
-            </select>
-            <span id="player-rating-3" class="ml-2 text-sm text-gray-600">Rating: Not rated</span>
-          </li>
-        </ul>
-      </div>
-    </section>
+  <main class="container">
+    <h2>Match Details</h2>
+    <div id="match-details">
+      <!-- JS will render match details here -->
+    </div>
   </main>
 
-  <script src="js/matchDetails.js"></script>
+  <footer>
+    <p>&copy; 2025 Weplay. All Rights reserved.</p>
+  </footer>
 </body>
 </html>
+
