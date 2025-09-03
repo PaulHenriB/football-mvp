@@ -1,61 +1,45 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login - NextPlay</title>
-    <link rel="stylesheet" href="styles.css">
-    <link rel="stylesheet" href="login.css">
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600&display=swap" rel="stylesheet">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login</title>
+  <link rel="stylesheet" href="login.css">
+
+  <!-- Base API config -->
+  <script>
+    window.__API_BASE__ = 'http://localhost:3001/';
+  </script>
+
+  <!-- Global helpers -->
+  <script src="/js/api.js" defer></script>
+  <script src="/js/auth.js" defer></script>
+  <script src="/js/login.js" defer></script>
 </head>
-
 <body>
-    <!-- Navigation Bar -->
-    <nav>
-        <ul>
-            <li><a href="index.html">Home</a></li>
-            <li><a href="manager.html">Manager</a></li>
-            <li><a href="matches.html">Matches</a></li>
-            <li><a href="profile.html">Profile</a></li>
-            <li><a href="login.html">Login</a></li>
-            <li><a href="signup.html">Sign Up</a></li>
-        </ul>
-    </nav>
-
-    <!-- Login Form -->
-    <div class="container">
-        <h2>Login</h2>
-        <form id="login-form">
-            <div class="input-group">
-                <label for="email">Email</label>
-                <input type="email" id="email" placeholder="Enter your email">
-                <p class="error" id="email-error"></p>
-            </div>
-            <div class="input-group">
-                <label for="password">Password</label>
-                <input type="password" id="password" placeholder="Enter your password">
-                <p class="error" id="password-error"></p>
-            </div>
-            <button type="submit">Login</button>
-            <p class="success" id="success-message"></p>
-            <p class="register-link">Don't have an account? <a href="signup.html">Sign Up</a></p>
-        </form>
-    </div>
-
-    <!-- Footer Section -->
-    <footer>
-        <p>&copy; 2025 NextPlay. All Rights Reserved.</p>
-    </footer>
-
+  <div class="container">
+    <h1>Weplay</h1>
+    <h2>Login</h2>
     <form id="login-form">
-  <input name="email" type="email" required />
-  <input name="password" type="password" required />
-  <button type="submit">Login</button>
-</form>
-<script type="module" src="/public/js/login.js"></script>
-    <!-- JS for Login Form -->
-    <script src="login.js"></script>
-</body>
+      <div class="input-group">
+        <label for="email">Email</label>
+        <input type="email" id="email" placeholder="Enter your email" required>
+        <p class="error" id="email-error"></p>
+      </div>
+      <div class="input-group">
+        <label for="password">Password</label>
+        <input type="password" id="password" placeholder="Enter your password" required>
+        <p class="error" id="password-error"></p>
+      </div>
+      <button type="submit">Login</button>
+      <p class="success" id="success-message"></p>
+      <p class="register-link">Don't have an account? <a href="signup.html">Sign Up</a></p>
+    </form>
+  </div>
 
+  <footer>
+    <p>&copy; 2025 Weplay. All Rights reserved.</p>
+  </footer>
+</body>
 </html>
+
