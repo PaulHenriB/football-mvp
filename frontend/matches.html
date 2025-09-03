@@ -1,71 +1,54 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Matches | NextPlay</title>
-  <link rel="stylesheet" href="css/matches.css" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Matches</title>
+  <link rel="stylesheet" href="matches.css">
+
+  <!-- Base API config -->
+  <script>
+    window.__API_BASE__ = 'http://localhost:3001/';
+  </script>
+
+  <!-- Global helpers -->
+  <script src="/js/api.js" defer></script>
+  <script src="/js/auth.js" defer></script>
+  <script src="/js/matches.js" defer></script>
 </head>
 <body>
-  <nav class="navbar">
-    <div class="logo">NextPlay</div>
-    <ul class="nav-links">
-      <li><a href="index.html">Home</a></li>
-      <li><a href="dashboard.html">Dashboard</a></li>
-      <li><a href="profile.html">Profile</a></li>
-      <li><a href="matches.html" class="active">Matches</a></li>
-      <li><a href="login.html">Login</a></li>
-      <li><a href="signup.html">Sign Up</a></li>
-    </ul>
-  </nav>
-
-  <header class="matches-header">
-    <h1>All Matches</h1>
-    <button class="cta-button" aria-label="Create or Join a Match">Create / Join a Match</button>
+  <header>
+    <h1>Weplay</h1>
+    <nav>
+      <ul>
+        <li><a href="index.html">home</a></li>
+        <li><a href="matches.html">Matches</a></li>
+        <li><a href="profile.html">Profile</a></li>
+        <li><a href="login.html">Logout</a></li>
+      </ul>
+    </nav>
   </header>
 
-  <main class="matches-container" role="main">
-    <!-- Filter Options -->
-    <section class="filter-options" aria-label="Filter Matches">
-      <label for="match-filter">Filter By:</label>
-      <select id="match-filter" name="match-filter">
+  <main class="container">
+    <h2>Matches</h2>
+
+    <!-- Filter Section -->
+    <div class="filter-container">
+      <label for="match-filter">Show:</label>
+      <select id="match-filter">
         <option value="upcoming">Upcoming Matches</option>
         <option value="past">Past Matches</option>
-        <option value="team">Team</option>
-        <option value="location">Location</option>
       </select>
-    </section>
+    </div>
 
-    <!-- Match Listings -->
-    <section class="match-list">
-      <!-- Upcoming -->
-      <article class="match-section">
-        <h2>Upcoming Matches</h2>
-        <div class="match-card upcoming">
-          <p><strong>Match:</strong> Team A vs Team B</p>
-          <p><strong>Date:</strong> March 30, 2025</p>
-          <p><strong>Time:</strong> 18:00</p>
-          <p><strong>Venue:</strong> Stadium X</p>
-          <button class="join-button" aria-label="Join match Team A vs Team B">Join</button>
-        </div>
-      </article>
-
-      <!-- Past -->
-      <article class="match-section">
-        <h2>Past Matches</h2>
-        <div class="match-card past">
-          <p><strong>Match:</strong> Team C vs Team D</p>
-          <p><strong>Date:</strong> March 20, 2025</p>
-          <p><strong>Result:</strong> Team C won 2–1</p>
-          <button class="view-button" aria-label="View details for Team C vs Team D">View Details</button>
-        </div>
-      </article>
-    </section>
-
-    <!-- Optional MatchForm React Mount Placeholder -->
-    <!-- <div id="match-form-root"></div> -->
+    <!-- Matches List -->
+    <div id="matches-list">
+      <!-- JS will render upcoming and past matches here -->
+    </div>
   </main>
 
-<script src="matches.js"></script>
+  <footer>
+    <p>&copy; 2025 Weplay. All Rights reserved.</p>
+  </footer>
 </body>
 </html>
