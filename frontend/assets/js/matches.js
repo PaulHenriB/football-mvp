@@ -4,51 +4,144 @@ import { apiRequest, API_ENDPOINTS } from "./api.js";
 document.addEventListener("DOMContentLoaded", async () => {
   await enforceAuth();
 
-  const container = document.getElementById("matches-list");
-  const filterSelect = document.getElementById("match-filter");
+  setupTabs();
 
-  const loadMatches = async (filter) => {
-    try {
-      const matches = await apiRequest(API_ENDPOINTS.MATCHES, { method: "GET" });
-      const now = new Date();
-
-      const filtered = matches.filter(m => {
-        const matchDate = new Date(m.date);
-        return filter === "upcoming" ? matchDate >= now : matchDate < now;
-      });
-
-      container.innerHTML = filtered.map(m => {
-        if (filter === "upcoming") {
-          return `
-            <div class="match upcoming">
-              <p><strong>Date:</strong> ${m.date}</p>
-              <p><strong>Time:</strong> ${m.time || "TBD"}</p>
-              <p><strong>Team:</strong> ${m.userTeam || "TBD"}</p>
-              <p><strong>Venue:</strong> ${m.venue || "TBD"}</p>
-              <a href="matchdetails.html?id=${m.id}">View Details</a>
-            </div>
-          `;
-        } else {
-          return `
-            <div class="match past">
-              <p><strong>Date:</strong> ${m.date}</p>
-              <p><strong>Team:</strong> ${m.userTeam || "TBD"}</p>
-              <p><strong>Result:</strong> ${m.result || "TBD"}</p>
-              <a href="matchdetails.html?id=${m.id}">View Details</a>
-            </div>
-          `;
-        }
-      }).join("");
-
-    } catch (err) {
-      console.error("Error loading matches:", err);
-      container.innerHTML = "<p>Error loading matches.</p>";
-    }
-  };
-
-  // Initial load
-  loadMatches(filterSelect.value);
-
-  // Update on filter change
-  filterSelect.addEventListener('change', () => loadMatches(filterSelect.value));
+  // Fetch matches
+  await loadUpcomingMatches();
+  await loadPastMatches();
+  await loadOpenMatches();
 });
+
+/**
+ * Setup tab switching
+ */
+function setupTabs() {
+  const tabBtns = document.querySelectorAll(".tab-btn");
+  const tabContents = document.querySelectorAll(".tab-content");
+
+  tabBtns.forEach((btn) => {
+    btn.addEventListener("click", () => {
+      tabBtns.forEach((b) => b.classList.remove("active"));
+      btn.classList.add("active");
+
+      tabContents.forEach((tc) => tc.classList.remove("active"));
+      document.getElementById(`tab-${btn.dataset.tab}`).classList.add("active");
+    });
+  });
+}
+
+/**
+ * Load Upcoming Matches
+ */
+async function loadUpcomingMatches() {
+  const container = document.getElementById("upcoming-list");
+  container.innerHTML = "<p>Loading...</p>";
+
+  try {
+    const matches = await apiRequest(API_ENDPOINTS.UPCOMING_MATCHES, { method: "GET" });
+    if (!matches.length) {
+      container.innerHTML = "<p>No upcoming matches.</p>";
+      return;
+    }
+    container.innerHTML = matches.map(renderMatchCard).join("");
+  } catch (err) {
+    console.error("Error fetching upcoming matches:", err);
+    container.innerHTML = "<p>Error loading upcoming matches.</p>";
+  }
+}
+
+/**
+ * Load Past Matches
+ */
+async function loadPastMatches() {
+  const container = document.getElementById("past-list");
+  container.innerHTML = "<p>Loading...</p>";
+
+  try {
+    const matches = await apiRequest(API_ENDPOINTS.PAST_MATCHES, { method: "GET" });
+    if (!matches.length) {
+      container.innerHTML = "<p>No past matches.</p>";
+      return;
+    }
+    container.innerHTML = matches.map(renderMatchCard).join("");
+  } catch (err) {
+    console.error("Error fetching past matches:", err);
+    container.innerHTML = "<p>Error loading past matches.</p>";
+  }
+}
+
+/**
+ * Load Open Matches (joinable matches)
+ */
+async function loadOpenMatches() {
+  const container = document.getElementById("open-list");
+  container.innerHTML = "<p>Loading...</p>";
+
+  try {
+    const matches = await apiRequest(API_ENDPOINTS.OPEN_MATCHES, { method: "GET" });
+    if (!matches.length) {
+      container.innerHTML = "<p>No open matches available.</p>";
+      return;
+    }
+    container.innerHTML = matches.map(renderOpenMatchCard).join("");
+
+    // Attach join handlers
+    document.querySelectorAll(".join-btn").forEach((btn) => {
+      btn.addEventListener("click", async (e) => {
+        const matchId = e.target.dataset.id;
+        await handleJoinMatch(matchId);
+      });
+    });
+  } catch (err) {
+    console.error("Error fetching open matches:", err);
+    container.innerHTML = "<p>Error loading open matches.</p>";
+  }
+}
+
+/**
+ * Render match card (for upcoming/past matches)
+ */
+function renderMatchCard(match) {
+  return `
+    <div class="match-card">
+      <h4>${match.name || "Match"}</h4>
+      <p>Date: ${match.date}</p>
+      <p>Location: ${match.location}</p>
+      ${match.result ? `<p>Result: ${match.result}</p>` : ""}
+    </div>
+  `;
+}
+
+/**
+ * Render open match card (with join button)
+ */
+function renderOpenMatchCard(match) {
+  const spotsLeft = match.spots - match.players.length;
+  const isClosed = spotsLeft <= 0;
+
+  return `
+    <div class="match-card">
+      <h4>${match.name || "Match"}</h4>
+      <p>Date: ${match.date}</p>
+      <p>Location: ${match.location}</p>
+      <p>Spots Left: ${spotsLeft}</p>
+      <button class="join-btn" data-id="${match.id}" ${isClosed ? "disabled" : ""}>
+        ${isClosed ? "Closed" : "Join"}
+      </button>
+    </div>
+  `;
+}
+
+/**
+ * Handle Join Match
+ */
+async function handleJoinMatch(matchId) {
+  try {
+    await apiRequest(API_ENDPOINTS.JOIN_MATCH(matchId), { method: "POST" });
+    alert("You successfully joined the match!");
+    await loadOpenMatches(); // refresh open matches
+  } catch (err) {
+    console.error("Error joining match:", err);
+    alert("Failed to join the match. Please try again.");
+  }
+}
