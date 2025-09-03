@@ -1,66 +1,30 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Dashboard | Football MVP</title>
-    <link rel="stylesheet" href="dashboard.css" />
-    <script type="module">
-  import { requireAuth } from '/asset/js/auth-guard.js';
-  requireAuth('/login.html');
-</script>
-<script type="module" src="/asset/js/dashboard.js"></script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard</title>
+  <link rel="stylesheet" href="dashboard.css">
 
+  <!-- Base API config -->
+  <script>
+    window.__API_BASE__ = 'http://localhost:3001/';
+  </script>
+
+  <!-- Global helpers -->
+  <script src="/js/api.js" defer></script>
+  <script src="/js/auth.js" defer></script>
+  <script src="/js/dashboard.js" defer></script>
 </head>
-
 <body>
-    <!-- Navigation Bar -->
-    <nav class="navbar">
-        <div class="nav-left">
-            <a href="index.html">Home</a>
-            <a href="profile.html">Profile</a>
-            <a href="matches.html">Matches</a>
-            <a href="login.html">Login</a>
-        </div>
-        <h1>Football MVP Dashboard</h1>
-        <button id="logout-btn">Logout</button>
-    </nav>
+  <div class="container">
+    <h1>Weplay</h1>
+    <h2>Dashboard</h2>
+    <div id="dashboard"></div>
+  </div>
 
-    <!-- Dashboard Content -->
-    <main class="container">
-        <section class="overview">
-            <h2>Welcome, <span id="user-name">Player</span>!</h2>
-            <p>Track your matches, stats, and team performance.</p>
-        </section>
-
-        <section class="dashboard-grid">
-            <!-- Upcoming Matches Card -->
-            <div class="card upcoming-matches">
-                <h3>Upcoming Matches</h3>
-                <ul id="match-list">
-                    <li>Loading matches...</li>
-                </ul>
-            </div>
-
-            <!-- Player Stats Card -->
-            <div class="card player-stats">
-                <h3>Your Stats</h3>
-                <p><strong>Games Played:</strong> <span id="games-played">0</span></p>
-                <p><strong>Goals Scored:</strong> <span id="goals-scored">0</span></p>
-                <p><strong>Assists:</strong> <span id="assists">0</span></p>
-            </div>
-
-            <!-- Team Performance Card -->
-            <div class="card team-performance">
-                <h3>Team Performance</h3>
-                <p><strong>Win Rate:</strong> <span id="win-rate">0%</span></p>
-                <p><strong>Last 5 Matches:</strong> <span id="recent-matches">N/A</span></p>
-            </div>
-        </section>
-    </main>
-
-    <script src="dashboard.js" defer></script>
+  <footer>
+    <p>&copy; 2025 Weplay. All Rights reserved.</p>
+  </footer>
 </body>
-
 </html>
