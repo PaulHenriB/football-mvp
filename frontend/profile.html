@@ -1,70 +1,68 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>NextPlay – Profile</title>
-  <link rel="stylesheet" href="styles.css" />
-  <link rel="stylesheet" href="profile.css" />
-  <script src="profile.js" defer></script>
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600&display=swap" rel="stylesheet" />
-  <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Profile</title>
+  <link rel="stylesheet" href="profile.css">
+
+  <!-- Base API config -->
+  <script>
+    window.__API_BASE__ = 'http://localhost:3001/';
+  </script>
+
+  <!-- Global helpers -->
+  <script src="/js/api.js" defer></script>
+  <script src="/js/auth.js" defer></script>
+  <script src="/js/profile.js" defer></script>
 </head>
-
 <body>
-  <!-- Navigation -->
-  <nav class="navbar">
-    <div class="logo">NextPlay</div>
-    <ul class="nav-links">
-      <li><a href="index.html">Home</a></li>
-      <li><a href="matches.html">Matches</a></li>
-      <li><a href="profile.html" class="active">Profile</a></li>
-      <li><a href="settings.html">Settings</a></li>
-      <li><a href="#">Logout</a></li>
-    </ul>
-  </nav>
-
-  <!-- Profile Content -->
-  <main class="profile-container">
-    <img src="avatar-placeholder.png" alt="User Avatar" class="profile-avatar" id="avatarPreview" />
-    <h1 id="userName">John Doe</h1>
-    <p><strong>Favorite Position:</strong> <span id="favPosition">Striker</span></p>
-
-    <button class="edit-btn" onclick="toggleEdit()">Edit Profile</button>
-
-    <!-- Hidden Form for Editing -->
-    <form id="editForm" style="display: none;">
-      <label for="nameInput">Name:</label>
-      <input type="text" id="nameInput" placeholder="Enter your name" />
-
-      <label for="positionInput">Favorite Position:</label>
-      <select id="positionInput">
-        <option value="Striker">Striker</option>
-        <option value="Midfielder">Midfielder</option>
-        <option value="Defender">Defender</option>
-        <option value="Goalkeeper">Goalkeeper</option>
-      </select>
-
-      <label for="avatarInput">Avatar:</label>
-      <input type="file" id="avatarInput" accept="image/*" />
-
-      <button type="button" onclick="saveProfile()">Save</button>
-    </form>
-
-    <section class="match-history">
-      <h2>Match History</h2>
-      <ul id="matchList">
-        <li>Match 1 – Won</li>
-        <li>Match 2 – Lost</li>
+  <header>
+    <h1>Weplay</h1>
+    <nav>
+      <ul>
+        <li><a href="index.html">home</a></li>
+        <li><a href="matches.html">Matches</a></li>  
+        <li><a href="login.html">Logout</a></li>
       </ul>
-    </section>
+    </nav>
+  </header>
+
+  <main class="container">
+    <h2>Profile</h2>
+
+    <div id="profile">
+      <form id="profile-form">
+        <input type="text" id="firstName" name="firstName" placeholder="First Name" required>
+        <input type="text" id="lastName" name="lastName" placeholder="Last Name" required>
+        <input type="date" id="dob" name="dob" required>
+
+        <label for="favoriteFoot">Preferred Foot</label>
+        <select id="favoriteFoot" name="favoriteFoot">
+          <option value="left">Left</option>
+          <option value="right">Right</option>
+        </select>
+
+        <label for="favoritePosition">Favorite Position</label>
+        <select id="favoritePosition" name="favoritePosition">
+          <option value="GK">Goalkeeper</option>
+          <option value="DF">Defender</option>
+          <option value="MF">Midfielder</option>
+          <option value="FW">Forward</option>
+        </select>
+
+        <button type="submit">Update Profile</button>
+      </form>
+    </div>
+
+    <h3>Availability</h3>
+    <div id="availability">
+      <!-- JS will render user availability here -->
+    </div>
   </main>
 
-  <!-- Footer -->
   <footer>
-    <p>&copy; 2025 NextPlay. All Rights Reserved.</p>
+    <p>&copy; 2025 Weplay. All Rights reserved.</p>
   </footer>
 </body>
 </html>
