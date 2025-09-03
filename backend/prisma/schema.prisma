@@ -51,20 +51,22 @@ model Player {
   user   User? @relation(fields: [userId], references: [id])
 }
 
+
 model Match {
-  id        Int      @id @default(autoincrement())
+  id        Int           @id @default(autoincrement())
   date      DateTime
   location  String
   duration  Int
   fee       Float
   createdBy Int
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt DateTime      @default(now())
+  updatedAt DateTime      @updatedAt
 
-  // Relations
-  players PlayerMatch[]
-  teams   Team[]
-  ratings Rating[]
+  capacity  Int           @default(10)   // <-- add this
+
+  players   PlayerMatch[]
+  teams     Team[]
+  ratings   Rating[]
 }
 
 model PlayerMatch {
