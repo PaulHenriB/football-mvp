@@ -1,28 +1,26 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Matches</title>
-  <link rel="stylesheet" href="matches.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Matches - Weplay</title>
+  <link rel="stylesheet" href="matches.css" />
 
-  <!-- Base API config -->
   <script>
     window.__API_BASE__ = 'http://localhost:3001/';
   </script>
 
-  <!-- Global helpers -->
   <script src="/js/api.js" defer></script>
   <script src="/js/auth.js" defer></script>
   <script src="/js/matches.js" defer></script>
 </head>
 <body>
   <header>
-    <h1>Weplay</h1>
+    <h1>Weplay - Matches</h1>
     <nav>
       <ul>
-        <li><a href="index.html">home</a></li>
-        <li><a href="matches.html">Matches</a></li>
+        <li><a href="index.html">Home</a></li>
+        <li><a href="dashboard.html">Dashboard</a></li>
         <li><a href="profile.html">Profile</a></li>
         <li><a href="login.html">Logout</a></li>
       </ul>
@@ -32,23 +30,32 @@
   <main class="container">
     <h2>Matches</h2>
 
-    <!-- Filter Section -->
-    <div class="filter-container">
-      <label for="match-filter">Show:</label>
-      <select id="match-filter">
-        <option value="upcoming">Upcoming Matches</option>
-        <option value="past">Past Matches</option>
-      </select>
+    <!-- Tabs for filtering -->
+    <div class="tabs">
+      <button class="tab-btn active" data-tab="upcoming">Upcoming</button>
+      <button class="tab-btn" data-tab="past">Past</button>
+      <button class="tab-btn" data-tab="open">Open</button>
     </div>
 
-    <!-- Matches List -->
-    <div id="matches-list">
-      <!-- JS will render upcoming and past matches here -->
-    </div>
+    <!-- Tab contents -->
+    <section id="tab-upcoming" class="tab-content active">
+      <h3>Upcoming Matches</h3>
+      <div id="upcoming-list"></div>
+    </section>
+
+    <section id="tab-past" class="tab-content">
+      <h3>Past Matches</h3>
+      <div id="past-list"></div>
+    </section>
+
+    <section id="tab-open" class="tab-content">
+      <h3>Open Matches</h3>
+      <div id="open-list"></div>
+    </section>
   </main>
 
   <footer>
-    <p>&copy; 2025 Weplay. All Rights reserved.</p>
+    <p>&copy; 2025 Weplay. All Rights Reserved.</p>
   </footer>
 </body>
 </html>
