@@ -1,34 +1,36 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Manager Dashboard - NextPlay</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Manager Dashboard</title>
+  <link rel="stylesheet" href="manager_dashboard.css">
 
-  <!-- Styles -->
-  <link rel="stylesheet" href="styles.css" />
-  <link rel="stylesheet" href="dashboard.css" />
+  <!-- Base API config -->
+  <script>
+    window.__API_BASE__ = 'http://localhost:3001/';
+  </script>
 
-  <!-- Fonts -->
-  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600&display=swap" rel="stylesheet"/>
-
-  <!-- JS -->
-  <script src="dashboard.js" defer></script>
+  <!-- Global helpers -->
+  <script src="/js/api.js" defer></script>
+  <script src="/js/auth.js" defer></script>
+  <script src="/js/manager_dashboard.js" defer></script>
 </head>
 <body>
-  <nav class="navbar">
-    <ul>
-      <li><a href="index.html">Home</a></li>
-      <li><a href="matches.html">Matches</a></li>
-      <li><a href="availability.html">Availability</a></li>
-      <li><a href="manager-dashboard.html" class="active">Dashboard</a></li>
-      <li><a href="profile.html">Profile</a></li>
-    </ul>
-  </nav>
+  <header>
+    <h1>Weplay - Manager Dashboard</h1>
+    <nav>
+      <ul>
+        <li><a href="index.html">Home</a></li>
+        <li><a href="team-balancer.html">Team Balancer</a></li>
+        <li><a href="profile.html">Switch to Player Profile</a></li>
+        <li><a href="login.html">Logout</a></li>
+      </ul>
+    </nav>
+  </header>
 
   <main class="container">
-    <h1>Manager Dashboard</h1>
-
+    <!-- Match Scheduling -->
     <section id="match-scheduling" class="card">
       <h2>Schedule a Match</h2>
       <form id="match-form" class="form-grid">
@@ -41,17 +43,47 @@
         <label for="match-location">Location:</label>
         <input type="text" id="match-location" required />
 
+        <label for="match-duration">Duration (minutes):</label>
+        <input type="number" id="match-duration" required min="30" step="5" />
+
+        <label for="match-players">Number of Players:</label>
+        <input type="number" id="match-players" required min="2" />
+
+        <label for="match-spots">Available Spots:</label>
+        <input type="number" id="match-spots" required min="2" />
+
         <button type="submit" class="primary-btn">Schedule Match</button>
       </form>
-      <div id="scheduled-matches"></div>
+      <div id="scheduled-matches">
+        <!-- Upcoming matches will be rendered here -->
+      </div>
     </section>
 
+    <!-- Upcoming Matches -->
+    <section id="upcoming-matches" class="card">
+      <h2>Upcoming Matches</h2>
+      <div id="upcoming-list">
+        <!-- JS will render upcoming matches with player list and team allocation -->
+      </div>
+    </section>
+
+    <!-- Past Matches -->
+    <section id="past-matches" class="card">
+      <h2>Past Matches</h2>
+      <div id="past-list">
+        <!-- JS will render past matches with results -->
+      </div>
+    </section>
+
+    <!-- Team Balancing -->
     <section id="team-balancing" class="card">
       <h2>Team Balancing</h2>
       <button id="balance-teams" class="secondary-btn">Auto Balance Teams</button>
+      <p>You can adjust teams manually after auto-balance.</p>
       <div id="team-results" class="team-results"></div>
     </section>
 
+    <!-- Player Management -->
     <section id="player-management" class="card">
       <h2>Manage Players</h2>
       <ul id="player-list" class="player-list">
@@ -61,7 +93,7 @@
   </main>
 
   <footer>
-    <p>&copy; 2025 NextPlay. All Rights Reserved.</p>
+    <p>&copy; 2025 Weplay. All Rights reserved.</p>
   </footer>
 </body>
 </html>
