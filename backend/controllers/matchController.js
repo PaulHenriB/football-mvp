@@ -1,13 +1,15 @@
 // backend/controllers/matchController.js
-const { PrismaClient, MatchStatus } = require('@prisma/client');
+const { PrismaClient } = require('@prisma/client');
 const prisma = new PrismaClient();
 const { balanceTeams } = require('../utils/teamBalancer');
+
+// ---------------- MATCH CRUD ----------------
 
 // GET /api/matches
 const getMatches = async (req, res) => {
   try {
     const matches = await prisma.match.findMany({
-      include: { players: { include: { player: true } }, teams: true, ratings: true }
+      include: { players: { include: { player: true } }, teams: true, ratings: true },
     });
     res.json(matches);
   } catch (error) {
@@ -18,7 +20,7 @@ const getMatches = async (req, res) => {
 
 // POST /api/matches
 const createMatch = async (req, res) => {
-  const { date, location, duration, fee, capacity } = req.body;
+  const { date, location, duration, fee } = req.body;
 
   try {
     const match = await prisma.match.create({
@@ -28,9 +30,7 @@ const createMatch = async (req, res) => {
         duration,
         fee,
         createdBy: req.user.id,
-        capacity,
-        status: 'SCHEDULED',
-      }
+      },
     });
     res.status(201).json(match);
   } catch (error) {
@@ -47,39 +47,12 @@ const updateMatch = async (req, res) => {
   try {
     const match = await prisma.match.update({
       where: { id: matchId },
-      data: { date: new Date(date), location, duration, fee }
+      data: { date: new Date(date), location, duration, fee },
     });
     res.json(match);
   } catch (error) {
     console.error('Error updating match:', error);
     res.status(500).json({ error: 'Failed to update match' });
-  }
-};
-
-// ✅ NEW: PUT /api/matches/:id/result
-const setMatchResult = async (req, res) => {
-  const matchId = parseInt(req.params.id);
-  const { homeScore, awayScore } = req.body;
-
-  try {
-    // TODO: replace this with real role check
-    if (!req.user || !req.user.isManager) {
-      return res.status(403).json({ error: 'Only managers can set match results' });
-    }
-
-    const match = await prisma.match.update({
-      where: { id: matchId },
-      data: {
-        homeScore,
-        awayScore,
-        status: 'FINISHED',
-      },
-    });
-
-    res.json({ message: '✅ Match result saved', match });
-  } catch (error) {
-    console.error('Error finishing match:', error);
-    res.status(500).json({ error: 'Failed to set match result' });
   }
 };
 
@@ -90,7 +63,7 @@ const getMatchPlayers = async (req, res) => {
   try {
     const players = await prisma.playerMatch.findMany({
       where: { matchId },
-      include: { player: true }
+      include: { player: true },
     });
     res.json(players);
   } catch (error) {
@@ -99,65 +72,115 @@ const getMatchPlayers = async (req, res) => {
   }
 };
 
-// ✅ UPDATED: POST /api/matches/:id/rate
-const ratePlayer = async (req, res) => {
+// ---------------- MATCH RESULT ----------------
+
+// PUT /api/matches/:id/result
+const finishMatch = async (req, res) => {
   const matchId = parseInt(req.params.id);
-  const raterUserId = req.user?.id;
-  const { playerId, score, comment } = req.body;
+  const { homeScore, awayScore } = req.body;
 
   try {
-    // 1) Ensure match is finished
+    if (req.user.role !== 'MANAGER') {
+      return res.status(403).json({ error: 'Only managers can finish matches' });
+    }
+
+    const updated = await prisma.match.update({
+      where: { id: matchId },
+      data: {
+        homeScore,
+        awayScore,
+        status: 'FINISHED',
+      },
+    });
+
+    res.json({ message: '✅ Match finished', match: updated });
+  } catch (error) {
+    console.error('Error finishing match:', error);
+    res.status(500).json({ error: 'Failed to finish match' });
+  }
+};
+
+// ---------------- RATINGS ----------------
+
+// POST /api/matches/:id/rate
+const ratePlayer = async (req, res) => {
+  const matchId = parseInt(req.params.id);
+  const { targetPlayerId, score, comment } = req.body;
+
+  try {
     const match = await prisma.match.findUnique({ where: { id: matchId } });
-    if (!match || match.status !== 'FINISHED') {
-      return res.status(400).json({ error: 'You can only rate after the match is finished' });
+    if (!match) return res.status(404).json({ error: 'Match not found' });
+    if (match.status !== 'FINISHED') {
+      return res.status(400).json({ error: 'Match is not finished yet' });
     }
 
-    // 2) Get the rater's Player profile
-    const raterPlayer = await prisma.player.findFirst({ where: { userId: raterUserId } });
-    if (!raterPlayer) {
-      return res.status(400).json({ error: 'You must have a Player profile to rate' });
-    }
+    const rater = await prisma.player.findFirst({ where: { userId: req.user.id } });
+    if (!rater) return res.status(400).json({ error: 'No Player profile linked to your account' });
 
-    // 3) Prevent self-rating
-    if (raterPlayer.id === playerId) {
+    if (rater.id === targetPlayerId) {
       return res.status(400).json({ error: 'You cannot rate yourself' });
     }
 
-    // 4) Check both players were in the match
-    const raterPlayed = await prisma.playerMatch.findUnique({
-      where: { playerId_matchId: { playerId: raterPlayer.id, matchId } }
-    });
-    const targetPlayed = await prisma.playerMatch.findUnique({
-      where: { playerId_matchId: { playerId, matchId } }
-    });
-    if (!raterPlayed || !targetPlayed) {
-      return res.status(400).json({ error: 'Both players must have participated in the match' });
+    // check both players participated
+    const [raterPM, targetPM] = await Promise.all([
+      prisma.playerMatch.findUnique({
+        where: { playerId_matchId: { playerId: rater.id, matchId } },
+      }),
+      prisma.playerMatch.findUnique({
+        where: { playerId_matchId: { playerId: targetPlayerId, matchId } },
+      }),
+    ]);
+    if (!raterPM || !targetPM) {
+      return res.status(400).json({ error: 'Both players must have played in this match' });
     }
 
-    // 5) Optional: ensure rating opponents only (different teams)
-    if (raterPlayed.team && targetPlayed.team && raterPlayed.team === targetPlayed.team) {
-      return res.status(400).json({ error: 'You can only rate opponents, not your teammates' });
+    // enforce opponent-only rule
+    if (raterPM.team === targetPM.team) {
+      return res.status(400).json({ error: 'You can only rate opponents' });
     }
 
-    // 6) Prevent duplicate rating
-    const existing = await prisma.rating.findUnique({
-      where: { playerId_matchId: { playerId, matchId } }
-    });
-    if (existing) {
-      return res.status(400).json({ error: 'You have already rated this player for this match' });
-    }
-
-    // 7) Save rating
+    // create rating
     const rating = await prisma.rating.create({
-      data: { playerId, matchId, score, comment }
+      data: {
+        playerId: targetPlayerId,
+        matchId,
+        score,
+        comment,
+      },
     });
 
-    res.status(201).json({ message: '✅ Rating saved', rating });
+    res.json({ message: '✅ Rating submitted', rating });
   } catch (error) {
+    if (error.code === 'P2002') {
+      return res.status(400).json({ error: 'You already rated this opponent in this match' });
+    }
     console.error('Error rating player:', error);
     res.status(500).json({ error: 'Failed to rate player' });
   }
 };
+
+// GET /api/players/:id/ratings
+const getPlayerRatings = async (req, res) => {
+  const playerId = parseInt(req.params.id);
+
+  try {
+    const ratings = await prisma.rating.findMany({
+      where: { playerId },
+      orderBy: { createdAt: 'desc' },
+    });
+
+    const avg = ratings.length
+      ? ratings.reduce((acc, r) => acc + r.score, 0) / ratings.length
+      : null;
+
+    res.json({ playerId, average: avg, ratings });
+  } catch (error) {
+    console.error('Error fetching ratings:', error);
+    res.status(500).json({ error: 'Failed to fetch ratings' });
+  }
+};
+
+// ---------------- AVAILABILITY & TEAMS ----------------
 
 // POST /api/matches/:id/availability
 const setAvailability = async (req, res) => {
@@ -168,7 +191,7 @@ const setAvailability = async (req, res) => {
     const availability = await prisma.availability.upsert({
       where: { playerId_matchDate: { playerId, matchDate: new Date(matchDate) } },
       update: { isAvailable },
-      create: { playerId, matchDate: new Date(matchDate), isAvailable }
+      create: { playerId, matchDate: new Date(matchDate), isAvailable },
     });
     res.json(availability);
   } catch (error) {
@@ -184,7 +207,7 @@ const getBalancedTeams = async (req, res) => {
   try {
     const playerMatches = await prisma.playerMatch.findMany({
       where: { matchId },
-      include: { player: true }
+      include: { player: true },
     });
 
     if (!playerMatches || playerMatches.length < 2) {
@@ -195,7 +218,7 @@ const getBalancedTeams = async (req, res) => {
       id: pm.player.id,
       name: pm.player.name,
       rating: pm.player.rating,
-      position: pm.player.position
+      position: pm.player.position,
     }));
 
     const { teamA, teamB } = balanceTeams(players);
@@ -207,13 +230,16 @@ const getBalancedTeams = async (req, res) => {
   }
 };
 
-module.exports = { 
-  getMatches, 
-  createMatch, 
-  updateMatch, 
-  setMatchResult,   // ✅ NEW
-  getMatchPlayers, 
-  ratePlayer,       // ✅ UPDATED
-  setAvailability, 
-  getBalancedTeams 
+// ---------------- EXPORTS ----------------
+
+module.exports = {
+  getMatches,
+  createMatch,
+  updateMatch,
+  getMatchPlayers,
+  finishMatch,
+  ratePlayer,
+  getPlayerRatings,
+  setAvailability,
+  getBalancedTeams,
 };
