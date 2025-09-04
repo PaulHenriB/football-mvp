@@ -6,6 +6,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   const form = document.getElementById("profile-form");
   const availabilityContainer = document.getElementById("availability");
+  const ratingsContainer = document.getElementById("ratings");
 
   try {
     const user = await apiRequest(API_ENDPOINTS.ME, { method: "GET" });
@@ -22,6 +23,28 @@ document.addEventListener("DOMContentLoaded", async () => {
     availabilityContainer.innerHTML = availability.length
       ? `<ul>${availability.map(a => `<li>${a.date}: ${a.status}</li>`).join('')}</ul>`
       : '<p>No availability set.</p>';
+
+    // Load user ratings
+    const ratings = await apiRequest(`${API_ENDPOINTS.PLAYERS}/${user.id}/ratings`, { method: "GET" });
+    if (ratings && ratings.length > 0) {
+      const avg = (
+        ratings.reduce((sum, r) => sum + r.score, 0) / ratings.length
+      ).toFixed(2);
+      ratingsContainer.innerHTML = `
+        <p><strong>Average Rating:</strong> ${avg}/10</p>
+        <ul>
+          ${ratings.map(r => `
+            <li>
+              Match ${r.matchId}: ${r.score}/10
+              ${r.comment ? ` - ${r.comment}` : ""}
+              <em>(${new Date(r.createdAt).toLocaleDateString()})</em>
+            </li>
+          `).join("")}
+        </ul>
+      `;
+    } else {
+      ratingsContainer.innerHTML = '<p>No ratings yet.</p>';
+    }
 
   } catch (err) {
     console.error("Error loading profile:", err);
