@@ -1,25 +1,28 @@
-// /utils/teamBalancer.js
+// backend/utils/teamBalancer.js
 
 /**
- * Simple team balancing algorithm
+ * Balanced team assignment algorithm
  * - Sorts players by rating (highest first)
  * - Alternates assignment into two teams
  * - Ensures each team has at least one goalkeeper (if available)
- * - Returns team composition + average rating for debug
+ * - Returns clean JSON with team composition + averages + difference
+ *
+ * @param {Array} players - Array of { id, name, rating, position }
+ * @returns {Object} { teamA, teamB, summary }
  */
-exports.balanceTeams = (players = []) => {
+function balanceTeams(players = []) {
   if (!Array.isArray(players) || players.length < 2) {
-    return { teamA: [], teamB: [] };
+    throw new Error("Not enough players to balance");
   }
 
-  // Ensure players have a rating field (default 0)
+  // Normalize players (ensure rating & position exist)
   const normalized = players.map((p) => ({
     ...p,
-    rating: p.rating || 0,
+    rating: typeof p.rating === "number" ? p.rating : 0,
     position: p.position || "UNKNOWN",
   }));
 
-  // Sort players by rating descending
+  // Sort players by rating (descending)
   const sorted = [...normalized].sort((a, b) => b.rating - a.rating);
 
   const teamA = [];
@@ -34,7 +37,7 @@ exports.balanceTeams = (players = []) => {
     }
   });
 
-  // Helper: Ensure each team has a GK
+  // Helper: Ensure each team has a goalkeeper if possible
   const ensureGoalkeeper = (team, fallbackTeam) => {
     const hasGK = team.some((p) => p.position === "GOALKEEPER");
     if (!hasGK) {
@@ -51,18 +54,26 @@ exports.balanceTeams = (players = []) => {
   ensureGoalkeeper(teamA, teamB);
   ensureGoalkeeper(teamB, teamA);
 
-  // Calculate team averages for reference
+  // Helper: Compute average rating
   const avgRating = (team) =>
     team.length > 0
-      ? (team.reduce((sum, p) => sum + (p.rating || 0), 0) / team.length).toFixed(2)
-      : "0.00";
+      ? team.reduce((sum, p) => sum + (p.rating || 0), 0) / team.length
+      : 0;
+
+  const averageRatingA = avgRating(teamA);
+  const averageRatingB = avgRating(teamB);
 
   return {
     teamA,
     teamB,
-    stats: {
-      teamA_avg: avgRating(teamA),
-      teamB_avg: avgRating(teamB),
+    summary: {
+      averageRatingA: Number(averageRatingA.toFixed(2)),
+      averageRatingB: Number(averageRatingB.toFixed(2)),
+      difference: Number(
+        Math.abs(averageRatingA - averageRatingB).toFixed(2)
+      ),
     },
   };
-};
+}
+
+module.exports = { balanceTeams };
