@@ -61,11 +61,27 @@
     <ul id="ratings-history"></ul>
   </section>
 
-    
-    <h3>Availability</h3>
-    <div id="availability">
-      <!-- JS will render user availability here -->
-    </div>
+  <!-- Availability -->
+<section id="availability-section" class="card">
+  <h2>Availability</h2>
+  <div id="availability">
+    <!-- Availability data populated by JS -->
+  </div>
+
+  <form id="availability-form">
+    <label for="availability-date">Date:</label>
+    <input type="date" id="availability-date" name="date" required />
+
+    <label for="availability-status">Status:</label>
+    <select id="availability-status" name="status">
+      <option value="available">Available</option>
+      <option value="unavailable">Unavailable</option>
+    </select>
+
+    <button type="submit" class="primary-btn">Set Availability</button>
+  </form>
+</section>
+  
   </main>
 
   <footer>
