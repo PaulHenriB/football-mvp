@@ -7,9 +7,11 @@ const { PrismaClient } = require("@prisma/client");
 const prisma = new PrismaClient();
 
 // Import routes
-const userRoutes = require("./routes/user");   // Handles register, login, /me
+const authRoutes = require("./routes/auth");   // Handles register, login, /me
 const matchRoutes = require("./routes/matches");     // /matches/create, /matches/:id/join, etc.
 const playerRoutes = require("./routes/players");   // /players/:id
+const availabilityRoutes = require("./routes/availability");
+const teambalanceRoutes = require("./routes/teambalance");
 
 const app = express();
 
