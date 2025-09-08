@@ -1,4 +1,4 @@
-generator client {
+generator client { 
   provider = "prisma-client-js"
 }
 
@@ -20,6 +20,11 @@ enum MatchStatus {
   FINISHED
 }
 
+enum Role {
+  PLAYER
+  MANAGER
+}
+
 model User {
   id               Int      @id @default(autoincrement())
   firstName        String
@@ -30,6 +35,7 @@ model User {
   phoneNumber      String   @unique
   email            String   @unique
   passwordHash     String
+  role             Role     @default(PLAYER)
   createdAt        DateTime @default(now())
 
   // Relations
@@ -132,3 +138,4 @@ model Rating {
 
   @@unique([playerId, matchId]) // a player can only rate an opponent once per match
 }
+
