@@ -21,7 +21,7 @@ app.use(express.json());
 app.use(morgan("dev"));
 
 // === Routes ===
-app.use("/user", userRoutes);   // register, login, /me
+app.use("/auth", authRoutes);   // register, login, /me
 app.use("/matches", matchRoutes);
 app.use("/players", playerRoutes);
 app.use("/availability", availabilityRoutes);
