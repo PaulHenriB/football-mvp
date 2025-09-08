@@ -7,11 +7,11 @@ const { PrismaClient } = require("@prisma/client");
 const prisma = new PrismaClient();
 
 // Import routes
-const authRoutes = require("./routes/auth");   // Handles register, login, /me
-const matchRoutes = require("./routes/matches");     // /matches/create, /matches/:id/join, etc.
-const playerRoutes = require("./routes/players");   // /players/:id
-const availabilityRoutes = require("./routes/availability");
-const teambalanceRoutes = require("./routes/teambalance");
+const authRoutes = require("./routes/auth");          // Handles register, login, /me
+const matchRoutes = require("./routes/matches");      // /matches/create, /matches/:id/join, etc.
+const playerRoutes = require("./routes/players");     // /players/:id
+const availabilityRoutes = require("./routes/availability"); // /availability
+const teamBalanceRoutes = require("./routes/teamBalance");   // /team-balance
 
 const app = express();
 
@@ -21,11 +21,11 @@ app.use(express.json());
 app.use(morgan("dev"));
 
 // === Routes ===
-app.use("/auth", authRoutes);   // register, login, /me
+app.use("/auth", authRoutes);        // register, login, /me
 app.use("/matches", matchRoutes);
 app.use("/players", playerRoutes);
 app.use("/availability", availabilityRoutes);
-app.use("/teamBalance", teamBalanceRoutes);
+app.use("/team-balance", teamBalanceRoutes);
 
 // === Health Check ===
 app.get("/", (req, res) => {
@@ -64,3 +64,4 @@ process.on("SIGINT", async () => {
 });
 
 startServer();
+
