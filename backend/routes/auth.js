@@ -1,106 +1,96 @@
 const express = require("express");
 const router = express.Router();
-const bcrypt = require("bcrypt");
+const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
-const { prisma } = require("../config/prisma");
+const { PrismaClient } = require("@prisma/client");
+const prisma = new PrismaClient();
 
-// =====================
-// REGISTER
-// =====================
+// Register
 router.post("/register", async (req, res) => {
-  const {
-    first_name,
-    last_name,
-    dob,
-    favorite_foot,
-    favorite_position,
-    phone_number,
-    email,
-    password,
-  } = req.body;
-
   try {
-    // Check if user already exists
+    const { firstName, lastName, email, password, role } = req.body;
+
+    // Default to PLAYER if no role is provided
+    const userRole = role && ["PLAYER", "MANAGER"].includes(role) ? role : "PLAYER";
+
+    // Check if email already exists
     const existingUser = await prisma.user.findUnique({
       where: { email },
     });
-
     if (existingUser) {
-      return res.status(400).json({ error: "User already exists" });
+      return res.status(400).json({ message: "User already exists" });
     }
 
     // Hash password
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    // Create new user in Prisma
+    // Save user
     const newUser = await prisma.user.create({
       data: {
-        firstName: first_name,
-        lastName: last_name,
-        dob: new Date(dob),
-        favoriteFoot: favorite_foot,
-        favoritePosition: favorite_position, // must match enum "Position"
-        phoneNumber: phone_number,
+        firstName,
+        lastName,
         email,
-        passwordHash: hashedPassword,
-      },
-      select: {
-        id: true,
-        firstName: true,
-        lastName: true,
-        email: true,
+        password: hashedPassword,
+        role: userRole,
       },
     });
 
-    res.status(201).json({ message: "User registered", user: newUser });
-  } catch (error) {
-    console.error("Registration error:", error.message);
-    res.status(500).json({ error: "Registration failed" });
+    // Generate JWT with role
+    const token = jwt.sign(
+      { id: newUser.id, email: newUser.email, role: newUser.role },
+      process.env.JWT_SECRET,
+      { expiresIn: "1d" }
+    );
+
+    res.status(201).json({
+      message: "User registered successfully",
+      user: {
+        id: newUser.id,
+        email: newUser.email,
+        role: newUser.role,
+      },
+      token,
+    });
+  } catch (err) {
+    console.error("Registration error:", err.message);
+    res.status(500).json({ message: "Server error" });
   }
 });
 
-// =====================
-// LOGIN
-// =====================
+// Login
 router.post("/login", async (req, res) => {
-  const { email, password } = req.body;
-
   try {
-    // Find user
-    const user = await prisma.user.findUnique({
-      where: { email },
-    });
+    const { email, password } = req.body;
 
+    const user = await prisma.user.findUnique({ where: { email } });
     if (!user) {
-      return res.status(400).json({ error: "Invalid credentials" });
+      return res.status(400).json({ message: "Invalid credentials" });
     }
 
-    // Compare password
-    const isMatch = await bcrypt.compare(password, user.passwordHash);
-    if (!isMatch) {
-      return res.status(400).json({ error: "Invalid credentials" });
+    const validPassword = await bcrypt.compare(password, user.password);
+    if (!validPassword) {
+      return res.status(400).json({ message: "Invalid credentials" });
     }
 
-    // Generate JWT
+    // Generate JWT with role
     const token = jwt.sign(
-      { id: user.id, email: user.email },
+      { id: user.id, email: user.email, role: user.role },
       process.env.JWT_SECRET,
       { expiresIn: "1d" }
     );
 
     res.json({
       message: "Login successful",
-      token,
       user: {
         id: user.id,
-        first_name: user.firstName,
-        last_name: user.lastName,
         email: user.email,
+        role: user.role,
       },
+      token,
     });
-  } catch (error) {
-    console.error("Login error:", error.message);
-    res.status(500).json({ error: "Login failed" });
+  } catch (err) {
+    console.error("Login error:", err.message);
+    res.status(500).json({ message: "Server error" });
   }
 });
 
