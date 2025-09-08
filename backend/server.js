@@ -24,6 +24,8 @@ app.use(morgan("dev"));
 app.use("/user", userRoutes);   // register, login, /me
 app.use("/matches", matchRoutes);
 app.use("/players", playerRoutes);
+app.use("/availability", availabilityRoutes);
+app.use("/teamBalance", teamBalanceRoutes);
 
 // === Health Check ===
 app.get("/", (req, res) => {
