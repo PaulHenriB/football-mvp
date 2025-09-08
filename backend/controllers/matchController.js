@@ -1,5 +1,5 @@
 // backend/controllers/matchController.js
-const { PrismaClient } = require('@prisma/client');
+const { PrismaClient } = require('@prisma/client'); 
 const prisma = new PrismaClient();
 const { balanceTeams } = require('../utils/teamBalancer');
 
@@ -180,25 +180,7 @@ const getPlayerRatings = async (req, res) => {
   }
 };
 
-// ---------------- AVAILABILITY & TEAMS ----------------
-
-// POST /api/matches/:id/availability
-const setAvailability = async (req, res) => {
-  const { matchDate, isAvailable, playerId } = req.body;
-  if (!playerId) return res.status(400).json({ error: 'playerId is required' });
-
-  try {
-    const availability = await prisma.availability.upsert({
-      where: { playerId_matchDate: { playerId, matchDate: new Date(matchDate) } },
-      update: { isAvailable },
-      create: { playerId, matchDate: new Date(matchDate), isAvailable },
-    });
-    res.json(availability);
-  } catch (error) {
-    console.error('Error setting availability:', error);
-    res.status(500).json({ error: 'Failed to set availability' });
-  }
-};
+// ---------------- TEAMS ----------------
 
 // GET /api/matches/:id/teams
 const getBalancedTeams = async (req, res) => {
@@ -240,6 +222,5 @@ module.exports = {
   finishMatch,
   ratePlayer,
   getPlayerRatings,
-  setAvailability,
   getBalancedTeams,
 };
