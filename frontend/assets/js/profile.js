@@ -6,10 +6,14 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   const form = document.getElementById("profile-form");
   const availabilityContainer = document.getElementById("availability");
-  const ratingsContainer = document.getElementById("ratings");
+  const availabilityForm = document.getElementById("availability-form");
+  const ratingsContainer = document.getElementById("ratings-summary");
+  const ratingsHistory = document.getElementById("ratings-history");
+
+  let user;
 
   try {
-    const user = await apiRequest(API_ENDPOINTS.ME, { method: "GET" });
+    user = await apiRequest(API_ENDPOINTS.ME, { method: "GET" });
 
     // Pre-fill form fields with user data
     form.firstName.value = user.firstName || "";
@@ -18,11 +22,8 @@ document.addEventListener("DOMContentLoaded", async () => {
     form.favoriteFoot.value = user.favoriteFoot || "left";
     form.favoritePosition.value = user.favoritePosition || "GK";
 
-    // Load user availability
-    const availability = user.availability || [];
-    availabilityContainer.innerHTML = availability.length
-      ? `<ul>${availability.map(a => `<li>${a.date}: ${a.status}</li>`).join('')}</ul>`
-      : '<p>No availability set.</p>';
+    // Load availability
+    renderAvailability(user.availability || []);
 
     // Load user ratings
     const ratings = await apiRequest(`${API_ENDPOINTS.PLAYERS}/${user.id}/ratings`, { method: "GET" });
@@ -30,8 +31,9 @@ document.addEventListener("DOMContentLoaded", async () => {
       const avg = (
         ratings.reduce((sum, r) => sum + r.score, 0) / ratings.length
       ).toFixed(2);
-      ratingsContainer.innerHTML = `
-        <p><strong>Average Rating:</strong> ${avg}/10</p>
+
+      ratingsContainer.innerHTML = `<p><strong>Average Rating:</strong> ${avg}/10</p>`;
+      ratingsHistory.innerHTML = `
         <ul>
           ${ratings.map(r => `
             <li>
@@ -43,7 +45,8 @@ document.addEventListener("DOMContentLoaded", async () => {
         </ul>
       `;
     } else {
-      ratingsContainer.innerHTML = '<p>No ratings yet.</p>';
+      ratingsContainer.innerHTML = "<p>No ratings yet.</p>";
+      ratingsHistory.innerHTML = "";
     }
 
   } catch (err) {
@@ -66,7 +69,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       await apiRequest(API_ENDPOINTS.UPDATE_ME, {
         method: "PUT",
         body: JSON.stringify(updatedData),
-        headers: { 'Content-Type': 'application/json' }
+        headers: { "Content-Type": "application/json" }
       });
       alert("Profile updated successfully.");
     } catch (err) {
@@ -74,4 +77,36 @@ document.addEventListener("DOMContentLoaded", async () => {
       alert("Failed to update profile.");
     }
   });
+
+  // Handle availability submission
+  availabilityForm.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const newAvailability = {
+      date: availabilityForm.date.value,
+      status: availabilityForm.status.value
+    };
+
+    try {
+      await apiRequest(API_ENDPOINTS.AVAILABILITY, {
+        method: "POST",
+        body: JSON.stringify(newAvailability),
+        headers: { "Content-Type": "application/json" }
+      });
+
+      alert("Availability updated.");
+      // Refresh availability list
+      const refreshedUser = await apiRequest(API_ENDPOINTS.ME, { method: "GET" });
+      renderAvailability(refreshedUser.availability || []);
+    } catch (err) {
+      console.error("Error updating availability:", err);
+      alert("Failed to update availability.");
+    }
+  });
+
+  // Helper: render availability
+  function renderAvailability(availability) {
+    availabilityContainer.innerHTML = availability.length
+      ? `<ul>${availability.map(a => `<li>${a.date}: ${a.status}</li>`).join("")}</ul>`
+      : "<p>No availability set.</p>";
+  }
 });
