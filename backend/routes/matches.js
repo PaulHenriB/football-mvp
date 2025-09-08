@@ -1,6 +1,7 @@
 // backend/routes/matches.js
 const express = require('express');
 const router = express.Router();
+const prisma = require('../prismaClient');
 const { authenticate } = require('../utils/authMiddleware'); // JWT middleware
 
 // import controller methods
@@ -10,7 +11,6 @@ const {
   updateMatch,
   getMatchPlayers,
   ratePlayer,
-  setAvailability,
   getBalancedTeams,
   finishMatch,      // new
   getPlayerRatings, // new
@@ -30,8 +30,48 @@ router.put('/:id', authenticate, updateMatch);
 // GET players for a match
 router.get('/:id/players', getMatchPlayers);
 
-// POST availability for a player
-router.post('/:id/availability', authenticate, setAvailability);
+// ---------------- PLAYER AVAILABILITY (MATCH-SPECIFIC) ---------------- //
+// POST /api/matches/:id/availability → set availability for a match
+router.post('/:id/availability', authenticate, async (req, res) => {
+  try {
+    const matchId = parseInt(req.params.id, 10);
+    const { status } = req.body;
+
+    if (!matchId || !status) {
+      return res.status(400).json({ error: 'Match ID and status are required' });
+    }
+
+    const isAvailable = status === 'available';
+
+    // Check match exists
+    const match = await prisma.match.findUnique({ where: { id: matchId } });
+    if (!match) {
+      return res.status(404).json({ error: 'Match not found' });
+    }
+
+    // Upsert player availability for this match
+    const existing = await prisma.availability.findFirst({
+      where: { playerId: req.user.id, matchDate: match.date },
+    });
+
+    let record;
+    if (existing) {
+      record = await prisma.availability.update({
+        where: { id: existing.id },
+        data: { isAvailable },
+      });
+    } else {
+      record = await prisma.availability.create({
+        data: { playerId: req.user.id, matchDate: match.date, isAvailable },
+      });
+    }
+
+    res.json(record);
+  } catch (err) {
+    console.error('❌ Error setting match availability:', err);
+    res.status(500).json({ error: 'Error setting match availability' });
+  }
+});
 
 // GET balanced teams for a match
 router.get('/:id/teams', getBalancedTeams);
