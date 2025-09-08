@@ -7,7 +7,6 @@ const getPlayers = async (req, res) => {
   try {
     const players = await prisma.player.findMany({
       include: {
-        availability: true,
         matches: true,
         teams: true,
         user: true
@@ -67,7 +66,10 @@ const updatePlayer = async (req, res) => {
   const { name, email, position, rating } = req.body;
 
   try {
-    const player = await prisma.player.update({ where: { id: playerId }, data: { name, email, position, rating } });
+    const player = await prisma.player.update({
+      where: { id: playerId },
+      data: { name, email, position, rating }
+    });
     res.json(player);
   } catch (error) {
     console.error('Error updating player:', error);
@@ -88,4 +90,10 @@ const deletePlayer = async (req, res) => {
   }
 };
 
-module.exports = { getPlayers, getAvailablePlayers, createPlayer, updatePlayer, deletePlayer };
+module.exports = {
+  getPlayers,
+  getAvailablePlayers,
+  createPlayer,
+  updatePlayer,
+  deletePlayer
+};
