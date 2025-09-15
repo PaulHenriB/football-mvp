@@ -1,35 +1,87 @@
-document.addEventListener("DOMContentLoaded", () => {
-  checkUserRole();
+import { enforceAuth } from "./auth-guard.js";
+import { apiRequest, API_ENDPOINTS } from "./api.js";
+
+document.addEventListener("DOMContentLoaded", async () => {
+  await enforceAuth();
+
+  try {
+    // Load user info
+    const user = await apiRequest(API_ENDPOINTS.ME, { method: "GET" });
+    document.getElementById("user-name").textContent = user.firstName || "Player";
+
+    // Load stats
+    await loadStats(user.id);
+
+    // Load matches
+    await loadUpcomingMatches();
+
+    // Load availability
+    renderAvailability(user.availability || []);
+  } catch (err) {
+    console.error("Error loading dashboard:", err);
+    document.getElementById("dashboard").innerHTML = "<p>Error loading dashboard.</p>";
+  }
 });
 
-async function checkUserRole() {
+/**
+ * Load user stats
+ */
+async function loadStats(userId) {
   try {
-    // Option 1: Get user role from localStorage (if you store it at login)
-    const user = JSON.parse(localStorage.getItem("user"));
-    let role = user?.role;
+    const stats = await apiRequest(`${API_ENDPOINTS.PLAYERS}/${userId}/stats`, {
+      method: "GET",
+    });
 
-    // Option 2: If role not in localStorage, fetch from backend
-    if (!role) {
-      const token = localStorage.getItem("token");
-      if (!token) return;
-
-      const res = await fetch("/api/me", {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-
-      if (!res.ok) return;
-      const data = await res.json();
-      role = data.role;
-
-      // Save for next time
-      localStorage.setItem("user", JSON.stringify(data));
-    }
-
-    // Show Team Balancer link if user is a manager
-    if (role === "manager") {
-      document.getElementById("team-balancer-link").style.display = "inline-block";
-    }
+    document.getElementById("stat-matches").textContent = stats.matchesPlayed || 0;
+    document.getElementById("stat-wins").textContent = stats.wins || 0;
+    document.getElementById("stat-goals").textContent = stats.goals || 0;
+    document.getElementById("stat-rating").textContent =
+      stats.avgRating ? stats.avgRating.toFixed(2) : "-";
   } catch (err) {
-    console.error("Error checking user role:", err);
+    console.error("Error fetching stats:", err);
   }
+}
+
+/**
+ * Load upcoming matches
+ */
+async function loadUpcomingMatches() {
+  const container = document.getElementById("matches-list");
+  container.innerHTML = "<p>Loading...</p>";
+
+  try {
+    const matches = await apiRequest(API_ENDPOINTS.UPCOMING_MATCHES, { method: "GET" });
+    if (!matches.length) {
+      container.innerHTML = "<li>No upcoming matches.</li>";
+      return;
+    }
+
+    container.innerHTML = matches
+      .map(
+        (m) => `
+        <li>
+          <strong>${m.name || "Match"}</strong> – ${m.date} @ ${m.location}
+        </li>
+      `
+      )
+      .join("");
+  } catch (err) {
+    console.error("Error fetching upcoming matches:", err);
+    container.innerHTML = "<li>Error loading matches.</li>";
+  }
+}
+
+/**
+ * Render availability
+ */
+function renderAvailability(availability) {
+  const container = document.getElementById("availability-list");
+  if (!availability.length) {
+    container.innerHTML = "<li>No availability set.</li>";
+    return;
+  }
+
+  container.innerHTML = availability
+    .map((a) => `<li>${a.date}: ${a.status}</li>`)
+    .join("");
 }
