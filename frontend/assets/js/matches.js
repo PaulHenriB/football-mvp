@@ -6,10 +6,11 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   setupTabs();
 
-  // Fetch matches
-  await loadUpcomingMatches();
-  await loadPastMatches();
-  await loadOpenMatches();
+  await Promise.all([
+    loadUpcomingMatches(),
+    loadPastMatches(),
+    loadOpenMatches(),
+  ]);
 });
 
 /**
@@ -39,11 +40,9 @@ async function loadUpcomingMatches() {
 
   try {
     const matches = await apiRequest(API_ENDPOINTS.UPCOMING_MATCHES, { method: "GET" });
-    if (!matches.length) {
-      container.innerHTML = "<p>No upcoming matches.</p>";
-      return;
-    }
-    container.innerHTML = matches.map(renderMatchCard).join("");
+    container.innerHTML = matches.length
+      ? matches.map(renderMatchCard).join("")
+      : "<p>No upcoming matches.</p>";
   } catch (err) {
     console.error("Error fetching upcoming matches:", err);
     container.innerHTML = "<p>Error loading upcoming matches.</p>";
@@ -59,11 +58,9 @@ async function loadPastMatches() {
 
   try {
     const matches = await apiRequest(API_ENDPOINTS.PAST_MATCHES, { method: "GET" });
-    if (!matches.length) {
-      container.innerHTML = "<p>No past matches.</p>";
-      return;
-    }
-    container.innerHTML = matches.map(renderMatchCard).join("");
+    container.innerHTML = matches.length
+      ? matches.map(renderMatchCard).join("")
+      : "<p>No past matches.</p>";
   } catch (err) {
     console.error("Error fetching past matches:", err);
     container.innerHTML = "<p>Error loading past matches.</p>";
@@ -71,7 +68,7 @@ async function loadPastMatches() {
 }
 
 /**
- * Load Open Matches (joinable matches)
+ * Load Open Matches
  */
 async function loadOpenMatches() {
   const container = document.getElementById("open-list");
@@ -83,6 +80,7 @@ async function loadOpenMatches() {
       container.innerHTML = "<p>No open matches available.</p>";
       return;
     }
+
     container.innerHTML = matches.map(renderOpenMatchCard).join("");
 
     // Attach join handlers
@@ -99,15 +97,15 @@ async function loadOpenMatches() {
 }
 
 /**
- * Render match card (for upcoming/past matches)
+ * Render match card (shared for upcoming & past)
  */
 function renderMatchCard(match) {
   return `
-    <div class="match-card">
+    <div class="match-card card">
       <h4>${match.name || "Match"}</h4>
-      <p>Date: ${match.date}</p>
-      <p>Location: ${match.location}</p>
-      ${match.result ? `<p>Result: ${match.result}</p>` : ""}
+      <p><strong>Date:</strong> ${match.date}</p>
+      <p><strong>Location:</strong> ${match.location}</p>
+      ${match.result ? `<p><strong>Result:</strong> ${match.result}</p>` : ""}
     </div>
   `;
 }
@@ -120,12 +118,12 @@ function renderOpenMatchCard(match) {
   const isClosed = spotsLeft <= 0;
 
   return `
-    <div class="match-card">
+    <div class="match-card card">
       <h4>${match.name || "Match"}</h4>
-      <p>Date: ${match.date}</p>
-      <p>Location: ${match.location}</p>
-      <p>Spots Left: ${spotsLeft}</p>
-      <button class="join-btn" data-id="${match.id}" ${isClosed ? "disabled" : ""}>
+      <p><strong>Date:</strong> ${match.date}</p>
+      <p><strong>Location:</strong> ${match.location}</p>
+      <p><strong>Spots Left:</strong> ${spotsLeft}</p>
+      <button class="primary-btn join-btn" data-id="${match.id}" ${isClosed ? "disabled" : ""}>
         ${isClosed ? "Closed" : "Join"}
       </button>
     </div>
@@ -139,7 +137,7 @@ async function handleJoinMatch(matchId) {
   try {
     await apiRequest(API_ENDPOINTS.JOIN_MATCH(matchId), { method: "POST" });
     alert("You successfully joined the match!");
-    await loadOpenMatches(); // refresh open matches
+    await loadOpenMatches(); // refresh list
   } catch (err) {
     console.error("Error joining match:", err);
     alert("Failed to join the match. Please try again.");
