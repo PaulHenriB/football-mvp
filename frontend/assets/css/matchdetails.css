@@ -1,30 +1,25 @@
-/* ============================
-   Match Details Page Styles
-   ============================ */
+/* Match Details Page Styles */
 
-.container {
-  max-width: 900px;
-  margin: 2rem auto;
-  padding: 1rem;
+/* General container */
+#match-details {
   display: flex;
   flex-direction: column;
   gap: 2rem;
+  margin-top: 2rem;
 }
 
-/* Cards */
-.card {
-  background: #fff;
-  padding: 2rem;
-  border-radius: 12px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+/* Card styling */
+#match-details .card {
+  padding: 1.5rem;
+  background: var(--surface);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-md);
 }
 
-.card h2 {
-  margin-bottom: 1rem;
-  font-size: 1.3rem;
-  color: #222;
-  border-bottom: 2px solid #eee;
-  padding-bottom: 0.5rem;
+/* Match info */
+.match-meta p {
+  margin: 0.5rem 0;
+  font-size: 1rem;
 }
 
 /* Forms */
@@ -34,37 +29,19 @@ form {
   gap: 1rem;
 }
 
-form label {
-  font-weight: 600;
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
 }
 
-form input {
-  padding: 0.6rem;
-  border: 1px solid #ddd;
-  border-radius: 8px;
+input[type="number"] {
+  padding: 0.5rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
   font-size: 1rem;
-}
-
-form input:focus {
-  border-color: #0077ff;
-  outline: none;
-}
-
-/* Buttons */
-.primary-btn {
-  padding: 0.8rem 1.2rem;
-  background: #0077ff;
-  color: #fff;
-  border: none;
-  border-radius: 8px;
-  font-size: 1rem;
-  cursor: pointer;
-  transition: background 0.3s ease;
-  align-self: flex-start;
-}
-
-.primary-btn:hover {
-  background-color: #005fcc;
+  width: 100%;
+  max-width: 200px;
 }
 
 /* Rating Section */
@@ -74,17 +51,29 @@ form input:focus {
   gap: 1rem;
 }
 
-#rating-list .opponent-rating {
+.rating-item {
   display: flex;
   align-items: center;
   justify-content: space-between;
 }
 
-#rating-list label {
-  flex: 1;
+.rating-stars {
+  display: flex;
+  gap: 0.3rem;
 }
 
-#rating-list input {
-  width: 80px;
-  text-align: center;
+.rating-stars span {
+  font-size: 1.5rem;
+  cursor: pointer;
+  color: var(--muted);
+  transition: color 0.2s;
+}
+
+.rating-stars span.active {
+  color: gold;
+}
+
+/* Utility classes */
+.hidden {
+  display: none;
 }
