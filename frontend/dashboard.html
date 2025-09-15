@@ -3,7 +3,9 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Dashboard</title>
+  <title>Weplay - Dashboard</title>
+
+  <!-- Page-specific and global styles -->
   <link rel="stylesheet" href="assets/css/dashboard.css">
   <link rel="stylesheet" href="assets/css/styles.css">
 
@@ -19,10 +21,10 @@
 </head>
 <body>
   <header>
-    <h1>Weplay</h1>
+    <h1>⚽ Weplay</h1>
     <nav>
       <ul>
-        <li><a href="index.html">home</a></li>
+        <li><a href="index.html">Home</a></li>
         <li><a href="matches.html">Matches</a></li>
         <li><a href="profile.html">Profile</a></li>
         <li><a href="login.html">Logout</a></li>
@@ -30,13 +32,58 @@
     </nav>
   </header>
 
-  <main class="container">
+  <main class="container" id="dashboard">
     <h2>Dashboard</h2>
-    <div id="dashboard"></div>
+
+    <!-- Welcome -->
+    <section id="welcome" class="card">
+      <h3>Welcome back, <span id="user-name">Player</span> 👋</h3>
+      <p>Here’s a quick overview of your matches, ratings, and availability.</p>
+    </section>
+
+    <!-- Quick stats -->
+    <section id="quick-stats" class="card">
+      <h3>📊 Quick Stats</h3>
+      <div class="stats-grid">
+        <div class="stat-item">
+          <p class="stat-value" id="stat-matches">0</p>
+          <p class="stat-label">Matches Played</p>
+        </div>
+        <div class="stat-item">
+          <p class="stat-value" id="stat-wins">0</p>
+          <p class="stat-label">Wins</p>
+        </div>
+        <div class="stat-item">
+          <p class="stat-value" id="stat-goals">0</p>
+          <p class="stat-label">Goals</p>
+        </div>
+        <div class="stat-item">
+          <p class="stat-value" id="stat-rating">-</p>
+          <p class="stat-label">Avg. Rating</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Upcoming matches -->
+    <section id="upcoming-matches" class="card">
+      <h3>📅 Upcoming Matches</h3>
+      <ul id="matches-list">
+        <li>No upcoming matches.</li>
+      </ul>
+    </section>
+
+    <!-- Availability -->
+    <section id="availability-dashboard" class="card">
+      <h3>✅ Availability</h3>
+      <ul id="availability-list">
+        <li>No availability set.</li>
+      </ul>
+      <a href="profile.html" class="secondary-btn">Update Availability</a>
+    </section>
   </main>
 
   <footer>
-    <p>&copy; 2025 Weplay. All Rights reserved.</p>
+    <p>&copy; 2025 Weplay. All Rights Reserved.</p>
   </footer>
 </body>
 </html>
