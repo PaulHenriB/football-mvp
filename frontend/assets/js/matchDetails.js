@@ -11,7 +11,11 @@ document.addEventListener("DOMContentLoaded", async () => {
   const matchId = getQueryParam("id");
   if (!matchId) return;
 
-  const matchContainer = document.getElementById("match-details");
+  const matchDate = document.getElementById("match-date");
+  const matchLocation = document.getElementById("match-location");
+  const matchTeams = document.getElementById("match-teams");
+  const matchStatus = document.getElementById("match-status");
+
   const resultFormSection = document.getElementById("result-form-section");
   const ratingSection = document.getElementById("rating-section");
   const ratingList = document.getElementById("rating-list");
@@ -20,45 +24,41 @@ document.addEventListener("DOMContentLoaded", async () => {
     const match = await apiRequest(API_ENDPOINTS.MATCH_BY_ID(matchId), { method: "GET" });
     const user = await apiRequest(API_ENDPOINTS.ME, { method: "GET" });
 
-    // Render basic match info
-    matchContainer.insertAdjacentHTML("afterbegin", `
-      <h2>${match.name}</h2>
-      <p>Date: ${match.date}</p>
-      <p>Location: ${match.location}</p>
-      <p>Status: ${match.status}</p>
-    `);
+    // ✅ Populate placeholders
+    matchDate.textContent = match.date;
+    matchLocation.textContent = match.location;
+    matchTeams.textContent = match.teams || `${match.homeTeam} vs ${match.awayTeam}`;
+    matchStatus.textContent = match.status;
 
-    // If match not finished → manager can record result
-    if (match.status !== "FINISHED") {
-      if (user.id === match.managerId) {
-        resultFormSection.style.display = "block";
-        setupResultForm(matchId);
-      }
+    // ✅ Manager: show result form if match not finished
+    if (match.status !== "FINISHED" && user.id === match.managerId) {
+      resultFormSection.classList.remove("hidden");
+      setupResultForm(matchId);
     }
 
-    // If match finished → players can rate opponents
+    // ✅ Player: show rating form if match finished
     if (match.status === "FINISHED") {
-      ratingSection.style.display = "block";
+      ratingSection.classList.remove("hidden");
+
       const opponents = match.players.filter(p => p.id !== user.id);
       opponents.forEach(p => {
-        ratingList.insertAdjacentHTML("beforeend", `
-          <div class="rating-item">
-            <p>${p.name}</p>
-            <label>Score (0–10):
-              <input type="number" name="score-${p.id}" min="0" max="10" required>
-            </label>
-            <label>Comment:
-              <input type="text" name="comment-${p.id}">
-            </label>
+        const div = document.createElement("div");
+        div.classList.add("rating-item");
+        div.innerHTML = `
+          <p>${p.name} (${p.position})</p>
+          <div class="rating-stars" data-player-id="${p.id}">
+            ${[1, 2, 3, 4, 5].map(i => `<span data-value="${i}">★</span>`).join("")}
           </div>
-        `);
+        `;
+        ratingList.appendChild(div);
       });
+
+      setupStarRating();
       setupRatingForm(matchId, opponents);
     }
-
   } catch (err) {
     console.error("Error loading match:", err);
-    matchContainer.innerHTML = "<p>Error loading match details.</p>";
+    document.getElementById("match-details").innerHTML = "<p>Error loading match details.</p>";
   }
 });
 
@@ -74,12 +74,26 @@ function setupResultForm(matchId) {
         method: "PUT",
         body: JSON.stringify({ homeScore, awayScore })
       });
-      alert("Result recorded successfully.");
+      alert("✅ Result recorded successfully.");
       location.reload();
     } catch (err) {
       console.error("Error submitting result:", err);
-      alert("Failed to record result.");
+      alert("❌ Failed to record result.");
     }
+  });
+}
+
+function setupStarRating() {
+  document.querySelectorAll(".rating-stars").forEach(container => {
+    container.addEventListener("click", (e) => {
+      if (e.target.tagName === "SPAN") {
+        const value = parseInt(e.target.dataset.value);
+        container.querySelectorAll("span").forEach(star => {
+          star.classList.toggle("active", parseInt(star.dataset.value) <= value);
+        });
+        container.dataset.selected = value;
+      }
+    });
   });
 }
 
@@ -90,23 +104,19 @@ function setupRatingForm(matchId, opponents) {
 
     try {
       for (let opponent of opponents) {
-        const score = form.querySelector(`[name="score-${opponent.id}"]`).value;
-        const comment = form.querySelector(`[name="comment-${opponent.id}"]`).value;
-        
+        const container = document.querySelector(`.rating-stars[data-player-id="${opponent.id}"]`);
+        const score = container.dataset.selected || 0;
+
         await apiRequest(API_ENDPOINTS.MATCH_RATE(matchId), {
           method: "POST",
-          body: JSON.stringify({
-            opponentId: opponent.id,
-            score,
-            comment
-          })
+          body: JSON.stringify({ opponentId: opponent.id, score })
         });
       }
-      alert("Ratings submitted successfully.");
-      form.querySelectorAll("input, button").forEach(el => el.disabled = true);
+      alert("⭐ Ratings submitted successfully.");
+      form.querySelectorAll("input, button, .rating-stars span").forEach(el => el.disabled = true);
     } catch (err) {
       console.error("Error submitting ratings:", err);
-      alert("Failed to submit ratings.");
+      alert("❌ Failed to submit ratings.");
     }
   });
 }
