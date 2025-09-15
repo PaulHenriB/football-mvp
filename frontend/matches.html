@@ -4,16 +4,17 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Matches - Weplay</title>
+  <!-- Corrected path to CSS -->
   <link rel="stylesheet" href="assets/css/matches.css" />
-  <link rel="stylesheet" href="assets/css/styles.css">
+  <link rel="stylesheet" href="assets/css/styles.css" />
 
   <script>
     window.__API_BASE__ = 'http://localhost:3001/';
   </script>
 
-  <script src="/asset/js/api.js" defer></script>
-  <script src="/asset/js/auth.js" defer></script>
-  <script src="/asset/js/matches.js" defer></script>
+  <script src="/js/api.js" defer></script>
+  <script src="/js/auth.js" defer></script>
+  <script src="/js/matches.js" defer></script>
 </head>
 <body>
   <header>
@@ -32,26 +33,26 @@
     <h2>Matches</h2>
 
     <!-- Tabs for filtering -->
-    <div class="tabs">
+    <div class="tabs card">
       <button class="tab-btn active" data-tab="upcoming">Upcoming</button>
       <button class="tab-btn" data-tab="past">Past</button>
       <button class="tab-btn" data-tab="open">Open</button>
     </div>
 
     <!-- Tab contents -->
-    <section id="tab-upcoming" class="tab-content active">
+    <section id="tab-upcoming" class="tab-content active card">
       <h3>Upcoming Matches</h3>
-      <div id="upcoming-list"></div>
+      <div id="upcoming-list" class="match-list"></div>
     </section>
 
-    <section id="tab-past" class="tab-content">
+    <section id="tab-past" class="tab-content card">
       <h3>Past Matches</h3>
-      <div id="past-list"></div>
+      <div id="past-list" class="match-list"></div>
     </section>
 
-    <section id="tab-open" class="tab-content">
+    <section id="tab-open" class="tab-content card">
       <h3>Open Matches</h3>
-      <div id="open-list"></div>
+      <div id="open-list" class="match-list"></div>
     </section>
   </main>
 
@@ -60,3 +61,4 @@
   </footer>
 </body>
 </html>
+
