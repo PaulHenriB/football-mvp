@@ -5,16 +5,14 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Team Balancer | NextPlay</title>
   <link rel="stylesheet" href="assets/css/teambalancer.css" />
-  <link rel="stylesheet" href="assets/css/styles.css">
+  <link rel="stylesheet" href="assets/css/styles.css" />
 
-  <script src="/asset/js/script.js" defer></script>
-  <script src="/asset/js/teambalancer.js" defer></script>
-
-    <!-- Global helpers -->
-  <script src="/asset/js/api.js" defer></script>
-  <script src="asset//js/auth.js" defer></script>
-  <script src="/asset/js/index.js" defer></script>
-
+  <!-- Scripts -->
+  <script src="assets/js/script.js" defer></script>
+  <script src="assets/js/teambalancer.js" defer></script>
+  <script src="assets/js/api.js" defer></script>
+  <script src="assets/js/auth.js" defer></script>
+  <script src="assets/js/index.js" defer></script>
 </head>
 <body>
   <nav class="navbar">
@@ -31,7 +29,7 @@
   <main class="team-balancer-main">
     <h1>Team Balancer</h1>
 
-    <div class="selector">
+    <div class="selector card">
       <label for="match-select">Select a Match:</label>
       <select id="match-select" required>
         <option value="" disabled selected>Select a match</option>
@@ -40,16 +38,20 @@
     </div>
 
     <section id="teams-display" class="teams-section">
-      <div class="team-container" id="team-1">
+      <div class="team-container card" id="team-1">
         <h2>Team 1</h2>
-        <ul class="team-list"></ul>
+        <ul class="team-list" id="team1-list"></ul>
       </div>
 
-      <div class="team-container" id="team-2">
+      <div class="team-container card" id="team-2">
         <h2>Team 2</h2>
-        <ul class="team-list"></ul>
+        <ul class="team-list" id="team2-list"></ul>
       </div>
     </section>
+
+    <div class="actions">
+      <button id="save-teams" class="primary-btn">Save Teams</button>
+    </div>
   </main>
 
   <footer>
@@ -57,3 +59,4 @@
   </footer>
 </body>
 </html>
+
