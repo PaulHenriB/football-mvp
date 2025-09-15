@@ -1,11 +1,11 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Login</title>
-  <link rel="stylesheet" href="assets/css/login.css">
-  <link rel="stylesheet" href="assets/css/styles.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Login - Weplay</title>
+  <link rel="stylesheet" href="assets/css/login.css" />
+  <link rel="stylesheet" href="assets/css/styles.css" />
 
   <!-- Base API config -->
   <script>
@@ -18,29 +18,36 @@
   <script src="/js/login.js" defer></script>
 </head>
 <body>
-  <div class="container">
-    <h1>Weplay</h1>
-    <h2>Login</h2>
-    <form id="login-form">
-      <div class="input-group">
-        <label for="email">Email</label>
-        <input type="email" id="email" placeholder="Enter your email" required>
-        <p class="error" id="email-error"></p>
-      </div>
-      <div class="input-group">
-        <label for="password">Password</label>
-        <input type="password" id="password" placeholder="Enter your password" required>
-        <p class="error" id="password-error"></p>
-      </div>
-      <button type="submit">Login</button>
-      <p class="success" id="success-message"></p>
-      <p class="register-link">Don't have an account? <a href="signup.html">Sign Up</a></p>
-    </form>
-  </div>
+  <main class="login-page">
+    <div class="card login-card">
+      <h1 class="app-title">Weplay</h1>
+      <h2 class="page-title">Login</h2>
+
+      <form id="login-form" novalidate>
+        <div class="input-group">
+          <label for="email">Email</label>
+          <input type="email" id="email" placeholder="Enter your email" required />
+          <p class="error" id="email-error"></p>
+        </div>
+
+        <div class="input-group">
+          <label for="password">Password</label>
+          <input type="password" id="password" placeholder="Enter your password" required />
+          <p class="error" id="password-error"></p>
+        </div>
+
+        <button type="submit" class="primary-btn full-width">Login</button>
+        <p class="success" id="success-message"></p>
+
+        <p class="auth-switch">
+          Don’t have an account? <a href="signup.html">Sign Up</a>
+        </p>
+      </form>
+    </div>
+  </main>
 
   <footer>
-    <p>&copy; 2025 Weplay. All Rights reserved.</p>
+    <p>&copy; 2025 Weplay. All Rights Reserved.</p>
   </footer>
 </body>
 </html>
-
