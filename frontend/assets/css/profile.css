@@ -2,7 +2,6 @@
    Profile Page Styles
    ============================ */
 
-/* Layout container */
 .container {
   max-width: 1000px;
   margin: 2rem auto;
@@ -12,15 +11,13 @@
   gap: 2rem;
 }
 
-/* Card Styling (profile, availability, ratings) */
 .card {
   background: #fff;
   padding: 2rem;
   border-radius: 12px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
 }
 
-/* Section Headings */
 .card h2 {
   margin-bottom: 1rem;
   font-size: 1.4rem;
@@ -29,7 +26,6 @@
   padding-bottom: 0.5rem;
 }
 
-/* Forms */
 form {
   display: flex;
   flex-direction: column;
@@ -56,7 +52,6 @@ form select:focus {
   outline: none;
 }
 
-/* Buttons */
 .primary-btn {
   padding: 0.8rem 1.2rem;
   background-color: #0077ff;
@@ -73,7 +68,7 @@ form select:focus {
   background-color: #005fcc;
 }
 
-/* Availability Section */
+/* Availability */
 #availability {
   margin-bottom: 1rem;
   padding: 1rem;
@@ -85,22 +80,33 @@ form select:focus {
   color: #444;
 }
 
-/* Ratings */
+#availability ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+#availability li {
+  padding: 0.4rem 0;
+}
+
+/* Ratings Summary */
 #ratings-summary {
-  font-size: 1.2rem;
-  font-weight: bold;
   margin-bottom: 1rem;
+  font-size: 1.1rem;
+  font-weight: bold;
   color: #222;
 }
 
+/* Ratings History */
 #ratings-history {
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
+  gap: 1rem;
 }
 
-#ratings-history .rating-entry {
-  padding: 0.6rem;
+.rating-entry {
+  padding: 1rem;
   background: #f4f6f9;
   border: 1px solid #ddd;
   border-radius: 6px;
@@ -108,13 +114,57 @@ form select:focus {
   color: #333;
 }
 
-/* Responsive Design */
+.rating-entry p {
+  margin: 0.3rem 0;
+}
+
+.rating-comment {
+  font-style: italic;
+  color: #555;
+}
+
+/* Stars */
+.stars {
+  display: inline-block;
+  font-size: 1.2rem;
+  line-height: 1;
+}
+
+.stars::before {
+  content: "★★★★★";
+  letter-spacing: 2px;
+  background: linear-gradient(
+    90deg,
+    #ffd700 calc(var(--rating, 0) * 20%),
+    #ccc calc(var(--rating, 0) * 20%)
+  );
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+/* Progress bar */
+.progress-bar {
+  background: #eee;
+  border-radius: 6px;
+  overflow: hidden;
+  height: 10px;
+  margin-top: 0.4rem;
+}
+
+.progress-bar div {
+  height: 100%;
+  background: #0077ff;
+  width: 0%;
+  transition: width 0.4s ease;
+}
+
+/* Responsive */
 @media (min-width: 768px) {
   .container {
     grid-template-columns: 1fr 1fr;
   }
 
   #ratings-section {
-    grid-column: 1 / -1; /* Ratings span both columns */
+    grid-column: 1 / -1;
   }
 }
