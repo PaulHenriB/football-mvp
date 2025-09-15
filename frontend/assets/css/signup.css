@@ -1,73 +1,97 @@
+/* Signup Page Styles
+   ---------------------------------- */
+
 body {
-    font-family: 'Poppins', sans-serif;
-    background-color: #f9f9f9;
-    margin: 0;
-    padding: 0;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
+  background-color: var(--color-background, #f9f9f9);
+  margin: 0;
+  padding: 0;
+  font-family: 'Poppins', sans-serif;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
 }
 
-.container {
-    background: white;
-    padding: 30px;
-    border-radius: 12px;
-    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
-    width: 100%;
-    max-width: 400px;
+.auth-container {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 2rem;
 }
 
-h2 {
-    text-align: center;
-    color: #1e3a8a;
+.auth-card {
+  width: 100%;
+  max-width: 420px;
+  padding: 2rem;
+  text-align: center;
+}
+
+.app-title {
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: var(--color-primary, #1e3a8a);
+  margin-bottom: 0.25rem;
+}
+
+.page-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--color-dark, #232323);
+  margin-bottom: 1.5rem;
 }
 
 .input-group {
-    margin-bottom: 15px;
+  text-align: left;
+  margin-bottom: 1rem;
 }
 
-label {
-    display: block;
-    font-weight: 600;
-    margin-bottom: 5px;
+.input-group label {
+  display: block;
+  font-weight: 600;
+  margin-bottom: 0.35rem;
+  color: var(--color-dark, #232323);
 }
 
-input {
-    width: 100%;
-    padding: 10px;
-    border: 1px solid #ccc;
-    border-radius: 6px;
-    font-size: 16px;
+.input-group input {
+  width: 100%;
+  padding: 0.75rem;
+  border: 1px solid var(--color-border, #ccc);
+  border-radius: var(--radius-md, 6px);
+  font-size: 0.95rem;
 }
 
-button {
-    width: 100%;
-    background: #ffcc00;
-    border: none;
-    padding: 12px;
-    font-size: 18px;
-    font-weight: 600;
-    color: #232323;
-    cursor: pointer;
-    border-radius: 6px;
-    transition: background 0.3s;
-}
-
-button:hover {
-    background: #e6b800;
+.primary-btn.full-width {
+  width: 100%;
+  margin-top: 1rem;
+  padding: 0.9rem;
+  font-size: 1rem;
 }
 
 .error {
-    color: red;
-    font-size: 14px;
-    margin-top: 5px;
-    display: none;
+  color: var(--color-error, red);
+  font-size: 0.8rem;
+  margin-top: 0.3rem;
+  display: none;
 }
 
 .success {
-    color: green;
-    font-size: 14px;
-    text-align: center;
-    display: none;
+  color: var(--color-success, green);
+  font-size: 0.9rem;
+  margin-top: 0.75rem;
+  display: none;
+}
+
+.auth-switch {
+  margin-top: 1rem;
+  font-size: 0.9rem;
+}
+
+.auth-switch a {
+  color: var(--color-primary, #1e3a8a);
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.auth-switch a:hover {
+  text-decoration: underline;
 }
