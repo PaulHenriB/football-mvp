@@ -4,20 +4,24 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Match Details - Weplay</title>
+
+  <!-- Global Styles -->
+  <link rel="stylesheet" href="assets/css/styles.css" />
+
+  <!-- Match Details Specific Styles -->
   <link rel="stylesheet" href="assets/css/matchdetails.css" />
-  <link rel="stylesheet" href="assets/css/styles.css">
 
   <script>
     window.__API_BASE__ = 'http://localhost:3001/';
   </script>
 
-  <script src="/asset/js/api.js" defer></script>
-  <script src="/asset/js/auth.js" defer></script>
-  <script src="/asset/js/matchdetails.js" defer></script>
+  <script src="/js/api.js" defer></script>
+  <script src="/js/auth.js" defer></script>
+  <script src="/js/matchdetails.js" defer></script>
 </head>
 <body>
   <header>
-    <h1>Weplay - Match Details</h1>
+    <h1>⚽ Weplay - Match Details</h1>
     <nav>
       <ul>
         <li><a href="matches.html">Matches</a></li>
@@ -29,28 +33,41 @@
   </header>
 
   <main class="container" id="match-details">
-    <!-- Match info will be rendered here -->
-    
-    <!-- Manager-only: result form -->
-    <section id="result-form-section" class="card" style="display: none;">
-      <h2>Record Result</h2>
-      <form id="result-form">
-        <label for="homeScore">Home Score:</label>
-        <input type="number" id="homeScore" name="homeScore" min="0" required>
+    <!-- Match Info -->
+    <section id="match-info" class="card">
+      <h2>Match Information</h2>
+      <div class="match-meta">
+        <p><strong>Date:</strong> <span id="match-date">Loading...</span></p>
+        <p><strong>Location:</strong> <span id="match-location">Loading...</span></p>
+        <p><strong>Teams:</strong> <span id="match-teams">Loading...</span></p>
+        <p><strong>Status:</strong> <span id="match-status">Loading...</span></p>
+      </div>
+    </section>
 
-        <label for="awayScore">Away Score:</label>
-        <input type="number" id="awayScore" name="awayScore" min="0" required>
+    <!-- Manager-only: result form -->
+    <section id="result-form-section" class="card hidden">
+      <h2>📊 Record Result</h2>
+      <form id="result-form">
+        <div class="form-group">
+          <label for="homeScore">Home Score:</label>
+          <input type="number" id="homeScore" name="homeScore" min="0" required>
+        </div>
+
+        <div class="form-group">
+          <label for="awayScore">Away Score:</label>
+          <input type="number" id="awayScore" name="awayScore" min="0" required>
+        </div>
 
         <button type="submit" class="primary-btn">Submit Result</button>
       </form>
     </section>
 
     <!-- Player-only: rating form -->
-    <section id="rating-section" class="card" style="display: none;">
-      <h2>Rate Your Opponents</h2>
+    <section id="rating-section" class="card hidden">
+      <h2>⭐ Rate Your Opponents</h2>
       <form id="rating-form">
         <div id="rating-list">
-          <!-- Opponents will be listed here with input fields -->
+          <!-- Opponents will be listed here dynamically -->
         </div>
         <button type="submit" class="primary-btn">Submit Ratings</button>
       </form>
@@ -62,4 +79,3 @@
   </footer>
 </body>
 </html>
-
