@@ -1,3 +1,4 @@
+// frontend/assets/js/manager_dashboard.js
 import { enforceAuth } from "./auth-guard.js";
 import { apiRequest, API_ENDPOINTS } from "./api.js";
 
@@ -8,14 +9,14 @@ document.addEventListener("DOMContentLoaded", async () => {
   const upcomingList = document.getElementById("upcoming-list");
   const pastList = document.getElementById("past-list");
   const playerList = document.getElementById("player-list");
-  const balanceBtn = document.getElementById("balance-teams");
   const teamResults = document.getElementById("team-results");
+  const teamBalancerLink = document.getElementById("team-balancer-link");
 
-  // Fetch and render matches on load
+  // Fetch initial data
   await fetchMatches();
   await fetchPlayers();
 
-  // Handle match scheduling
+  /** Handle match scheduling */
   matchForm.addEventListener("submit", async (e) => {
     e.preventDefault();
 
@@ -33,30 +34,16 @@ document.addEventListener("DOMContentLoaded", async () => {
         method: "POST",
         body: JSON.stringify(newMatch),
       });
-      alert("Match scheduled successfully!");
+      alert("✅ Match scheduled successfully!");
       matchForm.reset();
       await fetchMatches();
     } catch (err) {
       console.error("Error scheduling match:", err);
-      alert("Failed to schedule match. Please try again.");
+      alert("❌ Failed to schedule match. Please try again.");
     }
   });
 
-  // Handle team balancing
-  balanceBtn.addEventListener("click", async () => {
-    try {
-      const players = await apiRequest(API_ENDPOINTS.PLAYERS, { method: "GET" });
-      // Dummy auto-balancing (split into 2 teams)
-      const midpoint = Math.ceil(players.length / 2);
-      const teamA = players.slice(0, midpoint);
-      const teamB = players.slice(midpoint);
-
-      renderTeams(teamA, teamB);
-    } catch (err) {
-      console.error("Error balancing teams:", err);
-    }
-  });
-
+  /** Fetch and render matches */
   async function fetchMatches() {
     try {
       const matches = await apiRequest(API_ENDPOINTS.MATCHES, { method: "GET" });
@@ -68,16 +55,20 @@ document.addEventListener("DOMContentLoaded", async () => {
 
       matches.forEach((match) => {
         const matchDate = new Date(`${match.date}T${match.time}`);
+
         const matchEl = document.createElement("div");
-        matchEl.classList.add("match-card");
+        matchEl.classList.add("match"); // aligns with .match-list .match in CSS
         matchEl.innerHTML = `
-          <h3>${match.date} ${match.time}</h3>
-          <p>Location: ${match.location}</p>
-          <p>Duration: ${match.duration} min</p>
-          <p>Players: ${match.numberOfPlayers} (Spots: ${match.availableSpots})</p>
-          <h4>Registered Players:</h4>
-          <ul>${match.players.map(p => `<li>${p.name}</li>`).join("")}</ul>
-          <p>Teams can be managed in <a href="team-balancer.html">Team Balancer</a></p>
+          <div class="time">${match.time}</div>
+          <div class="meta">
+            <p><strong>${match.date}</strong> – ${match.location}</p>
+            <p>⏱ ${match.duration} min • 👥 ${match.numberOfPlayers} players (Spots: ${match.availableSpots})</p>
+            <span class="badge ${matchDate > now ? "badge--yellow" : "badge--green"}">
+              ${matchDate > now ? "Upcoming" : "Finished"}
+            </span>
+            <h4>Registered Players:</h4>
+            <ul>${match.players.map(p => `<li>${p.name}</li>`).join("")}</ul>
+          </div>
         `;
 
         if (matchDate > now) {
@@ -91,15 +82,34 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
   }
 
+  /** Fetch and render players */
   async function fetchPlayers() {
     try {
       const players = await apiRequest(API_ENDPOINTS.PLAYERS, { method: "GET" });
-      playerList.innerHTML = players.map(p => `<li>${p.name} (${p.position || "No position"})</li>`).join("");
+      playerList.innerHTML = players
+        .map(p => `<li>${p.name} (${p.position || "No position"})</li>`)
+        .join("");
+
+      // Auto-balance when players are fetched
+      autoBalanceTeams(players);
     } catch (err) {
       console.error("Error fetching players:", err);
     }
   }
 
+  /** Simple auto-balance into 2 teams */
+  function autoBalanceTeams(players) {
+    if (!players.length) return;
+
+    const midpoint = Math.ceil(players.length / 2);
+    const teamA = players.slice(0, midpoint);
+    const teamB = players.slice(midpoint);
+
+    renderTeams(teamA, teamB);
+    teamBalancerLink.style.display = "inline-block"; // show link to team-balancer.html
+  }
+
+  /** Render teams in dashboard */
   function renderTeams(teamA, teamB) {
     teamResults.innerHTML = `
       <div class="team">
