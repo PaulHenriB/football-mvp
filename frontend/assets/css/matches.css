@@ -1,180 +1,72 @@
-/* Reset & Base Styles */
-* {
-    box-sizing: border-box;
-    margin: 0;
-    padding: 0;
-  }
-  
-  body {
-    font-family: 'Poppins', sans-serif;
-    background-color: #f9f9f9;
-    color: #232323;
-    line-height: 1.6;
-  }
-  
-  /* Navbar */
-  .navbar {
-    background-color: #1e3a8a;
-    color: white;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 1rem 2rem;
-  }
-  
-  .navbar .logo {
-    font-size: 1.5rem;
-    font-weight: bold;
-  }
-  
-  .nav-links {
-    list-style: none;
-    display: flex;
-    gap: 1.5rem;
-  }
-  
-  .nav-links li a {
-    color: white;
-    text-decoration: none;
-    font-weight: 500;
-    transition: color 0.2s ease;
-  }
-  
-  .nav-links li a:hover,
-  .nav-links li a.active {
-    color: #ffcc00;
-  }
-  
-  /* Header Section */
-  .matches-header {
-    padding: 2rem 2rem 1rem;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    background-color: #ffffff;
-    border-bottom: 1px solid #ddd;
-  }
-  
-  .matches-header h1 {
-    font-size: 2rem;
-  }
-  
-  .cta-button {
-    background-color: #ffcc00;
-    color: #1e3a8a;
-    border: none;
-    padding: 0.75rem 1.5rem;
-    font-size: 1rem;
-    font-weight: bold;
-    border-radius: 8px;
-    cursor: pointer;
-    transition: background 0.3s ease;
-  }
-  
-  .cta-button:hover {
-    background-color: #e6b800;
-  }
-  
-  /* Main Layout */
-  .matches-container {
-    padding: 2rem;
-    max-width: 1100px;
-    margin: 0 auto;
-  }
-  
-  /* Filter Section */
-  .filter-options {
-    margin-bottom: 2rem;
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-  }
-  
-  .filter-options select {
-    padding: 0.5rem 1rem;
-    border: 1px solid #ccc;
-    border-radius: 6px;
-    background-color: #fff;
-  }
-  
-  /* Match Sections */
-  .match-section {
-    margin-bottom: 2rem;
-  }
-  
-  .match-section h2 {
-    font-size: 1.4rem;
-    margin-bottom: 1rem;
-    color: #1e3a8a;
-  }
-  
-  /* Match Cards */
-  .match-card {
-    background-color: white;
-    border: 1px solid #ddd;
-    border-left: 6px solid #1e3a8a;
-    border-radius: 12px;
-    padding: 1rem 1.5rem;
-    margin-bottom: 1rem;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.05);
-    transition: transform 0.2s ease;
-  }
-  
-  .match-card:hover {
-    transform: translateY(-2px);
-  }
-  
-  .match-card p {
-    margin-bottom: 0.5rem;
-  }
-  
-  /* Buttons */
-  .join-button,
-  .view-button {
-    margin-top: 1rem;
-    padding: 0.5rem 1.25rem;
-    font-weight: 500;
-    font-size: 0.95rem;
-    border: none;
-    border-radius: 6px;
-    cursor: pointer;
-    transition: all 0.3s ease;
-  }
-  
-  .join-button {
-    background-color: #28a745;
-    color: white;
-  }
-  
-  .join-button:hover {
-    background-color: #218838;
-  }
-  
-  .view-button {
-    background-color: #1e3a8a;
-    color: white;
-  }
-  
-  .view-button:hover {
-    background-color: #162c6d;
-  }
-  
-  /* Responsive */
-  @media screen and (max-width: 768px) {
-    .matches-header {
-      flex-direction: column;
-      align-items: flex-start;
-      gap: 1rem;
-    }
-  
-    .filter-options {
-      flex-direction: column;
-      align-items: flex-start;
-    }
-  
-    .nav-links {
-      flex-direction: column;
-      align-items: flex-end;
-    }
-  }
-  
+/* Matches Page Styles */
+
+/* Tabs */
+.tabs {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.tab-btn {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 0.5rem 1rem;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s;
+}
+
+.tab-btn.active {
+  background: var(--primary);
+  color: #fff;
+  border-color: var(--primary);
+}
+
+.tab-content {
+  display: none;
+}
+
+.tab-content.active {
+  display: block;
+}
+
+/* Match cards */
+.match-card {
+  background: var(--surface);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+  padding: 1rem;
+  margin-bottom: 1rem;
+}
+
+.match-card h4 {
+  margin: 0 0 0.5rem;
+  font-size: 1.1rem;
+}
+
+.match-card p {
+  margin: 0.25rem 0;
+  font-size: 0.95rem;
+}
+
+/* Join button */
+.match-card button {
+  margin-top: 0.5rem;
+  padding: 0.5rem 1rem;
+  border-radius: var(--radius-md);
+  border: none;
+  cursor: pointer;
+  font-size: 0.9rem;
+  background: var(--primary);
+  color: #fff;
+  transition: background 0.2s;
+}
+
+.match-card button:disabled {
+  background: var(--muted);
+  cursor: not-allowed;
+}
+
+.match-card button:hover:not(:disabled) {
+  background: var(--primary-dark, #005bb5);
+}
