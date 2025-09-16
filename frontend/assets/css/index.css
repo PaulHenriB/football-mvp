@@ -1,8 +1,7 @@
-/* index.css - homepage specific styles
-   Extends global styles (styles.css)
-*/
+/* index.css - Homepage styles */
+/* Extends global design system (styles.css) */
 
-/* ===== Hero Section ===== */
+/* ===== Hero ===== */
 .hero {
   text-align: center;
   padding: var(--space-xl) var(--space);
@@ -10,7 +9,7 @@
 }
 
 .hero h1 {
-  font-size: 2.25rem;
+  font-size: clamp(1.75rem, 4vw, 2.5rem);
   font-weight: 700;
   margin-bottom: var(--space);
 }
@@ -33,28 +32,7 @@
   gap: var(--space-sm);
 }
 
-.cta-buttons .btn-primary,
-.cta-buttons .btn-secondary {
-  padding: .75rem 1.5rem;
-  font-size: 1rem;
-  border-radius: var(--radius);
-  font-weight: 600;
-  transition: var(--transition);
-}
-
-.btn-primary {
-  background: var(--color-primary);
-  color: var(--color-surface);
-}
-.btn-primary:hover { background: var(--color-primary-dark); }
-
-.btn-secondary {
-  background: var(--color-secondary);
-  color: var(--text-default);
-}
-.btn-secondary:hover { background: var(--color-secondary-dark); }
-
-/* ===== Features Section ===== */
+/* ===== Features ===== */
 .features {
   padding: var(--space-xl) var(--space);
   text-align: center;
@@ -80,7 +58,8 @@
   transition: transform var(--transition), box-shadow var(--transition);
 }
 
-.feature-card:hover {
+.feature-card:hover,
+.feature-card:focus-within {
   transform: translateY(-4px);
   box-shadow: 0 10px 24px rgba(15, 23, 42, 0.08);
 }
@@ -100,7 +79,7 @@
   font-size: .95rem;
 }
 
-/* Larger screens: 2x2 grid */
+/* Responsive grids */
 @media (min-width: 768px) {
   .feature-grid {
     grid-template-columns: repeat(2, 1fr);
@@ -126,7 +105,7 @@
 .cta-banner h2 {
   margin-bottom: var(--space-sm);
   font-weight: 700;
-  font-size: 1.75rem;
+  font-size: clamp(1.5rem, 3vw, 2rem);
 }
 
 .cta-banner p {
@@ -138,7 +117,8 @@
   background: var(--color-secondary);
   color: var(--text-default);
 }
-.cta-banner .btn-primary:hover {
+.cta-banner .btn-primary:hover,
+.cta-banner .btn-primary:focus {
   background: var(--color-secondary-dark);
 }
 
@@ -150,4 +130,62 @@ footer {
   border-top: 1px solid rgba(15,23,42,0.05);
   color: var(--text-muted);
   font-size: var(--small);
+}
+
+/* ===== Hamburger Menu ===== */
+.hamburger {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 5px;
+  width: 32px;
+  height: 32px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+}
+
+.hamburger span {
+  display: block;
+  height: 3px;
+  width: 100%;
+  background: var(--text-default);
+  border-radius: 2px;
+  transition: all var(--transition);
+}
+
+/* Default: nav hidden on mobile */
+.nav-links {
+  display: none;
+  flex-direction: column;
+  gap: var(--space-sm);
+  position: absolute;
+  top: 60px;
+  right: var(--space);
+  background: var(--color-surface);
+  padding: var(--space);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+}
+
+.nav-links.nav-open {
+  display: flex;
+}
+
+/* Desktop: nav inline, hide hamburger */
+@media (min-width: 768px) {
+  .hamburger {
+    display: none;
+  }
+
+  .nav-links {
+    display: flex !important;
+    position: static;
+    flex-direction: row;
+    gap: var(--space-md);
+    background: transparent;
+    padding: 0;
+    box-shadow: none;
+  }
 }
