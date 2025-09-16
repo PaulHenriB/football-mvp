@@ -12,11 +12,11 @@ document.addEventListener("DOMContentLoaded", async () => {
   const teamResults = document.getElementById("team-results");
   const teamBalancerLink = document.getElementById("team-balancer-link");
 
-  // Fetch initial data
+  // ===== Initial Load =====
   await fetchMatches();
   await fetchPlayers();
 
-  /** Handle match scheduling */
+  // ===== Match Scheduling =====
   matchForm.addEventListener("submit", async (e) => {
     e.preventDefault();
 
@@ -43,35 +43,34 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
   });
 
-  /** Fetch and render matches */
+  // ===== Fetch & Render Matches =====
   async function fetchMatches() {
     try {
       const matches = await apiRequest(API_ENDPOINTS.MATCHES, { method: "GET" });
-
       upcomingList.innerHTML = "";
       pastList.innerHTML = "";
 
       const now = new Date();
-
       matches.forEach((match) => {
         const matchDate = new Date(`${match.date}T${match.time}`);
+        const isUpcoming = matchDate > now;
 
         const matchEl = document.createElement("div");
-        matchEl.classList.add("match"); // aligns with .match-list .match in CSS
+        matchEl.classList.add("match");
         matchEl.innerHTML = `
           <div class="time">${match.time}</div>
           <div class="meta">
             <p><strong>${match.date}</strong> – ${match.location}</p>
             <p>⏱ ${match.duration} min • 👥 ${match.numberOfPlayers} players (Spots: ${match.availableSpots})</p>
-            <span class="badge ${matchDate > now ? "badge--yellow" : "badge--green"}">
-              ${matchDate > now ? "Upcoming" : "Finished"}
+            <span class="badge ${isUpcoming ? "badge--yellow" : "badge--green"}">
+              ${isUpcoming ? "Upcoming" : "Finished"}
             </span>
             <h4>Registered Players:</h4>
-            <ul>${match.players.map(p => `<li>${p.name}</li>`).join("")}</ul>
+            <ul>${(match.players || []).map((p) => `<li>${p.name}</li>`).join("")}</ul>
           </div>
         `;
 
-        if (matchDate > now) {
+        if (isUpcoming) {
           upcomingList.appendChild(matchEl);
         } else {
           pastList.appendChild(matchEl);
@@ -82,22 +81,21 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
   }
 
-  /** Fetch and render players */
+  // ===== Fetch & Render Players =====
   async function fetchPlayers() {
     try {
       const players = await apiRequest(API_ENDPOINTS.PLAYERS, { method: "GET" });
       playerList.innerHTML = players
-        .map(p => `<li>${p.name} (${p.position || "No position"})</li>`)
+        .map((p) => `<li>${p.name} (${p.position || "No position"})</li>`)
         .join("");
 
-      // Auto-balance when players are fetched
       autoBalanceTeams(players);
     } catch (err) {
       console.error("Error fetching players:", err);
     }
   }
 
-  /** Simple auto-balance into 2 teams */
+  // ===== Auto Balance Teams =====
   function autoBalanceTeams(players) {
     if (!players.length) return;
 
@@ -106,19 +104,18 @@ document.addEventListener("DOMContentLoaded", async () => {
     const teamB = players.slice(midpoint);
 
     renderTeams(teamA, teamB);
-    teamBalancerLink.style.display = "inline-block"; // show link to team-balancer.html
+    teamBalancerLink.style.display = "inline-block";
   }
 
-  /** Render teams in dashboard */
   function renderTeams(teamA, teamB) {
     teamResults.innerHTML = `
       <div class="team">
         <h3>Team A</h3>
-        <ul>${teamA.map(p => `<li>${p.name}</li>`).join("")}</ul>
+        <ul>${teamA.map((p) => `<li>${p.name}</li>`).join("")}</ul>
       </div>
       <div class="team">
         <h3>Team B</h3>
-        <ul>${teamB.map(p => `<li>${p.name}</li>`).join("")}</ul>
+        <ul>${teamB.map((p) => `<li>${p.name}</li>`).join("")}</ul>
       </div>
     `;
   }
