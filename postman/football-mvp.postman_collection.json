@@ -1,0 +1,157 @@
+{
+  "info": {
+    "name": "Football MVP API",
+    "_postman_id": "12345678-abcd-efgh-ijkl-1234567890ab",
+    "description": "Postman collection for testing Football MVP backend API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Players",
+      "item": [
+        {
+          "name": "Get all players",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:3001/api/players",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "3001",
+              "path": ["api", "players"]
+            }
+          }
+        },
+        {
+          "name": "Create player",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"John Doe\",\n  \"email\": \"john@example.com\",\n  \"position\": \"FORWARD\"\n}"
+            },
+            "url": {
+              "raw": "http://localhost:3001/api/players",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "3001",
+              "path": ["api", "players"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Matches",
+      "item": [
+        {
+          "name": "Get all matches",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "http://localhost:3001/api/matches",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "3001",
+              "path": ["api", "matches"]
+            }
+          }
+        },
+        {
+          "name": "Create match",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"date\": \"2025-09-20T18:00:00.000Z\",\n  \"location\": \"Dublin Stadium\",\n  \"duration\": 90,\n  \"fee\": 10.0,\n  \"createdBy\": 1\n}"
+            },
+            "url": {
+              "raw": "http://localhost:3001/api/matches",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "3001",
+              "path": ["api", "matches"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Team Balance",
+      "item": [
+        {
+          "name": "Balance teams",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"players\": [\n    { \"id\": 1, \"name\": \"Player 1\", \"rating\": 7.5, \"position\": \"FORWARD\" },\n    { \"id\": 2, \"name\": \"Player 2\", \"rating\": 6.8, \"position\": \"DEFENDER\" },\n    { \"id\": 3, \"name\": \"Player 3\", \"rating\": 5.9, \"position\": \"MIDFIELDER\" }\n  ]\n}"
+            },
+            "url": {
+              "raw": "http://localhost:3001/api/team-balance",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "3001",
+              "path": ["api", "team-balance"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "Register user",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"firstName\": \"Paul\",\n  \"lastName\": \"Henri\",\n  \"dob\": \"1990-01-01T00:00:00.000Z\",\n  \"favoriteFoot\": \"right\",\n  \"favoritePosition\": \"FORWARD\",\n  \"phoneNumber\": \"123456789\",\n  \"email\": \"paul@example.com\",\n  \"password\": \"test123\"\n}"
+            },
+            "url": {
+              "raw": "http://localhost:3001/api/auth/register",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "3001",
+              "path": ["api", "auth", "register"]
+            }
+          }
+        },
+        {
+          "name": "Login user",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"paul@example.com\",\n  \"password\": \"test123\"\n}"
+            },
+            "url": {
+              "raw": "http://localhost:3001/api/auth/login",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "3001",
+              "path": ["api", "auth", "login"]
+            }
+          }
+        }
+      ]
+    }
+  ]
+}
