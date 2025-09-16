@@ -5,45 +5,45 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Weplay - Dashboard</title>
 
-  <!-- Page-specific and global styles -->
-  <link rel="stylesheet" href="assets/css/dashboard.css">
+  <!-- Global + Page Styles -->
   <link rel="stylesheet" href="assets/css/styles.css">
+  <link rel="stylesheet" href="assets/css/dashboard.css">
 
   <!-- Base API config -->
   <script>
     window.__API_BASE__ = 'http://localhost:3001/';
   </script>
 
-  <!-- Global helpers -->
+  <!-- Global + Page Scripts -->
   <script src="assets/js/api.js" defer></script>
   <script src="assets/js/auth.js" defer></script>
   <script src="assets/js/dashboard.js" defer></script>
 </head>
 <body>
-  <header>
-    <h1> Weplay</h1>
-    <nav>
-      <ul>
-        <li><a href="index.html">Home</a></li>
-        <li><a href="matches.html">Matches</a></li>
-        <li><a href="profile.html">Profile</a></li>
-        <li><a href="login.html">Logout</a></li>
-      </ul>
+  <!-- Navbar -->
+  <header class="navbar container">
+    <a href="index.html" class="navbar__brand">Weplay</a>
+    <button class="navbar__toggle" aria-label="Toggle navigation">☰</button>
+    <nav class="navbar__links" aria-label="Main navigation">
+      <a href="matches.html">Matches</a>
+      <a href="profile.html">Profile</a>
+      <a href="login.html">Logout</a>
     </nav>
   </header>
 
+  <!-- Main Content -->
   <main class="container" id="dashboard">
-    <h2> Dashboard</h2>
+    <h1 class="text-center mb-2">Dashboard</h1>
 
     <!-- Welcome -->
     <section id="welcome" class="card">
-      <h3>Welcome back, <span id="user-name">Player</span> </h3>
+      <h2 class="h3">Welcome back, <span id="user-name">Player</span></h2>
       <p>Here’s a quick overview of your matches, ratings, and availability.</p>
     </section>
 
     <!-- Quick stats -->
     <section id="quick-stats" class="card">
-      <h3>Quick Stats</h3>
+      <h2 class="h3">Quick Stats</h2>
       <div class="stats-grid">
         <div class="stat-item">
           <p class="stat-value" id="stat-matches">0</p>
@@ -66,24 +66,26 @@
 
     <!-- Upcoming matches -->
     <section id="upcoming-matches" class="card">
-      <h3> Upcoming Matches</h3>
-      <ul id="matches-list">
+      <h2 class="h3">Upcoming Matches</h2>
+      <ul id="matches-list" class="list-reset">
         <li>No upcoming matches.</li>
       </ul>
     </section>
 
     <!-- Availability -->
     <section id="availability-dashboard" class="card">
-      <h3> Availability</h3>
-      <ul id="availability-list">
+      <h2 class="h3">Availability</h2>
+      <ul id="availability-list" class="list-reset">
         <li>No availability set.</li>
       </ul>
-      <a href="profile.html" class="secondary-btn">Update Availability</a>
+      <a href="profile.html" class="btn btn--secondary mt-2">Update Availability</a>
     </section>
   </main>
 
-  <footer>
-    <p>&copy; 2025 Weplay. All Rights Reserved.</p>
+  <!-- Footer -->
+  <footer class="container text-center mt-3 mb-3">
+    <p class="text-muted">&copy; 2025 Weplay. All Rights Reserved.</p>
   </footer>
 </body>
 </html>
+
