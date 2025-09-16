@@ -1,68 +1,62 @@
-/* Dashboard Page Styles */
+/* Dashboard Page Styles (mobile-first) */
 
 #dashboard {
   display: flex;
   flex-direction: column;
-  gap: 2rem;
-  margin-top: 2rem;
-}
-
-/* Card layout */
-#dashboard .card {
-  padding: 1.5rem;
-  background: var(--surface);
-  border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-md);
-}
-
-/* Welcome */
-#welcome h3 {
-  margin-bottom: 0.5rem;
+  gap: var(--space-lg);
+  margin-top: var(--space-lg);
 }
 
 /* Quick stats */
 .stats-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-  gap: 1rem;
-  margin-top: 1rem;
+  gap: var(--space);
+  margin-top: var(--space);
 }
 
 .stat-item {
-  background: var(--background);
-  border-radius: var(--radius-md);
-  padding: 1rem;
+  background: var(--color-bg);
+  border-radius: var(--radius);
+  padding: var(--space);
   text-align: center;
-  box-shadow: var(--shadow-sm);
+  box-shadow: 0 2px 4px rgba(15, 23, 42, 0.05);
 }
 
 .stat-value {
   font-size: 1.5rem;
-  font-weight: bold;
-  color: var(--primary);
+  font-weight: 700;
+  color: var(--color-primary);
 }
 
 .stat-label {
-  font-size: 0.9rem;
-  color: var(--muted);
+  font-size: var(--small);
+  color: var(--text-muted);
 }
 
-/* Upcoming matches & availability */
+/* Lists for matches & availability */
 #matches-list,
 #availability-list {
   list-style: none;
   padding: 0;
-  margin-top: 1rem;
+  margin-top: var(--space);
 }
 
 #matches-list li,
 #availability-list li {
-  padding: 0.5rem 0;
-  border-bottom: 1px solid var(--border);
+  padding: .5rem 0;
+  border-bottom: 1px solid rgba(15,23,42,0.06);
   font-size: 0.95rem;
 }
 
 #matches-list li:last-child,
 #availability-list li:last-child {
   border-bottom: none;
+}
+
+/* Utility */
+.list-reset {
+  list-style: none;
+  padding: 0;
+  margin: 0;
 }
