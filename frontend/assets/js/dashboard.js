@@ -19,7 +19,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     renderAvailability(user.availability || []);
   } catch (err) {
     console.error("Error loading dashboard:", err);
-    document.getElementById("dashboard").innerHTML = "<p>Error loading dashboard.</p>";
+    document.getElementById("dashboard").innerHTML = "<p class='alert alert--error'>Error loading dashboard.</p>";
   }
 });
 
@@ -47,7 +47,7 @@ async function loadStats(userId) {
  */
 async function loadUpcomingMatches() {
   const container = document.getElementById("matches-list");
-  container.innerHTML = "<p>Loading...</p>";
+  container.innerHTML = "<li>Loading...</li>";
 
   try {
     const matches = await apiRequest(API_ENDPOINTS.UPCOMING_MATCHES, { method: "GET" });
@@ -67,7 +67,7 @@ async function loadUpcomingMatches() {
       .join("");
   } catch (err) {
     console.error("Error fetching upcoming matches:", err);
-    container.innerHTML = "<li>Error loading matches.</li>";
+    container.innerHTML = "<li class='text-muted'>Error loading matches.</li>";
   }
 }
 
