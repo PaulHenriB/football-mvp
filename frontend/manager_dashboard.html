@@ -1,27 +1,27 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Manager Dashboard</title>
-  <link rel="stylesheet" href="assets/css/manager_dashboard.css">
-  <link rel="stylesheet" href="assets/css/styles.css">
 
-  <!-- Base API config -->
+  <!-- Styles -->
+  <link rel="stylesheet" href="assets/css/styles.css" />
+  <link rel="stylesheet" href="assets/css/manager_dashboard.css" />
+
+  <!-- API config -->
   <script>
     window.__API_BASE__ = 'http://localhost:3001/';
   </script>
 
-  <!-- Global helpers -->
-  <script src="/assets/js/api.js" defer></script>
-  <script src="/assets/js/auth.js" defer></script>
-  <script src="/assets/js/manager_dashboard.js" defer></script>
+  <!-- Scripts -->
+  <script type="module" src="assets/js/manager_dashboard.js" defer></script>
 </head>
 <body>
   <header>
-    <h1>Weplay - Manager Dashboard</h1>
+    <h1> Weplay – Manager Dashboard</h1>
     <nav>
-      <ul>
+      <ul class="nav-links">
         <li><a href="index.html">Home</a></li>
         <li><a href="team-balancer.html">Team Balancer</a></li>
         <li><a href="profile.html">Switch to Player Profile</a></li>
@@ -30,74 +30,86 @@
     </nav>
   </header>
 
-  <main class="container">
-    <!-- Match Scheduling -->
-    <section id="match-scheduling" class="card">
-      <h2>Schedule a Match</h2>
-      <form id="match-form" class="form-grid">
-        <label for="match-date">Date:</label>
-        <input type="date" id="match-date" required />
+  <main class="dashboard container">
+    <div class="dashboard__grid">
+      <!-- Sidebar: Match Scheduling -->
+      <aside class="sidebar">
+        <section id="match-scheduling" class="card">
+          <h2>Schedule a Match</h2>
+          <form id="match-form" class="form-grid">
+            <label for="match-date">Date:</label>
+            <input type="date" id="match-date" required />
 
-        <label for="match-time">Time:</label>
-        <input type="time" id="match-time" required />
+            <label for="match-time">Time:</label>
+            <input type="time" id="match-time" required />
 
-        <label for="match-location">Location:</label>
-        <input type="text" id="match-location" required />
+            <label for="match-location">Location:</label>
+            <input type="text" id="match-location" required />
 
-        <label for="match-duration">Duration (minutes):</label>
-        <input type="number" id="match-duration" required min="30" step="5" />
+            <label for="match-duration">Duration (minutes):</label>
+            <input type="number" id="match-duration" min="30" step="5" required />
 
-        <label for="match-players">Number of Players:</label>
-        <input type="number" id="match-players" required min="2" />
+            <label for="match-players">Number of Players:</label>
+            <input type="number" id="match-players" min="2" required />
 
-        <label for="match-spots">Available Spots:</label>
-        <input type="number" id="match-spots" required min="2" />
+            <label for="match-spots">Available Spots:</label>
+            <input type="number" id="match-spots" min="2" required />
 
-        <button type="submit" class="primary-btn">Schedule Match</button>
-      </form>
-      <div id="scheduled-matches">
-        <!-- Upcoming matches will be rendered here -->
-      </div>
-    </section>
+            <button type="submit" class="primary-btn">Schedule Match</button>
+          </form>
+        </section>
+      </aside>
 
-    <!-- Upcoming Matches -->
-    <section id="upcoming-matches" class="card">
-      <h2>Upcoming Matches</h2>
-      <div id="upcoming-list">
-        <!-- JS will render upcoming matches with player list and team allocation -->
-      </div>
-    </section>
+      <!-- Main Content -->
+      <section class="main">
+        <!-- Controls -->
+        <div class="controls">
+          <input type="search" class="search" placeholder="Search players or matches…" />
+          <div class="action-btns">
+            <button class="btn">Export</button>
+            <button class="btn">Settings</button>
+          </div>
+        </div>
 
-    <!-- Past Matches -->
-    <section id="past-matches" class="card">
-      <h2>Past Matches</h2>
-      <div id="past-list">
-        <!-- JS will render past matches with results -->
-      </div>
-    </section>
+        <!-- Cards Grid -->
+        <div class="cards-grid">
+          <!-- Upcoming Matches -->
+          <section id="upcoming-matches" class="card match-list">
+            <h2>Upcoming Matches</h2>
+            <div id="upcoming-list"></div>
+          </section>
 
-    <!-- Team Balancing -->
-    <section id="team-balancing" class="card">
-      <h2>Team Balancing</h2>
-      <a href="team-balancer.html" class="btn" id="team-balancer-link" style="display: none;">
-      Open Team Balancer
-      </a>
-      
-      <p>You can adjust teams manually after auto-balance.</p>
-      <div id="team-results" class="team-results"></div>
-    </section>
+          <!-- Past Matches -->
+          <section id="past-matches" class="card match-list">
+            <h2>Past Matches</h2>
+            <div id="past-list"></div>
+          </section>
 
-    <!-- Player Management -->
-    <section id="player-management" class="card">
-      <h2>Manage Players</h2>
-      <ul id="player-list" class="player-list">
-        <!-- Players will be dynamically listed here -->
-      </ul>
-    </section>
+          <!-- Team Balancing -->
+          <section id="team-balancing" class="card">
+            <h2>Team Balancing</h2>
+            <a href="team-balancer.html" class="btn" id="team-balancer-link" style="display: none;">
+              Open Team Balancer
+            </a>
+            <p>You can adjust teams manually after auto-balance.</p>
+            <div id="team-results" class="team-results"></div>
+          </section>
+
+          <!-- Player Management -->
+          <section id="player-management" class="card">
+            <h2>Manage Players</h2>
+            <ul id="player-list" class="player-list"></ul>
+          </section>
+        </div>
+      </section>
+    </div>
   </main>
 
+  <!-- FAB for mobile -->
+  <button class="fab primary-btn">＋</button>
+
   <footer>
-    <p>&copy; 2025 Weplay. All Rights reserved.</p>
+    <p>&copy; 2025 Weplay. All Rights Reserved.</p>
   </footer>
 </body>
 </html>
