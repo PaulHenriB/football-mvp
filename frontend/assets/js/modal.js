@@ -1,124 +1,97 @@
-// frontend/assets/js/modal.js
-// Reusable modal module: initModals(), openModal(selectorOrEl), closeModal(selectorOrEl)
-// Dispatches custom events: 'modal:open' and 'modal:close' on document
+/**
+ * Weplay — Reusable Modal Component
+ * ----------------------------------
+ * Works across all pages (Dashboard, Matches, etc.)
+ *
+ * Usage in HTML:
+ * <button data-modal-target="#scheduleModal">Open</button>
+ *
+ * <div id="scheduleModal" class="modal" aria-hidden="true">
+ *   <div class="modal__overlay" data-modal-close></div>
+ *   <div class="modal__content" role="dialog" aria-modal="true">
+ *     <button class="modal__close" data-modal-close>&times;</button>
+ *     <!-- Your modal content here -->
+ *   </div>
+ * </div>
+ */
 
-const FOCUSABLE = 'a[href], area[href], input:not([disabled]):not([type="hidden"]), select:not([disabled]), textarea:not([disabled]), button:not([disabled]), iframe, [tabindex]:not([tabindex="-1"])';
+document.addEventListener("DOMContentLoaded", () => {
+  const body = document.body;
+  let activeModal = null;
 
-let openModals = new Set();
+  /** Open modal by selector or element */
+  function openModal(modal) {
+    if (!modal) return;
+    modal.classList.add("is-active");
+    modal.setAttribute("aria-hidden", "false");
+    body.classList.add("no-scroll");
+    activeModal = modal;
+  }
 
-function initModals() {
-  // Openers: elements with data-modal-target attribute (value is a selector e.g. "#modal-schedule")
-  document.querySelectorAll('[data-modal-target]').forEach(btn => {
-    btn.addEventListener('click', (e) => {
-      e.preventDefault();
-      const sel = btn.getAttribute('data-modal-target');
-      const modal = document.querySelector(sel);
-      if (modal) openModal(modal);
-    });
-  });
+  /** Close current modal */
+  function closeModal(modal) {
+    if (!modal) return;
+    modal.classList.remove("is-active");
+    modal.setAttribute("aria-hidden", "true");
+    body.classList.remove("no-scroll");
+    activeModal = null;
+  }
 
-  // Closeers: elements inside modals with data-modal-close
-  document.querySelectorAll('[data-modal-close]').forEach(btn => {
-    btn.addEventListener('click', (e) => {
-      e.preventDefault();
-      const modal = btn.closest('.modal');
-      if (modal) closeModal(modal);
-    });
-  });
-
-  // Close by clicking overlay
-  document.addEventListener('click', (e) => {
-    const target = e.target;
-    if (target.classList && target.classList.contains('modal')) {
-      closeModal(target);
-    }
-  });
-
-  // Close on ESC
-  document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape') {
-      openModals.forEach(modal => closeModal(modal));
-    }
-  });
-}
-
-/* Focus trap and restore */
-function trapFocus(modalEl) {
-  const focusable = Array.from(modalEl.querySelectorAll(FOCUSABLE));
-  const previouslyFocused = document.activeElement;
-  if (focusable.length) focusable[0].focus();
-
-  function handleTab(e) {
-    if (e.key !== 'Tab') return;
-    if (focusable.length === 0) {
-      e.preventDefault();
-      return;
-    }
-    const first = focusable[0];
-    const last = focusable[focusable.length - 1];
-    if (e.shiftKey) {
-      if (document.activeElement === first) {
-        e.preventDefault();
-        last.focus();
-      }
+  /** Toggle modal (open/close) */
+  function toggleModal(modal) {
+    if (modal.classList.contains("is-active")) {
+      closeModal(modal);
     } else {
-      if (document.activeElement === last) {
-        e.preventDefault();
-        first.focus();
-      }
+      openModal(modal);
     }
   }
 
-  document.addEventListener('keydown', handleTab);
-
-  // cleanup function to remove key handler and restore focus
-  function cleanup(e) {
-    if (!e || !e.detail || e.detail.modal !== modalEl) return;
-    document.removeEventListener('keydown', handleTab);
-    document.removeEventListener('modal:close', cleanup);
-    if (previouslyFocused && previouslyFocused.focus) {
-      previouslyFocused.focus();
-    }
-  }
-
-  document.addEventListener('modal:close', cleanup);
-}
-
-/* Open modal */
-function openModal(modalOrSelector) {
-  const modal = typeof modalOrSelector === 'string' ? document.querySelector(modalOrSelector) : modalOrSelector;
-  if (!modal) return;
-  modal.classList.add('is-open');
-  modal.setAttribute('aria-hidden', 'false');
-  openModals.add(modal);
-
-  // emit event for pages to react (e.g. move DOM nodes)
-  document.dispatchEvent(new CustomEvent('modal:open', { detail: { modal } }));
-
-  // trap focus
-  trapFocus(modal);
-}
-
-/* Close modal */
-function closeModal(modalOrSelector) {
-  const modal = typeof modalOrSelector === 'string' ? document.querySelector(modalOrSelector) : modalOrSelector;
-  if (!modal) return;
-  modal.classList.remove('is-open');
-  modal.setAttribute('aria-hidden', 'true');
-  openModals.delete(modal);
-
-  // emit close event
-  document.dispatchEvent(new CustomEvent('modal:close', { detail: { modal } }));
-}
-
-/* Expose API for modules and classic scripts */
-export { initModals, openModal, closeModal };
-
-// global fallback for non-module pages that want to use window.Modal
-if (typeof window !== 'undefined') {
-  window.Modal = { initModals, openModal, closeModal };
-  // Safe auto-init on DOM ready (idempotent)
-  document.addEventListener('DOMContentLoaded', () => {
-    try { initModals(); } catch (e) { /* ignore */ }
+  /** Handle openers */
+  document.querySelectorAll("[data-modal-target]").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const selector = btn.getAttribute("data-modal-target");
+      const modal = document.querySelector(selector);
+      openModal(modal);
+    });
   });
-}
+
+  /** Handle closers */
+  document.querySelectorAll("[data-modal-close]").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const modal = btn.closest(".modal");
+      closeModal(modal);
+    });
+  });
+
+  /** ESC key closes active modal */
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape" && activeModal) {
+      closeModal(activeModal);
+    }
+  });
+
+  // Expose helper functions globally if needed
+  window.Modal = {
+    open: (selectorOrEl) => {
+      const modal =
+        typeof selectorOrEl === "string"
+          ? document.querySelector(selectorOrEl)
+          : selectorOrEl;
+      openModal(modal);
+    },
+    close: (selectorOrEl) => {
+      const modal =
+        typeof selectorOrEl === "string"
+          ? document.querySelector(selectorOrEl)
+          : selectorOrEl;
+      closeModal(modal);
+    },
+    toggle: (selectorOrEl) => {
+      const modal =
+        typeof selectorOrEl === "string"
+          ? document.querySelector(selectorOrEl)
+          : selectorOrEl;
+      toggleModal(modal);
+    },
+  };
+});
