@@ -43,6 +43,8 @@ async function loadUpcomingMatches() {
     container.innerHTML = matches.length
       ? matches.map(renderMatchCard).join("")
       : "<p>No upcoming matches.</p>";
+
+    setupMatchCardHandlers(container);
   } catch (err) {
     console.error("Error fetching upcoming matches:", err);
     container.innerHTML = "<p>Error loading upcoming matches.</p>";
@@ -61,6 +63,8 @@ async function loadPastMatches() {
     container.innerHTML = matches.length
       ? matches.map(renderMatchCard).join("")
       : "<p>No past matches.</p>";
+
+    setupMatchCardHandlers(container);
   } catch (err) {
     console.error("Error fetching past matches:", err);
     container.innerHTML = "<p>Error loading past matches.</p>";
@@ -83,13 +87,15 @@ async function loadOpenMatches() {
 
     container.innerHTML = matches.map(renderOpenMatchCard).join("");
 
-    // Attach join handlers
-    document.querySelectorAll(".join-btn").forEach((btn) => {
+    // Attach join + view details handlers
+    container.querySelectorAll(".join-btn").forEach((btn) => {
       btn.addEventListener("click", async (e) => {
         const matchId = e.target.dataset.id;
         await handleJoinMatch(matchId);
       });
     });
+
+    setupMatchCardHandlers(container);
   } catch (err) {
     console.error("Error fetching open matches:", err);
     container.innerHTML = "<p>Error loading open matches.</p>";
@@ -106,12 +112,15 @@ function renderMatchCard(match) {
       <p><strong>Date:</strong> ${match.date}</p>
       <p><strong>Location:</strong> ${match.location}</p>
       ${match.result ? `<p><strong>Result:</strong> ${match.result}</p>` : ""}
+      <button class="secondary-btn view-details-btn" data-id="${match.id}">
+        View Details
+      </button>
     </div>
   `;
 }
 
 /**
- * Render open match card (with join button)
+ * Render open match card (with join + view details)
  */
 function renderOpenMatchCard(match) {
   const spotsLeft = match.spots - match.players.length;
@@ -126,8 +135,55 @@ function renderOpenMatchCard(match) {
       <button class="primary-btn join-btn" data-id="${match.id}" ${isClosed ? "disabled" : ""}>
         ${isClosed ? "Closed" : "Join"}
       </button>
+      <button class="secondary-btn view-details-btn" data-id="${match.id}">
+        View Details
+      </button>
     </div>
   `;
+}
+
+/**
+ * Attach handlers to "View Details" buttons
+ */
+function setupMatchCardHandlers(container) {
+  container.querySelectorAll(".view-details-btn").forEach((btn) => {
+    btn.addEventListener("click", async () => {
+      const matchId = btn.dataset.id;
+      await openMatchDetails(matchId);
+    });
+  });
+}
+
+/**
+ * Open match details in modal
+ */
+async function openMatchDetails(matchId) {
+  const modal = document.getElementById("matchDetailsModal");
+  const content = document.getElementById("match-details-content");
+
+  content.innerHTML = "<p>Loading match details...</p>";
+
+  try {
+    const match = await apiRequest(API_ENDPOINTS.MATCH_BY_ID(matchId), { method: "GET" });
+
+    content.innerHTML = `
+      <h3>${match.name || "Match"}</h3>
+      <p><strong>Date:</strong> ${match.date}</p>
+      <p><strong>Location:</strong> ${match.location}</p>
+      <p><strong>Status:</strong> ${match.status}</p>
+      ${match.result ? `<p><strong>Result:</strong> ${match.result}</p>` : ""}
+      <a href="matchdetails.html?id=${match.id}" class="primary-btn">
+        Open Full Page
+      </a>
+    `;
+
+    // Use modal.js open
+    modal.classList.add("open");
+    modal.setAttribute("aria-hidden", "false");
+  } catch (err) {
+    console.error("Error loading match details:", err);
+    content.innerHTML = "<p>Failed to load match details.</p>";
+  }
 }
 
 /**
