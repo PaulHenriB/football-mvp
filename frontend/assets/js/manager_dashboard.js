@@ -1,49 +1,82 @@
 // frontend/assets/js/manager_dashboard.js
 import { enforceAuth } from "./auth-guard.js";
 import { apiRequest, API_ENDPOINTS } from "./api.js";
+import { initModals, openModal } from "./modal.js"; // modal module
 
 document.addEventListener("DOMContentLoaded", async () => {
   await enforceAuth();
 
+  // initialize modal triggers
+  initModals();
+
   const matchForm = document.getElementById("match-form");
+  const matchFormWrapper = document.getElementById("match-form-wrapper");
   const upcomingList = document.getElementById("upcoming-list");
   const pastList = document.getElementById("past-list");
   const playerList = document.getElementById("player-list");
   const teamResults = document.getElementById("team-results");
   const teamBalancerLink = document.getElementById("team-balancer-link");
+  const modalSchedule = document.getElementById("modal-schedule");
 
-  // ===== Initial Load =====
-  await fetchMatches();
-  await fetchPlayers();
-
-  // ===== Match Scheduling =====
-  matchForm.addEventListener("submit", async (e) => {
-    e.preventDefault();
-
-    const newMatch = {
-      date: document.getElementById("match-date").value,
-      time: document.getElementById("match-time").value,
-      location: document.getElementById("match-location").value,
-      duration: parseInt(document.getElementById("match-duration").value, 10),
-      numberOfPlayers: parseInt(document.getElementById("match-players").value, 10),
-      availableSpots: parseInt(document.getElementById("match-spots").value, 10),
-    };
-
-    try {
-      await apiRequest(API_ENDPOINTS.MATCHES, {
-        method: "POST",
-        body: JSON.stringify(newMatch),
-      });
-      alert("✅ Match scheduled successfully!");
-      matchForm.reset();
-      await fetchMatches();
-    } catch (err) {
-      console.error("Error scheduling match:", err);
-      alert("❌ Failed to schedule match. Please try again.");
+  // Move form *into* modal when it opens, and back when it closes.
+  document.addEventListener("modal:open", (e) => {
+    const modal = e.detail.modal;
+    if (modal && modal.id === "modal-schedule") {
+      const body = modal.querySelector(".modal__body");
+      if (matchForm && body) {
+        body.appendChild(matchForm);
+      }
     }
   });
 
-  // ===== Fetch & Render Matches =====
+  document.addEventListener("modal:close", (e) => {
+    const modal = e.detail.modal;
+    if (modal && modal.id === "modal-schedule") {
+      if (matchForm && matchFormWrapper) {
+        matchFormWrapper.appendChild(matchForm); // move back to sidebar
+      }
+    }
+  });
+
+  // Form submission handling (works wherever the form lives)
+  document.addEventListener("submit", async (evt) => {
+    if (evt.target && evt.target.id === "match-form") {
+      evt.preventDefault();
+      const newMatch = {
+        date: document.getElementById("match-date").value,
+        time: document.getElementById("match-time").value,
+        location: document.getElementById("match-location").value,
+        duration: parseInt(document.getElementById("match-duration").value, 10),
+        numberOfPlayers: parseInt(document.getElementById("match-players").value, 10),
+        availableSpots: parseInt(document.getElementById("match-spots").value, 10),
+      };
+
+      try {
+        await apiRequest(API_ENDPOINTS.MATCHES, {
+          method: "POST",
+          body: JSON.stringify(newMatch),
+        });
+        // close the modal if open
+        if (modalSchedule && modalSchedule.classList.contains("is-open")) {
+          // trigger close via data-modal-close button (fallback)
+          document.querySelectorAll('[data-modal-close]').forEach(btn => btn.click());
+        }
+        // reset and refetch
+        evt.target.reset();
+        await fetchMatches();
+        alert("✅ Match scheduled successfully!");
+      } catch (err) {
+        console.error("Error scheduling match:", err);
+        alert("❌ Failed to schedule match. Please try again.");
+      }
+    }
+  });
+
+  // Fetch initial data
+  await fetchMatches();
+  await fetchPlayers();
+
+  /* Fetch & render functions - same as before (kept for clarity) */
   async function fetchMatches() {
     try {
       const matches = await apiRequest(API_ENDPOINTS.MATCHES, { method: "GET" });
@@ -70,18 +103,14 @@ document.addEventListener("DOMContentLoaded", async () => {
           </div>
         `;
 
-        if (isUpcoming) {
-          upcomingList.appendChild(matchEl);
-        } else {
-          pastList.appendChild(matchEl);
-        }
+        if (isUpcoming) upcomingList.appendChild(matchEl);
+        else pastList.appendChild(matchEl);
       });
     } catch (err) {
       console.error("Error fetching matches:", err);
     }
   }
 
-  // ===== Fetch & Render Players =====
   async function fetchPlayers() {
     try {
       const players = await apiRequest(API_ENDPOINTS.PLAYERS, { method: "GET" });
@@ -95,16 +124,13 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
   }
 
-  // ===== Auto Balance Teams =====
   function autoBalanceTeams(players) {
-    if (!players.length) return;
-
+    if (!players || !players.length) return;
     const midpoint = Math.ceil(players.length / 2);
     const teamA = players.slice(0, midpoint);
     const teamB = players.slice(midpoint);
-
     renderTeams(teamA, teamB);
-    teamBalancerLink.style.display = "inline-block";
+    if (teamBalancerLink) teamBalancerLink.style.display = "inline-block";
   }
 
   function renderTeams(teamA, teamB) {
