@@ -15,7 +15,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   try {
     user = await apiRequest(API_ENDPOINTS.ME, { method: "GET" });
 
-    // Pre-fill form fields with user data
+    // Pre-fill profile
     form.firstName.value = user.firstName || "";
     form.lastName.value = user.lastName || "";
     form.dob.value = user.dob || "";
@@ -25,54 +25,14 @@ document.addEventListener("DOMContentLoaded", async () => {
     // Load availability
     renderAvailability(user.availability || []);
 
-    // Load user ratings
-    const ratings = await apiRequest(
-      `${API_ENDPOINTS.PLAYERS}/${user.id}/ratings`,
-      { method: "GET" }
-    );
-
-    if (ratings && ratings.length > 0) {
-      const avg = (
-        ratings.reduce((sum, r) => sum + r.score, 0) / ratings.length
-      ).toFixed(2);
-
-      // Average rating summary with stars
-      ratingsContainer.innerHTML = `
-        <p><strong>Average Rating:</strong> ${avg}/10</p>
-        <div class="stars" data-rating="${(avg / 2).toFixed(1)}"></div>
-        <div class="progress-bar"><div style="width: ${(avg / 10) * 100}%"></div></div>
-      `;
-
-      // Ratings history with stars + progress bar
-      ratingsHistory.innerHTML = ratings
-        .map(
-          (r) => `
-          <div class="rating-entry">
-            <p>Match ${r.matchId} <em>(${new Date(r.createdAt).toLocaleDateString()})</em></p>
-            <div class="stars" data-rating="${(r.score / 2).toFixed(1)}"></div>
-            <div class="progress-bar"><div style="width: ${(r.score / 10) * 100}%"></div></div>
-            ${
-              r.comment
-                ? `<p class="rating-comment">"${r.comment}"</p>`
-                : ""
-            }
-          </div>
-        `
-        )
-        .join("");
-
-      // Activate star visualization
-      applyStarRatings();
-    } else {
-      ratingsContainer.innerHTML = "<p>No ratings yet.</p>";
-      ratingsHistory.innerHTML = "";
-    }
+    // Load ratings
+    await loadRatings(user.id);
   } catch (err) {
     console.error("Error loading profile:", err);
-    form.innerHTML = "<p>Error loading profile.</p>";
+    form.innerHTML = "<p class='error'>Error loading profile.</p>";
   }
 
-  // Handle profile form submission
+  // Handle profile update
   form.addEventListener("submit", async (e) => {
     e.preventDefault();
     const updatedData = {
@@ -89,14 +49,14 @@ document.addEventListener("DOMContentLoaded", async () => {
         body: JSON.stringify(updatedData),
         headers: { "Content-Type": "application/json" },
       });
-      alert("Profile updated successfully.");
+      alert("✅ Profile updated successfully.");
     } catch (err) {
       console.error("Error updating profile:", err);
-      alert("Failed to update profile.");
+      alert("❌ Failed to update profile.");
     }
   });
 
-  // Handle availability submission
+  // Handle availability update
   availabilityForm.addEventListener("submit", async (e) => {
     e.preventDefault();
     const newAvailability = {
@@ -111,24 +71,76 @@ document.addEventListener("DOMContentLoaded", async () => {
         headers: { "Content-Type": "application/json" },
       });
 
-      alert("Availability updated.");
+      alert("✅ Availability updated.");
       const refreshedUser = await apiRequest(API_ENDPOINTS.ME, {
         method: "GET",
       });
       renderAvailability(refreshedUser.availability || []);
     } catch (err) {
       console.error("Error updating availability:", err);
-      alert("Failed to update availability.");
+      alert("❌ Failed to update availability.");
     }
   });
 
+  // ============================
   // Helpers
+  // ============================
+
   function renderAvailability(availability) {
     availabilityContainer.innerHTML = availability.length
       ? `<ul>${availability
           .map((a) => `<li><strong>${a.date}</strong>: ${a.status}</li>`)
           .join("")}</ul>`
       : "<p>No availability set.</p>";
+  }
+
+  async function loadRatings(playerId) {
+    try {
+      const ratings = await apiRequest(
+        `${API_ENDPOINTS.PLAYERS}/${playerId}/ratings`,
+        { method: "GET" }
+      );
+
+      if (ratings && ratings.length > 0) {
+        const avg = (
+          ratings.reduce((sum, r) => sum + r.score, 0) / ratings.length
+        ).toFixed(2);
+
+        ratingsContainer.innerHTML = `
+          <p><strong>Average Rating:</strong> ${avg}/10</p>
+          <div class="stars" data-rating="${(avg / 2).toFixed(1)}"></div>
+          <div class="progress-bar"><div style="width: ${(avg / 10) * 100}%"></div></div>
+        `;
+
+        ratingsHistory.innerHTML = ratings
+          .map(
+            (r) => `
+            <div class="rating-entry">
+              <p>Match ${r.matchId} <em>(${new Date(
+              r.createdAt
+            ).toLocaleDateString()})</em></p>
+              <div class="stars" data-rating="${(r.score / 2).toFixed(1)}"></div>
+              <div class="progress-bar"><div style="width: ${(r.score / 10) *
+                100}%"></div></div>
+              ${
+                r.comment
+                  ? `<p class="rating-comment">"${r.comment}"</p>`
+                  : ""
+              }
+            </div>
+          `
+          )
+          .join("");
+
+        applyStarRatings();
+      } else {
+        ratingsContainer.innerHTML = "<p>No ratings yet.</p>";
+        ratingsHistory.innerHTML = "";
+      }
+    } catch (err) {
+      console.error("Error loading ratings:", err);
+      ratingsContainer.innerHTML = "<p class='error'>Failed to load ratings.</p>";
+    }
   }
 
   function applyStarRatings() {
