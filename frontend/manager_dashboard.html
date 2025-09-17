@@ -14,88 +14,75 @@
     window.__API_BASE__ = 'http://localhost:3001/';
   </script>
 
-  <!-- Scripts -->
+  <!-- Page script (module) -->
   <script type="module" src="assets/js/manager_dashboard.js" defer></script>
 </head>
 <body>
-  <header>
+  <header class="container">
     <h1> Weplay – Manager Dashboard</h1>
-    <nav>
-      <ul class="nav-links">
-        <li><a href="index.html">Home</a></li>
-        <li><a href="team-balancer.html">Team Balancer</a></li>
-        <li><a href="profile.html">Switch to Player Profile</a></li>
-        <li><a href="login.html">Logout</a></li>
-      </ul>
-    </nav>
   </header>
 
-  <main class="dashboard container">
+  <main class="dashboard container" id="manager-dashboard">
     <div class="dashboard__grid">
-      <!-- Sidebar: Match Scheduling -->
+      <!-- Sidebar -->
       <aside class="sidebar">
-        <section id="match-scheduling" class="card">
-          <h2>Schedule a Match</h2>
-          <form id="match-form" class="form-grid">
-            <label for="match-date">Date:</label>
-            <input type="date" id="match-date" required />
+        <section class="card" aria-labelledby="schedule-title">
+          <h2 id="schedule-title">Schedule a Match</h2>
 
-            <label for="match-time">Time:</label>
-            <input type="time" id="match-time" required />
+          <!-- wrapper to hold the form in desktop. Manager JS will move form into modal on mobile open -->
+          <div id="match-form-wrapper">
+            <form id="match-form" class="form-grid">
+              <label for="match-date">Date:</label>
+              <input type="date" id="match-date" required />
 
-            <label for="match-location">Location:</label>
-            <input type="text" id="match-location" required />
+              <label for="match-time">Time:</label>
+              <input type="time" id="match-time" required />
 
-            <label for="match-duration">Duration (minutes):</label>
-            <input type="number" id="match-duration" min="30" step="5" required />
+              <label for="match-location">Location:</label>
+              <input type="text" id="match-location" required />
 
-            <label for="match-players">Number of Players:</label>
-            <input type="number" id="match-players" min="2" required />
+              <label for="match-duration">Duration (minutes):</label>
+              <input type="number" id="match-duration" min="30" step="5" required />
 
-            <label for="match-spots">Available Spots:</label>
-            <input type="number" id="match-spots" min="2" required />
+              <label for="match-players">Number of Players:</label>
+              <input type="number" id="match-players" min="2" required />
 
-            <button type="submit" class="primary-btn">Schedule Match</button>
-          </form>
+              <label for="match-spots">Available Spots:</label>
+              <input type="number" id="match-spots" min="2" required />
+
+              <button type="submit" class="primary-btn">Schedule Match</button>
+            </form>
+          </div>
         </section>
       </aside>
 
-      <!-- Main Content -->
+      <!-- Main Area -->
       <section class="main">
-        <!-- Controls -->
         <div class="controls">
-          <input type="search" class="search" placeholder="Search players or matches…" />
+          <input type="search" class="search" placeholder="Search players or matches…" aria-label="Search" />
           <div class="action-btns">
-            <button class="btn">Export</button>
-            <button class="btn">Settings</button>
+            <button class="btn" type="button">Export</button>
+            <button class="btn" type="button">Settings</button>
           </div>
         </div>
 
-        <!-- Cards Grid -->
         <div class="cards-grid">
-          <!-- Upcoming Matches -->
           <section id="upcoming-matches" class="card match-list">
             <h2>Upcoming Matches</h2>
-            <div id="upcoming-list"></div>
+            <div id="upcoming-list" aria-live="polite"></div>
           </section>
 
-          <!-- Past Matches -->
           <section id="past-matches" class="card match-list">
             <h2>Past Matches</h2>
-            <div id="past-list"></div>
+            <div id="past-list" aria-live="polite"></div>
           </section>
 
-          <!-- Team Balancing -->
           <section id="team-balancing" class="card">
             <h2>Team Balancing</h2>
-            <a href="team-balancer.html" class="btn" id="team-balancer-link" style="display: none;">
-              Open Team Balancer
-            </a>
-            <p>You can adjust teams manually after auto-balance.</p>
+            <a href="team-balancer.html" class="btn" id="team-balancer-link" style="display: none;">Open Team Balancer</a>
             <div id="team-results" class="team-results"></div>
           </section>
 
-          <!-- Player Management -->
           <section id="player-management" class="card">
             <h2>Manage Players</h2>
             <ul id="player-list" class="player-list"></ul>
@@ -105,11 +92,25 @@
     </div>
   </main>
 
-  <!-- FAB for mobile -->
-  <button class="fab primary-btn">＋</button>
+  <!-- Reusable Modal: target for schedule form on mobile -->
+  <div id="modal-schedule" class="modal" role="dialog" aria-modal="true" aria-hidden="true" aria-labelledby="modal-schedule-title">
+    <div class="modal__dialog" role="document">
+      <button class="modal__close" data-modal-close aria-label="Close dialog">&times;</button>
+      <h3 id="modal-schedule-title" class="modal__title">Schedule a Match</h3>
+      <div class="modal__body">
+        <!-- The schedule form (match-form) will be moved here dynamically when modal opens on mobile -->
+      </div>
+      <div class="modal__footer">
+        <button type="button" class="btn" data-modal-close>Cancel</button>
+      </div>
+    </div>
+  </div>
 
-  <footer>
-    <p>&copy; 2025 Weplay. All Rights Reserved.</p>
+  <!-- FAB (mobile) - uses data-modal-target to open the reusable modal -->
+  <button class="fab primary-btn" data-modal-target="#modal-schedule" aria-label="Schedule match">＋</button>
+
+  <footer class="container text-center">
+    <p class="text-muted">&copy; 2025 Weplay. All Rights Reserved.</p>
   </footer>
 </body>
 </html>
