@@ -11,11 +11,16 @@
   gap: 2rem;
 }
 
+/* Card improvements */
 .card {
   background: #fff;
   padding: 2rem;
   border-radius: 12px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  transition: transform 0.2s ease;
+}
+.card:hover {
+  transform: translateY(-2px);
 }
 
 .card h2 {
@@ -26,15 +31,17 @@
   padding-bottom: 0.5rem;
 }
 
+/* Form groups for spacing consistency */
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
 form {
   display: flex;
   flex-direction: column;
   gap: 1rem;
-}
-
-form label {
-  font-weight: 600;
-  margin-bottom: 0.3rem;
 }
 
 form input,
@@ -43,32 +50,21 @@ form select {
   border: 1px solid #ddd;
   border-radius: 8px;
   font-size: 1rem;
-  transition: border 0.2s ease;
+  transition: border 0.2s ease, box-shadow 0.2s ease;
 }
 
 form input:focus,
 form select:focus {
   border-color: #0077ff;
+  box-shadow: 0 0 0 3px rgba(0, 119, 255, 0.2);
   outline: none;
 }
 
 .primary-btn {
-  padding: 0.8rem 1.2rem;
-  background-color: #0077ff;
-  color: #fff;
-  border: none;
-  border-radius: 8px;
-  font-size: 1rem;
-  cursor: pointer;
-  transition: background 0.3s ease;
   align-self: flex-start;
 }
 
-.primary-btn:hover {
-  background-color: #005fcc;
-}
-
-/* Availability */
+/* Availability box */
 #availability {
   margin-bottom: 1rem;
   padding: 1rem;
@@ -90,7 +86,7 @@ form select:focus {
   padding: 0.4rem 0;
 }
 
-/* Ratings Summary */
+/* Ratings */
 #ratings-summary {
   margin-bottom: 1rem;
   font-size: 1.1rem;
@@ -98,7 +94,6 @@ form select:focus {
   color: #222;
 }
 
-/* Ratings History */
 #ratings-history {
   display: flex;
   flex-direction: column;
