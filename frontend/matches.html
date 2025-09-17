@@ -31,7 +31,7 @@
   </header>
 
   <main class="container">
-    <h2>Matches</h2>
+    <h1>Matches</h1>
 
     <!-- Tabs for filtering -->
     <div class="tabs card">
@@ -42,20 +42,32 @@
 
     <!-- Tab contents -->
     <section id="tab-upcoming" class="tab-content active card">
-      <h3>Upcoming Matches</h3>
+      <h2>Upcoming Matches</h2>
       <div id="upcoming-list" class="match-list"></div>
     </section>
 
     <section id="tab-past" class="tab-content card">
-      <h3>Past Matches</h3>
+      <h2>Past Matches</h2>
       <div id="past-list" class="match-list"></div>
     </section>
 
     <section id="tab-open" class="tab-content card">
-      <h3>Open Matches</h3>
+      <h2>Open Matches</h2>
       <div id="open-list" class="match-list"></div>
     </section>
   </main>
+
+  <!-- Example Modal for match details (reusable) -->
+  <div id="matchDetailsModal" class="modal" aria-hidden="true">
+    <div class="modal__overlay" data-modal-close></div>
+    <div class="modal__content" role="dialog" aria-modal="true">
+      <button class="modal__close" data-modal-close>&times;</button>
+      <h2>Match Details</h2>
+      <div id="match-details-content">
+        <p>Details will be loaded dynamically…</p>
+      </div>
+    </div>
+  </div>
 
   <footer>
     <p>&copy; 2025 Weplay. All Rights Reserved.</p>
