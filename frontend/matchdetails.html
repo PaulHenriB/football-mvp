@@ -7,14 +7,12 @@
 
   <!-- Global Styles -->
   <link rel="stylesheet" href="assets/css/styles.css" />
-
   <!-- Match Details Specific Styles -->
   <link rel="stylesheet" href="assets/css/matchdetails.css" />
 
   <script>
     window.__API_BASE__ = 'http://localhost:3001/';
   </script>
-
   <script src="assets/js/api.js" defer></script>
   <script src="assets/js/auth.js" defer></script>
   <script src="assets/js/matchdetails.js" defer></script>
@@ -34,6 +32,7 @@
   </header>
 
   <main class="container" id="match-details">
+
     <!-- Match Info -->
     <section id="match-info" class="card">
       <h2>Match Information</h2>
@@ -43,6 +42,7 @@
         <p><strong>Teams:</strong> <span id="match-teams">Loading...</span></p>
         <p><strong>Status:</strong> <span id="match-status">Loading...</span></p>
       </div>
+      <button class="secondary-btn" data-modal-target="#matchDetailsModal">View Details</button>
     </section>
 
     <!-- Manager-only: result form -->
@@ -53,12 +53,10 @@
           <label for="homeScore">Home Score:</label>
           <input type="number" id="homeScore" name="homeScore" min="0" required>
         </div>
-
         <div class="form-group">
           <label for="awayScore">Away Score:</label>
           <input type="number" id="awayScore" name="awayScore" min="0" required>
         </div>
-
         <button type="submit" class="primary-btn">Submit Result</button>
       </form>
     </section>
@@ -67,16 +65,33 @@
     <section id="rating-section" class="card hidden">
       <h2> Rate Your Opponents</h2>
       <form id="rating-form">
-        <div id="rating-list">
-          <!-- Opponents will be listed here dynamically -->
-        </div>
+        <div id="rating-list"> <!-- Opponents injected dynamically --> </div>
         <button type="submit" class="primary-btn">Submit Ratings</button>
       </form>
     </section>
+
   </main>
 
   <footer>
     <p>&copy; 2025 Weplay. All Rights Reserved.</p>
   </footer>
+
+  <!-- Unified Modal -->
+  <div class="modal" id="matchDetailsModal">
+    <div class="modal-content">
+      <button class="close-btn" data-modal-close>&times;</button>
+      <h2>Match Details</h2>
+      <div class="modal-body">
+        <p><strong>Date:</strong> <span id="modal-match-date">Loading...</span></p>
+        <p><strong>Location:</strong> <span id="modal-match-location">Loading...</span></p>
+        <p><strong>Teams:</strong> <span id="modal-match-teams">Loading...</span></p>
+        <p><strong>Status:</strong> <span id="modal-match-status">Loading...</span></p>
+      </div>
+      <div class="modal-actions">
+        <button class="primary-btn">Join</button>
+        <button class="secondary-btn" data-modal-close>Cancel</button>
+      </div>
+    </div>
+  </div>
 </body>
 </html>
