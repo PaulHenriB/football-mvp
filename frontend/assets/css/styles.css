@@ -221,37 +221,117 @@ input:focus, select:focus, textarea:focus { border-color:var(--color-primary); b
 .fab:hover { background: var(--color-primary-dark); transform: scale(1.05); }
 
 /* ========== Modal (unified) ========== */
+/* =========================
+   MODAL COMPONENT (unified)
+   ========================= */
 .modal {
+  display: none;
   position: fixed;
   inset: 0;
-  display: none;
-  background: rgba(0,0,0,0.5);
+  background-color: rgba(0, 0, 0, 0.55);
+  z-index: 1000;
   justify-content: center;
   align-items: center;
-  padding: var(--space);
-  z-index: 1000;
+  padding: 1rem;
+  transition: opacity 0.3s ease-in-out;
 }
-.modal.is-open { display: flex; }
-.modal__content {
-  background: var(--color-surface);
-  border-radius: var(--radius-lg);
+
+.modal.active {
+  display: flex;
+}
+
+.modal-content {
+  background: #fff;
+  border-radius: 1rem;
   max-width: 500px;
   width: 100%;
-  padding: var(--space-lg);
-  position: relative;
-  box-shadow: var(--shadow);
+  padding: 2rem;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.25);
+  animation: slideDown 0.3s ease-out;
 }
-.modal__close {
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.close-btn {
   position: absolute;
-  top: var(--space-sm);
-  right: var(--space-sm);
+  top: 1rem;
+  right: 1rem;
   background: none;
   border: none;
-  font-size: 1.25rem;
+  font-size: 1.5rem;
   cursor: pointer;
-  color: var(--text-muted);
+  color: #666;
+  transition: color 0.2s ease-in-out;
 }
-.modal__header { margin-bottom: var(--space); font-weight:600; }
+
+.close-btn:hover {
+  color: #000;
+}
+
+/* =========================
+   BUTTONS (primary vs secondary)
+   ========================= */
+.primary-btn {
+  display: inline-block;
+  background: #2e7d32; /* strong green */
+  color: #fff;
+  border: none;
+  border-radius: 0.75rem;
+  padding: 0.75rem 1.25rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s ease-in-out, transform 0.1s ease-in-out;
+}
+
+.primary-btn:hover {
+  background: #256428;
+}
+
+.primary-btn:active {
+  transform: scale(0.97);
+}
+
+.primary-btn:focus-visible {
+  outline: 3px solid #90caf9;
+  outline-offset: 2px;
+}
+
+/* Lighter style for secondary actions */
+.secondary-btn {
+  display: inline-block;
+  background: #f4f4f4;
+  color: #333;
+  border: 1px solid #ccc;
+  border-radius: 0.75rem;
+  padding: 0.75rem 1.25rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.2s ease-in-out, border-color 0.2s ease-in-out, transform 0.1s ease-in-out;
+}
+
+.secondary-btn:hover {
+  background: #e9e9e9;
+  border-color: #bbb;
+}
+
+.secondary-btn:active {
+  transform: scale(0.97);
+}
+
+.secondary-btn:focus-visible {
+  outline: 3px solid #90caf9;
+  outline-offset: 2px;
+}
+
 
 /* ========== Utilities ========== */
 .text-center { text-align:center; }
