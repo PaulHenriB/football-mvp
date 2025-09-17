@@ -1,6 +1,5 @@
 /* Manager Dashboard Layout & Components */
 
-/* ===== Layout ===== */
 .dashboard {
   padding: var(--space-lg) var(--space);
 }
@@ -16,128 +15,33 @@
   }
 }
 
-/* Sidebar */
-.sidebar .card {
-  padding: var(--space);
+/* Sidebar card form wrapper */
+#match-form-wrapper {
+  display: block;
 }
 
-/* Main Content */
-.main {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-lg);
-}
-.controls {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--space);
-  align-items: center;
-}
-.controls .search {
-  flex: 1;
-  min-width: 200px;
-}
-.controls .action-btns {
-  display: flex;
-  gap: var(--space-sm);
-}
+/* Main */
+.main { display:flex; flex-direction:column; gap:var(--space-lg); }
+.controls { display:flex; gap:var(--space); align-items:center; }
+.controls .search { flex:1; min-width:200px; padding:.5rem; border-radius:var(--radius); border:1px solid rgba(15,23,42,0.06); }
 
-/* Cards Grid */
-.cards-grid {
-  display: grid;
-  gap: var(--space-lg);
-  grid-template-columns: 1fr;
-}
-@media (min-width: 768px) {
-  .cards-grid {
-    grid-template-columns: repeat(2, 1fr);
-  }
-}
-@media (min-width: 1200px) {
-  .cards-grid {
-    grid-template-columns: repeat(3, 1fr);
-  }
-}
+/* Cards grid */
+.cards-grid { display:grid; gap:var(--space-lg); grid-template-columns:1fr; }
+@media (min-width: 768px) { .cards-grid { grid-template-columns: repeat(2, 1fr); } }
+@media (min-width: 1200px) { .cards-grid { grid-template-columns: repeat(3, 1fr); } }
 
-/* ===== Match List ===== */
-.match-list .match {
-  display: flex;
-  gap: var(--space-sm);
-  align-items: flex-start;
-  padding: var(--space-sm);
-  border-radius: var(--radius-sm);
-  background: var(--color-surface);
-  border: 1px solid rgba(15, 23, 42, 0.05);
-  margin-bottom: var(--space-sm);
-}
-.match .time {
-  font-weight: 600;
-  width: 72px;
-}
-.match .meta {
-  font-size: .95rem;
-  color: var(--text-muted);
-}
-.match .meta h4 {
-  margin-top: var(--space-sm);
-  font-weight: 600;
-}
+/* Matches list styling */
+.match-list .match { display:flex; gap: var(--space-sm); align-items:flex-start; padding: var(--space-sm); border-radius: var(--radius-sm); background: var(--color-surface); border:1px solid rgba(15,23,42,0.05); margin-bottom: var(--space-sm); }
+.match .time { font-weight:600; width:72px; }
+.match .meta { font-size:.95rem; color:var(--text-muted); }
 
-/* Badges */
-.badge {
-  display: inline-flex;
-  align-items: center;
-  gap: .35rem;
-  padding: .25rem .5rem;
-  font-weight: 600;
-  border-radius: 999px;
-  font-size: .8rem;
-}
-.badge--green {
-  background: rgba(40, 167, 69, 0.12);
-  color: var(--success);
-}
-.badge--yellow {
-  background: rgba(255, 204, 0, 0.12);
-  color: var(--color-secondary-dark);
-}
-.badge--muted {
-  background: rgba(15, 23, 42, 0.04);
-  color: var(--text-muted);
-}
+/* Teams & players */
+.team-results { display:flex; gap:var(--space-lg); flex-wrap:wrap; margin-top:var(--space); }
+.team { flex:1; min-width:200px; }
+.player-list li { padding:.5rem; border-bottom:1px solid rgba(15,23,42,0.05); }
 
-/* ===== Teams ===== */
-.team-results {
-  display: flex;
-  gap: var(--space-lg);
-  flex-wrap: wrap;
-  margin-top: var(--space);
-}
-.team {
-  flex: 1;
-  min-width: 200px;
-}
-.team h3 {
-  margin-bottom: var(--space-sm);
-  font-weight: 600;
-}
+/* FAB */
+.fab { position: fixed; right: 16px; bottom: 16px; z-index: 60; border-radius: 999px; width:56px; height:56px; display:flex; align-items:center; justify-content:center; box-shadow:0 10px 30px rgba(15,23,42,0.12); font-size:1.6rem; }
 
-/* ===== Players ===== */
-.player-list li {
-  padding: .5rem;
-  border-bottom: 1px solid rgba(15, 23, 42, 0.05);
-}
-
-/* ===== FAB (mobile quick add) ===== */
-@media (max-width: 767px) {
-  .fab {
-    position: fixed;
-    right: 16px;
-    bottom: 16px;
-    z-index: 60;
-    border-radius: 50%;
-    padding: var(--space-md);
-    font-size: 1.5rem;
-    box-shadow: 0 10px 30px rgba(15, 23, 42, 0.12);
-  }
-}
+/* make sure modal body (when form is moved) is visually consistent */
+.modal__body form { margin: 0; }
