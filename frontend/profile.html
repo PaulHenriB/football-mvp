@@ -1,11 +1,13 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Profile</title>
-  <link rel="stylesheet" href="assets/css/profile.css">
-  <link rel="stylesheet" href="assets/css/styles.css">
+
+  <!-- Global styles + page styles -->
+  <link rel="stylesheet" href="assets/css/styles.css" />
+  <link rel="stylesheet" href="assets/css/profile.css" />
 
   <!-- Base API config -->
   <script>
@@ -13,9 +15,9 @@
   </script>
 
   <!-- Global helpers -->
-  <script src="/assets/js/api.js" defer></script>
-  <script src="/assets/js/auth.js" defer></script>
-  <script src="/assets/js/profile.js" defer></script>
+  <script src="assets/js/api.js" defer></script>
+  <script src="assets/js/auth.js" defer></script>
+  <script src="assets/js/profile.js" defer></script>
   <script type="module" src="assets/js/modal.js" defer></script>
 </head>
 <body>
@@ -23,71 +25,97 @@
     <h1>Weplay</h1>
     <nav>
       <ul>
-        <li><a href="index.html">home</a></li>
-        <li><a href="matches.html">Matches</a></li>  
+        <li><a href="index.html">Home</a></li>
+        <li><a href="matches.html">Matches</a></li>
         <li><a href="login.html">Logout</a></li>
       </ul>
     </nav>
   </header>
 
   <main class="container">
-    <h2>Profile</h2>
-
-    <div id="profile">
+    <!-- Profile Info -->
+    <section class="card">
+      <h2>My Profile</h2>
       <form id="profile-form">
-        <input type="text" id="firstName" name="firstName" placeholder="First Name" required>
-        <input type="text" id="lastName" name="lastName" placeholder="Last Name" required>
-        <input type="date" id="dob" name="dob" required>
+        <div class="form-group">
+          <label for="firstName">First Name</label>
+          <input type="text" id="firstName" name="firstName" required />
+        </div>
 
-        <label for="favoriteFoot">Preferred Foot</label>
-        <select id="favoriteFoot" name="favoriteFoot">
-          <option value="left">Left</option>
-          <option value="right">Right</option>
-        </select>
+        <div class="form-group">
+          <label for="lastName">Last Name</label>
+          <input type="text" id="lastName" name="lastName" required />
+        </div>
 
-        <label for="favoritePosition">Favorite Position</label>
-        <select id="favoritePosition" name="favoritePosition">
-          <option value="GK">Goalkeeper</option>
-          <option value="DF">Defender</option>
-          <option value="MF">Midfielder</option>
-          <option value="FW">Forward</option>
-        </select>
+        <div class="form-group">
+          <label for="dob">Date of Birth</label>
+          <input type="date" id="dob" name="dob" required />
+        </div>
 
-        <button type="submit">Update Profile</button>
+        <div class="form-group">
+          <label for="favoriteFoot">Preferred Foot</label>
+          <select id="favoriteFoot" name="favoriteFoot">
+            <option value="left">Left</option>
+            <option value="right">Right</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="favoritePosition">Favorite Position</label>
+          <select id="favoritePosition" name="favoritePosition">
+            <option value="GK">Goalkeeper</option>
+            <option value="DF">Defender</option>
+            <option value="MF">Midfielder</option>
+            <option value="FW">Forward</option>
+          </select>
+        </div>
+
+        <button type="submit" class="primary-btn">Update Profile</button>
       </form>
-    </div>
+    </section>
 
-  <section id="ratings-section" class="card">
-    <h2>Player Ratings</h2>
-    <p>Average Rating: <span id="avg-rating">-</span></p>
-    <ul id="ratings-history"></ul>
-  </section>
+    <!-- Ratings -->
+    <section id="ratings-section" class="card">
+      <h2>Player Ratings</h2>
+      <div id="ratings-summary"></div>
+      <ul id="ratings-history"></ul>
+    </section>
 
-  <!-- Availability -->
-<section id="availability-section" class="card">
-  <h2>Availability</h2>
-  <div id="availability">
-    <!-- Availability data populated by JS -->
-  </div>
+    <!-- Availability -->
+    <section id="availability-section" class="card">
+      <h2>Availability</h2>
+      <div id="availability"></div>
 
-  <form id="availability-form">
-    <label for="availability-date">Date:</label>
-    <input type="date" id="availability-date" name="date" required />
+      <form id="availability-form">
+        <div class="form-group">
+          <label for="availability-date">Date</label>
+          <input type="date" id="availability-date" name="date" required />
+        </div>
 
-    <label for="availability-status">Status:</label>
-    <select id="availability-status" name="status">
-      <option value="available">Available</option>
-      <option value="unavailable">Unavailable</option>
-    </select>
+        <div class="form-group">
+          <label for="availability-status">Status</label>
+          <select id="availability-status" name="status">
+            <option value="available">Available</option>
+            <option value="unavailable">Unavailable</option>
+          </select>
+        </div>
 
-    <button type="submit" class="primary-btn">Set Availability</button>
-  </form>
-</section>
-  
+        <button type="submit" class="primary-btn">Set Availability</button>
+      </form>
+    </section>
   </main>
 
   <footer>
     <p>&copy; 2025 Weplay. All Rights reserved.</p>
   </footer>
+
+  <!-- Shared Modal -->
+  <div class="modal-overlay" id="global-modal" aria-hidden="true">
+    <div class="modal">
+      <button class="modal-close secondary-btn" data-modal-close>&times;</button>
+      <div class="modal-content"></div>
+    </div>
+  </div>
 </body>
 </html>
+
