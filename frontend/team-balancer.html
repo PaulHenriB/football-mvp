@@ -12,19 +12,21 @@
   <script src="assets/js/teambalancer.js" defer></script>
   <script src="assets/js/api.js" defer></script>
   <script src="assets/js/auth.js" defer></script>
-  <script type="module" src="assets/js/modal.js" defer></script>
+  <script src="assets/js/index.js" defer></script>
 </head>
 <body>
-  <nav class="navbar">
-    <div class="logo">NextPlay</div>
-    <ul class="nav-links">
-      <li><a href="index.html">Home</a></li>
-      <li><a href="dashboard.html">Dashboard</a></li>
-      <li><a href="matches.html">Matches</a></li>
-      <li><a href="profile.html">Profile</a></li>
-      <li><a href="login.html">Logout</a></li>
-    </ul>
-  </nav>
+  <header class="navbar container">
+    <a href="index.html" class="navbar__brand">Weplay</a>
+    <button class="navbar__toggle" aria-label="Toggle navigation">☰</button>
+    <nav class="navbar__links" aria-label="Main navigation">
+      <a href="dashboard.html">Dashboard</a>
+      <a href="index.html">Home</a>
+      <a href="profile.html">Profile</a>
+      <a href="manager_dashboard.html">Manager Dashboard</a>
+      <a href="matches.html">Matches</a>
+      <a href="login.html">Logout</a>
+    </nav>
+  </header>
 
   <main class="team-balancer-main">
     <h1>Team Balancer</h1>
@@ -59,4 +61,3 @@
   </footer>
 </body>
 </html>
-
