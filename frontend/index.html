@@ -4,10 +4,12 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Weplay - Home</title>
+
+  <!-- Global & Page Styles -->
   <link rel="stylesheet" href="assets/css/styles.css">
   <link rel="stylesheet" href="assets/css/index.css">
 
-  <!-- FontAwesome (for icons) -->
+  <!-- FontAwesome -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 
   <!-- Base API config -->
@@ -15,30 +17,36 @@
     window.__API_BASE__ = 'http://localhost:3001/';
   </script>
 
-  <!-- Global helpers -->
+  <!-- Scripts -->
   <script src="assets/js/api.js" defer></script>
   <script src="assets/js/auth.js" defer></script>
   <script src="assets/js/index.js" defer></script>
-  <script type="module" src="assets/js/modal.js" defer></script>
 </head>
 <body>
   <!-- Navbar -->
   <header>
-  <nav class="navbar">
-    <div class="logo">Weplay</div>
+    <nav class="navbar">
+      <a href="index.html" class="logo">Weplay</a>
 
-    <!-- Nav links -->
-    <ul class="nav-links" id="nav-links">
-      <li><a href="dashboard.html">Dashboard</a></li>
-      <li><a href="matches.html">Matches</a></li>
-      <li><a href="profile.html">Profile</a></li>
-      <li><a href="login.html" id="logout-link">Logout</a></li>
-      <li><a href="signup.html" id="signup-link">Sign Up</a></li>
-    </ul>
-  </nav>
+      <!-- Hamburger -->
+      <button class="hamburger" aria-label="Toggle navigation" aria-expanded="false" aria-controls="nav-links">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+
+      <!-- Nav links -->
+      <ul class="nav-links" id="nav-links">
+        <li><a href="dashboard.html">Dashboard</a></li>
+        <li><a href="matches.html">Matches</a></li>
+        <li><a href="profile.html">Profile</a></li>
+        <li><a href="login.html" id="logout-link">Logout</a></li>
+        <li><a href="signup.html" id="signup-link">Sign Up</a></li>
+      </ul>
+    </nav>
   </header>
 
-  <!-- Hero Section -->
+  <!-- Hero -->
   <main>
     <section class="hero">
       <h1>Welcome to <span class="highlight">Weplay</span></h1>
@@ -49,30 +57,30 @@
       </div>
     </section>
 
-    <!-- Features Section -->
+    <!-- Features -->
     <section class="features">
       <h2>Why Choosing Weplay?</h2>
       <div class="feature-grid">
-        <div class="feature-card">
-          <i class="fas fa-calendar-check fa-2x"></i>
+        <article class="feature-card">
+          <i class="fas fa-calendar-check fa-2x" aria-hidden="true"></i>
           <h3>Organize Matches</h3>
           <p>Schedule matches, manage availability, and record results in one place.</p>
-        </div>
-        <div class="feature-card">
-          <i class="fas fa-users fa-2x"></i>
+        </article>
+        <article class="feature-card">
+          <i class="fas fa-users fa-2x" aria-hidden="true"></i>
           <h3>Fair Team Balancing</h3>
           <p>Smart algorithms balance teams based on ratings and positions.</p>
-        </div>
-        <div class="feature-card">
-          <i class="fas fa-star fa-2x"></i>
+        </article>
+        <article class="feature-card">
+          <i class="fas fa-star fa-2x" aria-hidden="true"></i>
           <h3>Player Ratings</h3>
           <p>Rate your teammates, track performance, and climb the leaderboard.</p>
-        </div>
-        <div class="feature-card">
-          <i class="fas fa-comments fa-2x"></i>
+        </article>
+        <article class="feature-card">
+          <i class="fas fa-comments fa-2x" aria-hidden="true"></i>
           <h3>Stay Connected</h3>
           <p>Use match chat, notifications, and social sharing to stay in the loop.</p>
-        </div>
+        </article>
       </div>
     </section>
 
