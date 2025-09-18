@@ -106,6 +106,7 @@
   margin-bottom: var(--space-sm);
   font-weight: 700;
   font-size: clamp(1.5rem, 3vw, 2rem);
+  color: rgba(255,255,255,0.9);
 }
 
 .cta-banner p {
