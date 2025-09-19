@@ -10,9 +10,9 @@ document.addEventListener("DOMContentLoaded", async () => {
   const ratingsContainer = document.getElementById("ratings-summary");
   const ratingsHistory = document.getElementById("ratings-history");
 
-  // NEW: containers for matches
+  // Containers for matches (aligned with profile.html)
+  const openMatchesContainer = document.getElementById("player-open-matches");
   const upcomingMatchesContainer = document.getElementById("player-upcoming-matches");
-  const registeredMatchesContainer = document.getElementById("player-registered-matches");
   const pastMatchesContainer = document.getElementById("player-past-matches");
 
   let user;
@@ -33,14 +33,16 @@ document.addEventListener("DOMContentLoaded", async () => {
     // Load ratings
     await loadRatings(user.id);
 
-    // Load player matches
+    // Load matches
     await loadPlayerMatches(user.id);
   } catch (err) {
     console.error("Error loading profile:", err);
     form.innerHTML = "<p class='error'>Error loading profile.</p>";
   }
 
-  // Handle profile update
+  // ============================
+  // Profile update
+  // ============================
   form.addEventListener("submit", async (e) => {
     e.preventDefault();
     const updatedData = {
@@ -55,7 +57,6 @@ document.addEventListener("DOMContentLoaded", async () => {
       await apiFetch(API_ENDPOINTS.UPDATE_ME, {
         method: "PUT",
         body: JSON.stringify(updatedData),
-        headers: { "Content-Type": "application/json" },
       });
       alert("✅ Profile updated successfully.");
     } catch (err) {
@@ -64,7 +65,9 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
   });
 
-  // Handle availability update
+  // ============================
+  // Availability
+  // ============================
   availabilityForm.addEventListener("submit", async (e) => {
     e.preventDefault();
     const newAvailability = {
@@ -76,7 +79,6 @@ document.addEventListener("DOMContentLoaded", async () => {
       await apiFetch(API_ENDPOINTS.AVAILABILITY, {
         method: "POST",
         body: JSON.stringify(newAvailability),
-        headers: { "Content-Type": "application/json" },
       });
 
       alert("✅ Availability updated.");
@@ -88,27 +90,41 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
   });
 
+  function renderAvailability(availability) {
+    availabilityContainer.innerHTML = availability.length
+      ? `<ul>${availability
+          .map((a) => `<li><strong>${a.date}</strong>: ${a.status}</li>`)
+          .join("")}</ul>`
+      : "<p>No availability set.</p>";
+  }
+
   // ============================
-  // Matches for this player
+  // Matches (open, upcoming, past)
   // ============================
   async function loadPlayerMatches(playerId) {
     try {
-      // Upcoming matches (player can still join)
-      const upcoming = await apiFetch(API_ENDPOINTS.PLAYER_UPCOMING_MATCHES(playerId));
-      renderMatches(upcomingMatchesContainer, upcoming, { allowJoin: true });
+      // Open matches (joinable)
+      const openMatches = await apiFetch(API_ENDPOINTS.OPEN_MATCHES);
+      renderMatches(openMatchesContainer, openMatches, { allowJoin: true });
 
-      // Registered matches (future matches already joined)
-      const registered = await apiFetch(API_ENDPOINTS.PLAYER_REGISTERED_MATCHES(playerId));
-      renderMatches(registeredMatchesContainer, registered);
+      // Upcoming matches (already registered)
+      const upcoming = await apiFetch(API_ENDPOINTS.UPCOMING_MATCHES);
+      const upcomingForPlayer = upcoming.filter(m =>
+        m.players?.some(p => p.id === playerId)
+      );
+      renderMatches(upcomingMatchesContainer, upcomingForPlayer);
 
-      // Past matches (played matches)
-      const past = await apiFetch(API_ENDPOINTS.PLAYER_PAST_MATCHES(playerId));
-      renderMatches(pastMatchesContainer, past);
+      // Past matches (only those player took part in)
+      const past = await apiFetch(API_ENDPOINTS.PAST_MATCHES);
+      const pastForPlayer = past.filter(m =>
+        m.players?.some(p => p.id === playerId)
+      );
+      renderMatches(pastMatchesContainer, pastForPlayer);
     } catch (err) {
       console.error("Error loading player matches:", err);
-      upcomingMatchesContainer.innerHTML = "<p class='error'>Failed to load matches.</p>";
-      registeredMatchesContainer.innerHTML = "<p class='error'>Failed to load matches.</p>";
-      pastMatchesContainer.innerHTML = "<p class='error'>Failed to load matches.</p>";
+      openMatchesContainer.innerHTML = "<p class='error'>Failed to load open matches.</p>";
+      upcomingMatchesContainer.innerHTML = "<p class='error'>Failed to load upcoming matches.</p>";
+      pastMatchesContainer.innerHTML = "<p class='error'>Failed to load past matches.</p>";
     }
   }
 
@@ -124,19 +140,20 @@ document.addEventListener("DOMContentLoaded", async () => {
     matches.forEach(match => {
       const li = document.createElement("li");
       li.innerHTML = `
-        <strong>${match.title}</strong> - ${new Date(match.date).toLocaleString()}
+        <strong>${match.title || "Unnamed Match"}</strong> - ${new Date(match.date).toLocaleString()}
         ${options.allowJoin ? `<button class="btn primary-btn join-btn" data-id="${match.id}">Join</button>` : ""}
       `;
       list.appendChild(li);
     });
     container.appendChild(list);
 
+    // Join match logic
     if (options.allowJoin) {
       container.querySelectorAll(".join-btn").forEach(btn => {
         btn.addEventListener("click", async () => {
           const matchId = btn.dataset.id;
           try {
-            await apiFetch(API_ENDPOINTS.JOIN_MATCH(matchId), { method: "POST" });
+            await apiFetch(`${API_ENDPOINTS.JOIN_MATCH}/${matchId}`, { method: "POST" });
             alert("✅ Joined match successfully.");
             await loadPlayerMatches(user.id); // refresh lists
           } catch (err) {
@@ -149,20 +166,11 @@ document.addEventListener("DOMContentLoaded", async () => {
   }
 
   // ============================
-  // Helpers
+  // Ratings
   // ============================
-
-  function renderAvailability(availability) {
-    availabilityContainer.innerHTML = availability.length
-      ? `<ul>${availability
-          .map((a) => `<li><strong>${a.date}</strong>: ${a.status}</li>`)
-          .join("")}</ul>`
-      : "<p>No availability set.</p>";
-  }
-
   async function loadRatings(playerId) {
     try {
-      const ratings = await apiFetch(`${API_ENDPOINTS.PLAYERS}/${playerId}/ratings`, { method: "GET" });
+      const ratings = await apiFetch(`${API_ENDPOINTS.PLAYERS}/${playerId}/ratings`);
 
       if (ratings && ratings.length > 0) {
         const avg = (
@@ -206,3 +214,4 @@ document.addEventListener("DOMContentLoaded", async () => {
     });
   }
 });
+
