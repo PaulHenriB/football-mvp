@@ -1,33 +1,47 @@
-// asset/js/api.js
+// frontend/assets/js/api.js
 
 import { getToken, isExpired, removeToken } from "./auth-helper.js";
 
 const API_BASE_URL = "http://localhost:5000/api";
 
 export const API_ENDPOINTS = {
+  // --- Auth & Users ---
   REGISTER: `${API_BASE_URL}/users/register`,
   LOGIN: `${API_BASE_URL}/users/login`,
   ME: `${API_BASE_URL}/users/me`,
-  UPCOMING_MATCHES: `${API_BASE_URL}/matches/upcoming`,
-  PAST_MATCHES: `${API_BASE_URL}/matches/past`,
-  OPEN_MATCHES: `${API_BASE_URL}/matches/open`,
-  MATCH_DETAILS: `${API_BASE_URL}/matches`,    
-  JOIN_MATCH: `${API_BASE_URL}/matches/join`,     
-  CANCEL_MATCH: `${API_BASE_URL}/matches/cancel`,
-  MANAGER_UPCOMING_MATCHES: `${API_BASE_URL}/matches/manager/upcoming`,
+
+  // --- Generic Matches ---
+  UPCOMING_MATCHES: `${API_BASE_URL}/matches/upcoming`,   // all upcoming matches
+  PAST_MATCHES: `${API_BASE_URL}/matches/past`,           // all past matches
+  OPEN_MATCHES: `${API_BASE_URL}/matches/open`,           // matches still open for join
 
   MATCHES: `${API_BASE_URL}/matches`,
   MATCH_BY_ID: (id) => `${API_BASE_URL}/matches/${id}`,
+  MATCH_DETAILS: (id) => `${API_BASE_URL}/matches/${id}`, // alias for clarity
   MATCH_PLAYERS: (id) => `${API_BASE_URL}/matches/${id}/players`,
   MATCH_RATE_PLAYER: (id) => `${API_BASE_URL}/matches/${id}/rate`,
   MATCH_AVAILABILITY: (id) => `${API_BASE_URL}/matches/${id}/availability`,
   MATCH_TEAMS: (id) => `${API_BASE_URL}/matches/${id}/teams`,
 
+  // --- Match Actions ---
+  JOIN_MATCH: (id) => `${API_BASE_URL}/matches/join/${id}`,
+  CANCEL_MATCH: (id) => `${API_BASE_URL}/matches/cancel/${id}`,
+
+  // --- Manager-specific ---
+  MANAGER_UPCOMING_MATCHES: `${API_BASE_URL}/matches/manager/upcoming`,
+
+  // --- Player-specific (NEW, for profile.html) ---
+  PLAYER_UPCOMING_MATCHES: (playerId) => `${API_BASE_URL}/players/${playerId}/matches/upcoming`, 
+  PLAYER_REGISTERED_MATCHES: (playerId) => `${API_BASE_URL}/players/${playerId}/matches/registered`, 
+  PLAYER_PAST_MATCHES: (playerId) => `${API_BASE_URL}/players/${playerId}/matches/past`, 
+
+  // --- Players ---
   PLAYERS: `${API_BASE_URL}/players`,
   PLAYER_BY_ID: (id) => `${API_BASE_URL}/players/${id}`,
   AVAILABLE_PLAYERS: (date) => `${API_BASE_URL}/players/available?date=${date}`,
 };
 
+// --- API Fetch Helper ---
 export async function apiFetch(endpoint, options = {}) {
   let token = getToken();
 
