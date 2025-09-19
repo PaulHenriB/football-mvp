@@ -10,12 +10,12 @@ export const API_ENDPOINTS = {
   LOGIN: `${API_BASE_URL}/users/login`,
   ME: `${API_BASE_URL}/users/me`,
 
-  // --- Generic Matches ---
+  // --- Generic Matches (global scope, not tied to player/manager) ---
+  MATCHES: `${API_BASE_URL}/matches`,
   UPCOMING_MATCHES: `${API_BASE_URL}/matches/upcoming`,   // all upcoming matches
   PAST_MATCHES: `${API_BASE_URL}/matches/past`,           // all past matches
   OPEN_MATCHES: `${API_BASE_URL}/matches/open`,           // matches still open for join
 
-  MATCHES: `${API_BASE_URL}/matches`,
   MATCH_BY_ID: (id) => `${API_BASE_URL}/matches/${id}`,
   MATCH_DETAILS: (id) => `${API_BASE_URL}/matches/${id}`, // alias for clarity
   MATCH_PLAYERS: (id) => `${API_BASE_URL}/matches/${id}/players`,
@@ -30,7 +30,8 @@ export const API_ENDPOINTS = {
   // --- Manager-specific ---
   MANAGER_UPCOMING_MATCHES: `${API_BASE_URL}/matches/manager/upcoming`,
 
-  // --- Player-specific (NEW, for profile.html) ---
+  // --- Player-specific (NEW) ---
+  PLAYER_MATCHES: (playerId) => `${API_BASE_URL}/players/${playerId}/matches`, // all matches for player
   PLAYER_UPCOMING_MATCHES: (playerId) => `${API_BASE_URL}/players/${playerId}/matches/upcoming`, 
   PLAYER_REGISTERED_MATCHES: (playerId) => `${API_BASE_URL}/players/${playerId}/matches/registered`, 
   PLAYER_PAST_MATCHES: (playerId) => `${API_BASE_URL}/players/${playerId}/matches/past`, 
