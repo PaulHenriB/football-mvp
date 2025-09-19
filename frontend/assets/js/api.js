@@ -8,6 +8,13 @@ export const API_ENDPOINTS = {
   REGISTER: `${API_BASE_URL}/users/register`,
   LOGIN: `${API_BASE_URL}/users/login`,
   ME: `${API_BASE_URL}/users/me`,
+  UPCOMING_MATCHES: `${API_BASE_URL}/matches/upcoming`,
+  PAST_MATCHES: `${API_BASE_URL}/matches/past`,
+  OPEN_MATCHES: `${API_BASE_URL}/matches/open`,
+  MATCH_DETAILS: `${API_BASE_URL}/matches`,    
+  JOIN_MATCH: `${API_BASE_URL}/matches/join`,     
+  CANCEL_MATCH: `${API_BASE_URL}/matches/cancel`,
+  MANAGER_UPCOMING_MATCHES: `${API_BASE_URL}/matches/manager/upcoming`,
 
   MATCHES: `${API_BASE_URL}/matches`,
   MATCH_BY_ID: (id) => `${API_BASE_URL}/matches/${id}`,
