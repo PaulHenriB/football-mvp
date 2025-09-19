@@ -1,201 +1,158 @@
-import { enforceAuth } from "./auth-guard.js";
-import { apiRequest, API_ENDPOINTS } from "./api.js";
+// frontend/assets/js/matches.js
 
-document.addEventListener("DOMContentLoaded", async () => {
-  await enforceAuth();
+import { API_ENDPOINTS, apiRequest } from "./api.js";
+import { openModal, closeModal } from "./modal.js";
 
-  setupTabs();
+document.addEventListener("DOMContentLoaded", () => {
+  const tabs = document.querySelectorAll(".tab-btn");
+  const contents = document.querySelectorAll(".tab-content");
 
-  await Promise.all([
-    loadUpcomingMatches(),
-    loadPastMatches(),
-    loadOpenMatches(),
-  ]);
+  // Tab switching
+  tabs.forEach(tab => {
+    tab.addEventListener("click", () => {
+      tabs.forEach(btn => btn.classList.remove("active"));
+      contents.forEach(content => content.classList.remove("active"));
+
+      tab.classList.add("active");
+      document.getElementById(`tab-${tab.dataset.tab}`).classList.add("active");
+    });
+  });
+
+  loadMatches();
 });
 
-/**
- * Setup tab switching
- */
-function setupTabs() {
-  const tabBtns = document.querySelectorAll(".tab-btn");
-  const tabContents = document.querySelectorAll(".tab-content");
-
-  tabBtns.forEach((btn) => {
-    btn.addEventListener("click", () => {
-      tabBtns.forEach((b) => b.classList.remove("active"));
-      btn.classList.add("active");
-
-      tabContents.forEach((tc) => tc.classList.remove("active"));
-      document.getElementById(`tab-${btn.dataset.tab}`).classList.add("active");
-    });
-  });
+// Load matches for each tab
+async function loadMatches() {
+  await loadUpcomingMatches();
+  await loadPastMatches();
+  await loadOpenMatches();
 }
 
-/**
- * Load Upcoming Matches
- */
 async function loadUpcomingMatches() {
-  const container = document.getElementById("upcoming-list");
-  container.innerHTML = "<p>Loading...</p>";
-
   try {
-    const matches = await apiRequest(API_ENDPOINTS.UPCOMING_MATCHES, { method: "GET" });
-    container.innerHTML = matches.length
-      ? matches.map(renderMatchCard).join("")
-      : "<p>No upcoming matches.</p>";
+    const matches = await apiRequest(API_ENDPOINTS.UPCOMING_MATCHES, "GET");
+    const managerMatches = await apiRequest(API_ENDPOINTS.MANAGER_UPCOMING_MATCHES, "GET");
+    const managerMatchIds = new Set(managerMatches.map(m => m.id));
 
-    setupMatchCardHandlers(container);
+    renderMatchList("upcoming-list", matches, { managerMatchIds });
   } catch (err) {
-    console.error("Error fetching upcoming matches:", err);
-    container.innerHTML = "<p>Error loading upcoming matches.</p>";
+    console.error("Error loading upcoming matches", err);
   }
 }
 
-/**
- * Load Past Matches
- */
 async function loadPastMatches() {
-  const container = document.getElementById("past-list");
-  container.innerHTML = "<p>Loading...</p>";
-
   try {
-    const matches = await apiRequest(API_ENDPOINTS.PAST_MATCHES, { method: "GET" });
-    container.innerHTML = matches.length
-      ? matches.map(renderMatchCard).join("")
-      : "<p>No past matches.</p>";
-
-    setupMatchCardHandlers(container);
+    const matches = await apiRequest(API_ENDPOINTS.PAST_MATCHES, "GET");
+    renderMatchList("past-list", matches);
   } catch (err) {
-    console.error("Error fetching past matches:", err);
-    container.innerHTML = "<p>Error loading past matches.</p>";
+    console.error("Error loading past matches", err);
   }
 }
 
-/**
- * Load Open Matches
- */
 async function loadOpenMatches() {
-  const container = document.getElementById("open-list");
-  container.innerHTML = "<p>Loading...</p>";
-
   try {
-    const matches = await apiRequest(API_ENDPOINTS.OPEN_MATCHES, { method: "GET" });
-    if (!matches.length) {
-      container.innerHTML = "<p>No open matches available.</p>";
-      return;
-    }
-
-    container.innerHTML = matches.map(renderOpenMatchCard).join("");
-
-    // Attach join + view details handlers
-    container.querySelectorAll(".join-btn").forEach((btn) => {
-      btn.addEventListener("click", async (e) => {
-        const matchId = e.target.dataset.id;
-        await handleJoinMatch(matchId);
-      });
-    });
-
-    setupMatchCardHandlers(container);
+    const matches = await apiRequest(API_ENDPOINTS.OPEN_MATCHES, "GET");
+    renderMatchList("open-list", matches);
   } catch (err) {
-    console.error("Error fetching open matches:", err);
-    container.innerHTML = "<p>Error loading open matches.</p>";
+    console.error("Error loading open matches", err);
   }
 }
 
-/**
- * Render match card (shared for upcoming & past)
- */
-function renderMatchCard(match) {
-  return `
-    <div class="match-card card">
-      <h4>${match.name || "Match"}</h4>
-      <p><strong>Date:</strong> ${match.date}</p>
-      <p><strong>Location:</strong> ${match.location}</p>
-      ${match.result ? `<p><strong>Result:</strong> ${match.result}</p>` : ""}
-      <button class="secondary-btn view-details-btn" data-id="${match.id}">
-        View Details
-      </button>
-    </div>
-  `;
-}
+// Render a match list with action buttons
+function renderMatchList(containerId, matches, options = {}) {
+  const container = document.getElementById(containerId);
+  container.innerHTML = "";
 
-/**
- * Render open match card (with join + view details)
- */
-function renderOpenMatchCard(match) {
-  const spotsLeft = match.spots - match.players.length;
-  const isClosed = spotsLeft <= 0;
+  if (!matches || matches.length === 0) {
+    container.innerHTML = `<p>No matches found.</p>`;
+    return;
+  }
 
-  return `
-    <div class="match-card card">
-      <h4>${match.name || "Match"}</h4>
-      <p><strong>Date:</strong> ${match.date}</p>
-      <p><strong>Location:</strong> ${match.location}</p>
-      <p><strong>Spots Left:</strong> ${spotsLeft}</p>
-      <button class="primary-btn join-btn" data-id="${match.id}" ${isClosed ? "disabled" : ""}>
-        ${isClosed ? "Closed" : "Join"}
-      </button>
-      <button class="secondary-btn view-details-btn" data-id="${match.id}">
-        View Details
-      </button>
-    </div>
-  `;
-}
+  matches.forEach(match => {
+    const matchCard = document.createElement("div");
+    matchCard.className = "match-card card";
 
-/**
- * Attach handlers to "View Details" buttons
- */
-function setupMatchCardHandlers(container) {
-  container.querySelectorAll(".view-details-btn").forEach((btn) => {
-    btn.addEventListener("click", async () => {
-      const matchId = btn.dataset.id;
-      await openMatchDetails(matchId);
-    });
-  });
-}
-
-/**
- * Open match details in modal
- */
-async function openMatchDetails(matchId) {
-  const modal = document.getElementById("matchDetailsModal");
-  const content = document.getElementById("match-details-content");
-
-  content.innerHTML = "<p>Loading match details...</p>";
-
-  try {
-    const match = await apiRequest(API_ENDPOINTS.MATCH_BY_ID(matchId), { method: "GET" });
-
-    content.innerHTML = `
-      <h3>${match.name || "Match"}</h3>
-      <p><strong>Date:</strong> ${match.date}</p>
-      <p><strong>Location:</strong> ${match.location}</p>
-      <p><strong>Status:</strong> ${match.status}</p>
-      ${match.result ? `<p><strong>Result:</strong> ${match.result}</p>` : ""}
-      <a href="matchdetails.html?id=${match.id}" class="primary-btn">
-        Open Full Page
-      </a>
+    matchCard.innerHTML = `
+      <h4>${match.title}</h4>
+      <p>${new Date(match.date).toLocaleString()}</p>
+      <div class="match-actions">
+        <button class="btn primary-btn" data-action="join" data-id="${match.id}">Join</button>
+        <button class="btn secondary-btn" data-action="details" data-id="${match.id}">View Details</button>
+        ${options.managerMatchIds?.has(match.id)
+          ? `<button class="btn danger-btn" data-action="cancel" data-id="${match.id}">Cancel</button>`
+          : ""}
+      </div>
     `;
 
-    // Use modal.js open
-    modal.classList.add("open");
-    modal.setAttribute("aria-hidden", "false");
+    container.appendChild(matchCard);
+  });
+
+  attachMatchEvents(container);
+}
+
+// Attach events to match action buttons
+function attachMatchEvents(container) {
+  container.querySelectorAll("button[data-action]").forEach(button => {
+    const matchId = button.dataset.id;
+    const action = button.dataset.action;
+
+    button.addEventListener("click", async () => {
+      if (action === "details") {
+        await showMatchDetails(matchId);
+      } else if (action === "join") {
+        await joinMatch(matchId);
+      } else if (action === "cancel") {
+        await cancelMatch(matchId);
+      }
+    });
+  });
+}
+
+// Show match details in modal
+async function showMatchDetails(matchId) {
+  try {
+    const match = await apiRequest(`${API_ENDPOINTS.MATCH_DETAILS}/${matchId}`, "GET");
+
+    const content = document.getElementById("match-details-content");
+    content.innerHTML = `
+      <h5>${match.title}</h5>
+      <p><strong>Date:</strong> ${new Date(match.date).toLocaleString()}</p>
+      <p><strong>Location:</strong> ${match.location}</p>
+      <p><strong>Players Registered:</strong> ${match.players?.length || 0}</p>
+      <ul>
+        ${match.players?.map(player => `<li>${player.name}</li>`).join("") || "<li>No players yet</li>"}
+      </ul>
+    `;
+
+    openModal("matchDetailsModal");
   } catch (err) {
-    console.error("Error loading match details:", err);
-    content.innerHTML = "<p>Failed to load match details.</p>";
+    console.error("Error fetching match details", err);
   }
 }
 
-/**
- * Handle Join Match
- */
-async function handleJoinMatch(matchId) {
+// Join match
+async function joinMatch(matchId) {
   try {
-    await apiRequest(API_ENDPOINTS.JOIN_MATCH(matchId), { method: "POST" });
-    alert("You successfully joined the match!");
-    await loadOpenMatches(); // refresh list
+    await apiRequest(`${API_ENDPOINTS.JOIN_MATCH}/${matchId}`, "POST");
+    alert("You joined the match!");
+    await loadMatches();
   } catch (err) {
-    console.error("Error joining match:", err);
-    alert("Failed to join the match. Please try again.");
+    console.error("Error joining match", err);
+    alert("Failed to join match.");
   }
 }
+
+// Cancel match (Manager only)
+async function cancelMatch(matchId) {
+  if (!confirm("Are you sure you want to cancel this match?")) return;
+
+  try {
+    await apiRequest(`${API_ENDPOINTS.CANCEL_MATCH}/${matchId}`, "DELETE");
+    alert("Match canceled.");
+    await loadMatches();
+  } catch (err) {
+    console.error("Error canceling match", err);
+    alert("Failed to cancel match.");
+  }
+}
+
