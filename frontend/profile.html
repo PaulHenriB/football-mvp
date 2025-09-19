@@ -75,12 +75,39 @@
       </form>
     </section>
 
-    <section>
-      <h2>Accessing to "My Dashboard"</h2>
-      <a href="dashboard.html" class="btn-primary" id="get-started-btn">My Dashboard</a>
+    <!-- Quick access to Dashboard -->
+    <section class="card">
+      <h2>Quick Access</h2>
+      <p>Go directly to your manager dashboard for scheduling and team management.</p>
+      <a href="dashboard.html" class="primary-btn" id="get-started-btn">My Dashboard</a>
     </section>
 
-    
+    <!-- Matches (player view) -->
+    <section id="player-matches" class="card">
+      <h2>My Matches</h2>
+
+      <div class="subsection">
+        <h3>Open Matches (Joinable)</h3>
+        <div id="player-open-matches">
+          <p class="placeholder">No open matches available.</p>
+        </div>
+      </div>
+
+      <div class="subsection">
+        <h3>Upcoming Matches (Registered)</h3>
+        <div id="player-upcoming-matches">
+          <p class="placeholder">You are not registered for any upcoming matches.</p>
+        </div>
+      </div>
+
+      <div class="subsection">
+        <h3>Past Matches</h3>
+        <div id="player-past-matches">
+          <p class="placeholder">No past matches found.</p>
+        </div>
+      </div>
+    </section>
+
     <!-- Ratings -->
     <section id="ratings-section" class="card">
       <h2>Player Ratings</h2>
