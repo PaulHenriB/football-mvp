@@ -19,22 +19,24 @@ export const API_ENDPOINTS = {
   MATCH_BY_ID: (id) => `${API_BASE_URL}/matches/${id}`,
   MATCH_DETAILS: (id) => `${API_BASE_URL}/matches/${id}`, // alias for clarity
   MATCH_PLAYERS: (id) => `${API_BASE_URL}/matches/${id}/players`,
-  MATCH_RATE_PLAYER: (id) => `${API_BASE_URL}/matches/${id}/rate`,
   MATCH_AVAILABILITY: (id) => `${API_BASE_URL}/matches/${id}/availability`,
   MATCH_TEAMS: (id) => `${API_BASE_URL}/matches/${id}/teams`,
 
   // --- Match Actions ---
   JOIN_MATCH: (id) => `${API_BASE_URL}/matches/join/${id}`,
   CANCEL_MATCH: (id) => `${API_BASE_URL}/matches/cancel/${id}`,
+  MATCH_RESULTS: (id) => `${API_BASE_URL}/matches/${id}/results`, 
+  // ✅ Use this endpoint to submit BOTH match results and player ratings in one call:
+  // { teamAScore, teamBScore, ratings: [{ playerId, rating }] }
 
   // --- Manager-specific ---
   MANAGER_UPCOMING_MATCHES: `${API_BASE_URL}/matches/manager/upcoming`,
 
-  // --- Player-specific (NEW) ---
+  // --- Player-specific (for profile/history) ---
   PLAYER_MATCHES: (playerId) => `${API_BASE_URL}/players/${playerId}/matches`, // all matches for player
-  PLAYER_UPCOMING_MATCHES: (playerId) => `${API_BASE_URL}/players/${playerId}/matches/upcoming`, 
-  PLAYER_REGISTERED_MATCHES: (playerId) => `${API_BASE_URL}/players/${playerId}/matches/registered`, 
-  PLAYER_PAST_MATCHES: (playerId) => `${API_BASE_URL}/players/${playerId}/matches/past`, 
+  PLAYER_UPCOMING_MATCHES: (playerId) => `${API_BASE_URL}/players/${playerId}/matches/upcoming`,
+  PLAYER_REGISTERED_MATCHES: (playerId) => `${API_BASE_URL}/players/${playerId}/matches/registered`,
+  PLAYER_PAST_MATCHES: (playerId) => `${API_BASE_URL}/players/${playerId}/matches/past`,
 
   // --- Players ---
   PLAYERS: `${API_BASE_URL}/players`,
@@ -68,3 +70,4 @@ export async function apiFetch(endpoint, options = {}) {
 
   return response.json();
 }
+
