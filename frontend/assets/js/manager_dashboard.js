@@ -1,162 +1,143 @@
-import { enforceAuth } from "./auth-guard.js";
-import { apiRequest, API_ENDPOINTS } from "./api.js";
+// frontend/assets/js/manager_dashboard.js 
 
-document.addEventListener("DOMContentLoaded", async () => {
-  await enforceAuth();
-  await loadUpcomingMatches();
-  await loadAvailability();
-  setupScheduleForm();
+import { API_ENDPOINTS, apiRequest } from "./api.js";
+import { openModal, closeModal } from "./modal.js";
+
+document.addEventListener("DOMContentLoaded", () => {
+  const tabs = document.querySelectorAll(".tab-btn");
+  const contents = document.querySelectorAll(".tab-content");
+
+  // Tab switching
+  tabs.forEach(tab => {
+    tab.addEventListener("click", () => {
+      tabs.forEach(btn => btn.classList.remove("active"));
+      contents.forEach(content => content.classList.remove("active"));
+
+      tab.classList.add("active");
+      document.getElementById(`tab-${tab.dataset.tab}`).classList.add("active");
+    });
+  });
+
+  loadMatches();
 });
 
-/**
- * Load manager's upcoming matches with cancel/edit actions
- */
+// Load matches
+async function loadMatches() {
+  await loadUpcomingMatches();
+  await loadPastMatches();
+  await loadOpenMatches();
+}
+
 async function loadUpcomingMatches() {
-  const container = document.getElementById("dashboard-upcoming");
-  container.innerHTML = "<p>Loading upcoming matches...</p>";
-
   try {
-    const matches = await apiRequest(API_ENDPOINTS.MANAGER_UPCOMING_MATCHES, { method: "GET" });
+    const matches = await apiRequest(API_ENDPOINTS.UPCOMING_MATCHES, "GET");
+    const managerMatches = await apiRequest(API_ENDPOINTS.MANAGER_UPCOMING_MATCHES, "GET");
+    const managerMatchIds = new Set(managerMatches.map(m => m.id));
 
-    container.innerHTML = matches.length
-      ? matches.map(renderManagerMatchCard).join("")
-      : "<p>No upcoming matches scheduled.</p>";
-
-    attachManagerMatchHandlers(container);
+    renderMatchList("upcoming-list", matches, { managerMatchIds });
   } catch (err) {
-    console.error("Error fetching manager matches:", err);
-    container.innerHTML = "<p>Failed to load upcoming matches.</p>";
+    console.error("Error loading upcoming matches", err);
   }
 }
 
-/**
- * Render a match card with manager actions
- */
-function renderManagerMatchCard(match) {
-  return `
-    <div class="match-card card">
-      <h4>${match.name}</h4>
-      <p><strong>Date:</strong> ${match.date}</p>
-      <p><strong>Location:</strong> ${match.location}</p>
-      <div class="actions">
-        <button class="secondary-btn view-details-btn" data-id="${match.id}">
-          View Details
-        </button>
-        <button class="secondary-btn edit-btn" data-id="${match.id}">
-          Edit
-        </button>
-        <button class="danger-btn cancel-btn" data-id="${match.id}">
-          Cancel
-        </button>
+async function loadPastMatches() {
+  try {
+    const matches = await apiRequest(API_ENDPOINTS.PAST_MATCHES, "GET");
+    renderMatchList("past-list", matches);
+  } catch (err) {
+    console.error("Error loading past matches", err);
+  }
+}
+
+async function loadOpenMatches() {
+  try {
+    const matches = await apiRequest(API_ENDPOINTS.OPEN_MATCHES, "GET");
+    renderMatchList("open-list", matches);
+  } catch (err) {
+    console.error("Error loading open matches", err);
+  }
+}
+
+function renderMatchList(containerId, matches, options = {}) {
+  const container = document.getElementById(containerId);
+  container.innerHTML = "";
+
+  if (!matches || matches.length === 0) {
+    container.innerHTML = `<p>No matches found.</p>`;
+    return;
+  }
+
+  matches.forEach(match => {
+    const matchCard = document.createElement("div");
+    matchCard.className = "match-card card";
+
+    matchCard.innerHTML = `
+      <h4>${match.title}</h4>
+      <p>${new Date(match.date).toLocaleString()}</p>
+      <div class="match-actions">
+        <button class="btn primary-btn" data-action="join" data-id="${match.id}">Join</button>
+        <button class="btn secondary-btn" data-action="details" data-id="${match.id}">View Details</button>
+        ${options.managerMatchIds?.has(match.id)
+          ? `<button class="btn danger-btn" data-action="cancel" data-id="${match.id}">Cancel</button>`
+          : ""}
       </div>
-    </div>
-  `;
+    `;
+
+    container.appendChild(matchCard);
+  });
+
+  attachMatchEvents(container);
 }
 
-/**
- * Attach handlers (details, edit, cancel)
- */
-function attachManagerMatchHandlers(container) {
-  container.querySelectorAll(".view-details-btn").forEach((btn) => {
-    btn.addEventListener("click", async () => {
-      await openMatchDetails(btn.dataset.id);
-    });
-  });
+function attachMatchEvents(container) {
+  container.querySelectorAll("button[data-action]").forEach(button => {
+    const matchId = button.dataset.id;
+    const action = button.dataset.action;
 
-  container.querySelectorAll(".edit-btn").forEach((btn) => {
-    btn.addEventListener("click", () => {
-      alert(`Edit match ${btn.dataset.id} (placeholder for future feature).`);
-    });
-  });
-
-  container.querySelectorAll(".cancel-btn").forEach((btn) => {
-    btn.addEventListener("click", async () => {
-      if (!confirm("Are you sure you want to cancel this match?")) return;
-      await handleCancelMatch(btn.dataset.id);
+    button.addEventListener("click", async () => {
+      if (action === "details") {
+        await showMatchDetails(matchId);
+      } else if (action === "join") {
+        await joinMatch(matchId);
+      } else if (action === "cancel") {
+        await cancelMatch(matchId);
+      }
     });
   });
 }
 
-/**
- * Cancel a match
- */
-async function handleCancelMatch(matchId) {
+// Show match details (with results & ratings)
+async function showMatchDetails(matchId) {
   try {
-    await apiRequest(API_ENDPOINTS.CANCEL_MATCH(matchId), { method: "DELETE" });
-    alert("Match cancelled successfully.");
-    await loadUpcomingMatches(); // refresh
-  } catch (err) {
-    console.error("Error cancelling match:", err);
-    alert("Failed to cancel the match.");
-  }
-}
+    const match = await apiRequest(API_ENDPOINTS.MATCH_DETAILS(matchId), "GET");
 
-/**
- * Open match details in modal (shared logic from matches.js)
- */
-async function openMatchDetails(matchId) {
-  const modal = document.getElementById("matchDetailsModal");
-  const content = document.getElementById("match-details-content");
-
-  content.innerHTML = "<p>Loading match details...</p>";
-
-  try {
-    const match = await apiRequest(API_ENDPOINTS.MATCH_BY_ID(matchId), { method: "GET" });
+    const content = document.getElementById("match-details-content");
     content.innerHTML = `
-      <h3>${match.name}</h3>
-      <p><strong>Date:</strong> ${match.date}</p>
+      <h5>${match.title}</h5>
+      <p><strong>Date:</strong> ${new Date(match.date).toLocaleString()}</p>
       <p><strong>Location:</strong> ${match.location}</p>
       <p><strong>Status:</strong> ${match.status}</p>
-    `;
-    modal.classList.add("open");
-    modal.setAttribute("aria-hidden", "false");
-  } catch (err) {
-    console.error("Error loading match details:", err);
-    content.innerHTML = "<p>Failed to load match details.</p>";
-  }
-}
 
-/**
- * Load player availability (placeholder for expansion)
- */
-async function loadAvailability() {
-  const container = document.getElementById("dashboard-availability");
-  container.innerHTML = "<p>Loading availability...</p>";
+      <div class="section">
+        <h6>Players</h6>
+        <ul class="player-list">
+          ${match.players?.map(p => `
+            <li>
+              ${p.name} 
+              ${match.status === "completed" 
+                ? `<input type="number" class="player-rating" data-player="${p.id}" min="0" max="10" value="${p.rating ?? ""}" placeholder="Rate"/>`
+                : ""}
+            </li>`).join("") || "<li>No players registered</li>"}
+        </ul>
+      </div>
 
-  try {
-    const availability = await apiRequest(API_ENDPOINTS.AVAILABILITY, { method: "GET" });
-    container.innerHTML = availability.length
-      ? availability.map((a) => `<p>${a.playerName}: ${a.status}</p>`).join("")
-      : "<p>No availability data yet.</p>";
-  } catch (err) {
-    console.error("Error loading availability:", err);
-    container.innerHTML = "<p>Failed to load availability.</p>";
-  }
-}
+      ${match.isManager && match.status === "completed" ? `
+        <div class="section">
+          <h6>Record Results & Ratings</h6>
+          <form id="result-form">
+            <label>Team A Score <input type="number" id="teamA-score" min="0" value="${match.teamAScore ?? ""}"></label>
+            <label>Team B Score <input type="number" id="teamB-score" min="0" value="${match.teamBScore ?? ""}"></label>
+            <button type="submit" class="btn primary-btn">Save</button>
+          </form>
+        </div>  
 
-/**
- * Handle schedule form submission
- */
-function setupScheduleForm() {
-  const form = document.getElementById("schedule-form");
-  if (!form) return;
-
-  form.addEventListener("submit", async (e) => {
-    e.preventDefault();
-
-    const formData = Object.fromEntries(new FormData(form).entries());
-    try {
-      await apiRequest(API_ENDPOINTS.CREATE_MATCH, {
-        method: "POST",
-        body: JSON.stringify(formData),
-      });
-      alert("Match scheduled successfully!");
-      form.reset();
-      document.querySelector("[data-modal-close]").click();
-      await loadUpcomingMatches();
-    } catch (err) {
-      console.error("Error scheduling match:", err);
-      alert("Failed to schedule match.");
-    }
-  });
-}
