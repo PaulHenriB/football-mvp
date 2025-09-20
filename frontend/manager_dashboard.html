@@ -4,12 +4,10 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Manager Dashboard</title>
-
-  <!-- Styles -->
   <link rel="stylesheet" href="assets/css/styles.css" />
   <link rel="stylesheet" href="assets/css/manager_dashboard.css" />
 
-  <!-- API config -->
+    <!-- API config -->
   <script>
     window.__API_BASE__ = 'http://localhost:3001/';
   </script>
@@ -19,94 +17,97 @@
   <script type="module" src="assets/js/modal.js" defer></script>
 </head>
 <body>
+
   <header class="navbar container">
     <a href="index.html" class="navbar__brand">Weplay</a>
     <button class="navbar__toggle" aria-label="Toggle navigation">☰</button>
     <nav class="navbar__links" aria-label="Main navigation">
-      <a href="dashboard.html">Dashboard</a>
-      <a href="matches.html">Matches</a>
-      <a href="profile.html">Profile</a>
-      <a href="login.html" id="logout-link">Logout</a>
-      <a href="signup.html" id="signup-link">Sign Up</a>
+        <a href="dashboard.html">Dashboard</a>
+        <a href="matches.html">Matches</a>
+        <a href="profile.html">Profile</a>
+        <a href="login.html" id="logout-link">Logout</a>
+        <a href="signup.html" id="signup-link">Sign Up</a>
     </nav>
   </header>
 
-  <main class="container">
-    <h1>Manager Dashboard</h1>
+  <!-- Dashboard Main -->
+  <main class="dashboard-page">
+    <section class="main">
+      <h1 class="page-title">Manager Dashboard</h1>
 
-    <section class="card-grid">
-      <!-- Upcoming Matches -->
-      <div class="card">
-        <div class="card__header">
-          <h2>Upcoming Matches</h2>
-        </div>
-        <div id="dashboard-upcoming">
-          <!-- Placeholder: matches with manager actions will be injected here -->
-        </div>
+      <!-- Controls -->
+      <div class="controls">
+        <input type="text" class="search" placeholder="Search matches..." />
+        <button class="btn primary-btn" id="new-match-btn">+ New Match</button>
       </div>
 
-      <!-- Player Availability -->
-      <div class="card">
-        <div class="card__header">
-          <h2>Player Availability</h2>
-        </div>
-        <div id="dashboard-availability">
-          <!-- Placeholder for availability data -->
-        </div>
+      <!-- Tabs -->
+      <div class="tabs">
+        <button class="tab-btn active" data-tab="upcoming">Upcoming</button>
+        <button class="tab-btn" data-tab="past">Past</button>
+        <button class="tab-btn" data-tab="open">Open</button>
+      </div>
+
+      <!-- Tab Contents -->
+      <div class="tab-content active" id="tab-upcoming">
+        <div id="upcoming-list" class="cards-grid"></div>
+      </div>
+
+      <div class="tab-content" id="tab-past">
+        <div id="past-list" class="cards-grid"></div>
+      </div>
+
+      <div class="tab-content" id="tab-open">
+        <div id="open-list" class="cards-grid"></div>
       </div>
     </section>
   </main>
 
-  <!-- Floating Action Button (FAB) -->
-  <button class="fab" data-modal-target="#scheduleModal">＋</button>
+  <!-- Floating Action Button -->
+  <button class="fab primary-btn" id="fab-add">+</button>
 
-  <!-- Modal for scheduling -->
-  <div id="scheduleModal" class="modal" aria-hidden="true">
-    <div class="modal__overlay" data-modal-close></div>
-    <div class="modal__content" role="dialog" aria-modal="true">
-      <button class="modal__close" data-modal-close>&times;</button>
-      <h2>Schedule a Match</h2>
-      <form id="schedule-form">
-        <div class="form-group">
-          <label for="matchName">Match Name</label>
-          <input type="text" id="matchName" name="matchName" required />
-        </div>
-        <div class="form-group">
-          <label for="matchDate">Date</label>
-          <input type="date" id="matchDate" name="matchDate" required />
-        </div>
-        <div class="form-group">
-          <label for="matchLocation">Location</label>
-          <input type="text" id="matchLocation" name="matchLocation" required />
-        </div>
-        <div class="form-group">
-          <label for="matchSpots">Available Spots</label>
-          <input type="number" id="matchSpots" name="matchSpots" min="2" step="1" required />
-        </div>
-        <div class="form-group">
-          <label for="matchPrice">Price per Player (€)</label>
-          <input type="number" id="matchPrice" name="matchPrice" min="0" step="0.01" value="0" required />
-          <small>Set 0 for Free</small>
-        </div>
-        <button type="submit" class="btn">Save</button>
-      </form>
-    </div>
-  </div>
-
-  <!-- Reusable modal for details -->
-  <div id="matchDetailsModal" class="modal" aria-hidden="true">
-    <div class="modal__overlay" data-modal-close></div>
-    <div class="modal__content" role="dialog" aria-modal="true">
-      <button class="modal__close" data-modal-close>&times;</button>
-      <h4>Match Details</h4>
-      <div id="match-details-content">
-        <p>Details will be loaded dynamically…</p>
+  <!-- Match Details Modal -->
+  <div id="matchDetailsModal" class="modal">
+    <div class="modal__content">
+      <button class="modal__close" data-close>&times;</button>
+      <div class="modal__body" id="match-details-content">
+        <!-- Match details are dynamically injected via JS -->
+      </div>
+      <div class="modal__footer">
+        <button class="btn secondary-btn" data-close>Close</button>
       </div>
     </div>
   </div>
 
+  <!-- Create/Edit Match Modal -->
+  <div id="matchFormModal" class="modal">
+    <div class="modal__content">
+      <button class="modal__close" data-close>&times;</button>
+      <h3>Create New Match</h3>
+      <div class="modal__body">
+        <form id="match-form">
+          <label>
+            Title
+            <input type="text" name="title" required />
+          </label>
+          <label>
+            Date & Time
+            <input type="datetime-local" name="date" required />
+          </label>
+          <label>
+            Location
+            <input type="text" name="location" required />
+          </label>
+          <button type="submit" class="btn primary-btn">Save</button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+
   <footer class="container text-center">
     <p class="text-muted">&copy; 2025 Weplay. All Rights Reserved.</p>
   </footer>
+
 </body>
 </html>
