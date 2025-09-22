@@ -1,4 +1,4 @@
-generator client { 
+generator client {
   provider = "prisma-client-js"
 }
 
@@ -7,6 +7,7 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+/// ENUMS
 enum Position {
   GOALKEEPER
   DEFENDER
@@ -14,16 +15,26 @@ enum Position {
   FORWARD
 }
 
+enum Role {
+  PLAYER
+  MANAGER
+  ADMIN
+}
+
 enum MatchStatus {
   SCHEDULED
   ONGOING
   FINISHED
+  CANCELLED
 }
 
-enum Role {
-  PLAYER
-  MANAGER
+/// Team name is stricter now: only two sides allowed
+enum TeamName {
+  TEAM_A
+  TEAM_B
 }
+
+/// MODELS
 
 model User {
   id               Int      @id @default(autoincrement())
@@ -35,11 +46,11 @@ model User {
   phoneNumber      String   @unique
   email            String   @unique
   passwordHash     String
-  role             Role     @default(PLAYER)
+  role             Role     @default(PLAYER)    // new role field
   createdAt        DateTime @default(now())
 
   // Relations
-  players Player[]
+  players Player[]            // a user can have multiple player profiles
   groups  Group[] @relation("UserGroups")
 }
 
@@ -60,38 +71,40 @@ model Player {
 
   // Relation to User (many players per user)
   userId Int?
-  user   User? @relation(fields: [userId], references: [id])
+  user   User? @relation(fields: [userId], references: [id], onDelete: SetNull)
 }
 
 model Match {
-  id        Int           @id @default(autoincrement())
-  date      DateTime
-  location  String
-  duration  Int
-  fee       Float
-  createdBy Int
-  createdAt DateTime      @default(now())
-  updatedAt DateTime      @updatedAt
+  id         Int         @id @default(autoincrement())
+  date       DateTime
+  location   String
+  duration   Int
+  fee        Float
+  createdBy  Int
+  createdAt  DateTime    @default(now())
+  updatedAt  DateTime    @updatedAt
 
-  capacity  Int           @default(10)
+  capacity   Int         @default(10)
+  status     MatchStatus @default(SCHEDULED)   // new status enum
+  finalScore Json?                               // new finalScore as JSON; nullable
 
-  status    MatchStatus   @default(SCHEDULED)
-  homeScore Int?
-  awayScore Int?
+  // Relations
+  players    PlayerMatch[]  // participation records
+  teams      Team[]         // saved team assignments
+  ratings    Rating[]
 
-  players   PlayerMatch[]
-  teams     Team[]
-  ratings   Rating[]
+  /// Optional: you can add an FK constraint for createdBy if you want
+  /// createdByUser User? @relation(fields:[createdBy], references:[id], onDelete: SetNull)
 }
 
 model PlayerMatch {
   id       Int    @id @default(autoincrement())
   playerId Int
   matchId  Int
-  team     String
+  team     TeamName? // optionally reference TeamName enum for strictness
 
-  match  Match  @relation(fields: [matchId], references: [id])
-  player Player @relation(fields: [playerId], references: [id])
+  match  Match  @relation(fields: [matchId], references: [id], onDelete: Cascade)
+  player Player @relation(fields: [playerId], references: [id], onDelete: Cascade)
 
   @@unique([playerId, matchId]) // prevent duplicate participation
 }
@@ -102,7 +115,10 @@ model Availability {
   matchDate   DateTime
   isAvailable Boolean  @default(true)
 
-  player Player @relation(fields: [playerId], references: [id])
+  player Player @relation(fields: [playerId], references: [id], onDelete: Cascade)
+
+  /// Optional: ensure one availability row per player+matchDate
+  /// @@unique([playerId, matchDate])
 }
 
 model Group {
@@ -117,12 +133,15 @@ model Team {
   id        Int      @id @default(autoincrement())
   matchId   Int
   playerId  Int
-  teamName  String
+  teamName  TeamName
   createdAt DateTime @default(now())
 
-  // Relations
-  match  Match  @relation(fields: [matchId], references: [id])
-  player Player @relation("PlayerTeams", fields: [playerId], references: [id])
+  // Relations (cascade deletion of team entries if match/player is deleted)
+  match  Match  @relation(fields: [matchId], references: [id], onDelete: Cascade)
+  player Player @relation("PlayerTeams", fields: [playerId], references: [id], onDelete: Cascade)
+
+  /// Optional: if you want to prevent duplicate player entries for the same match+team:
+  /// @@unique([matchId, playerId])
 }
 
 model Rating {
@@ -133,8 +152,8 @@ model Rating {
   comment   String?
   createdAt DateTime @default(now())
 
-  player Player @relation(fields: [playerId], references: [id])
-  match  Match  @relation(fields: [matchId], references: [id])
+  player Player @relation(fields: [playerId], references: [id], onDelete: Cascade)
+  match  Match  @relation(fields: [matchId], references: [id], onDelete: Cascade)
 
   @@unique([playerId, matchId]) // a player can only rate an opponent once per match
 }
