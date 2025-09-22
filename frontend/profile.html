@@ -4,29 +4,24 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Profile</title>
-
-  <!-- Global styles + page styles -->
   <link rel="stylesheet" href="assets/css/styles.css" />
   <link rel="stylesheet" href="assets/css/profile.css" />
 
-  <!-- Base API config -->
   <script>
     window.__API_BASE__ = 'http://localhost:3001/';
   </script>
 
-  <!-- Global helpers -->
   <script src="assets/js/api.js" defer></script>
   <script src="assets/js/auth.js" defer></script>
   <script src="assets/js/profile.js" defer></script>
   <script type="module" src="assets/js/modal.js" defer></script>
 </head>
 <body>
-
   <header class="navbar container">
     <a href="index.html" class="navbar__brand">Weplay</a>
     <button class="navbar__toggle" aria-label="Toggle navigation">☰</button>
     <nav class="navbar__links" aria-label="Main navigation">
-      <a href="dashboard.html">Dashboard</a>
+      <a href="dashboard.html" id="manager-link" style="display:none;">Manager Dashboard</a>
       <a href="index.html">Home</a>
       <a href="matches.html">Matches</a>
       <a href="login.html">Logout</a>
@@ -42,17 +37,14 @@
           <label for="firstName">First Name</label>
           <input type="text" id="firstName" name="firstName" required />
         </div>
-
         <div class="form-group">
           <label for="lastName">Last Name</label>
           <input type="text" id="lastName" name="lastName" required />
         </div>
-
         <div class="form-group">
           <label for="dob">Date of Birth</label>
           <input type="date" id="dob" name="dob" required />
         </div>
-
         <div class="form-group">
           <label for="favoriteFoot">Preferred Foot</label>
           <select id="favoriteFoot" name="favoriteFoot">
@@ -60,7 +52,6 @@
             <option value="right">Right</option>
           </select>
         </div>
-
         <div class="form-group">
           <label for="favoritePosition">Favorite Position</label>
           <select id="favoritePosition" name="favoritePosition">
@@ -70,41 +61,31 @@
             <option value="FW">Forward</option>
           </select>
         </div>
-
         <button type="submit" class="primary-btn">Update Profile</button>
       </form>
     </section>
 
-    <!-- Quick access to Dashboard -->
-    <section class="card">
+    <!-- Quick access (conditional) -->
+    <section class="card" id="quick-access" style="display:none;">
       <h2>Quick Access</h2>
       <p>Go directly to your manager dashboard for scheduling and team management.</p>
       <a href="dashboard.html" class="primary-btn" id="get-started-btn">My Dashboard</a>
     </section>
 
-    <!-- Matches (player view) -->
+    <!-- Matches -->
     <section id="player-matches" class="card">
       <h2>My Matches</h2>
-
       <div class="subsection">
         <h3>Open Matches (Joinable)</h3>
-        <div id="player-open-matches">
-          <p class="placeholder">No open matches available.</p>
-        </div>
+        <div id="player-open-matches"><p class="placeholder">No open matches available.</p></div>
       </div>
-
       <div class="subsection">
         <h3>Upcoming Matches (Registered)</h3>
-        <div id="player-upcoming-matches">
-          <p class="placeholder">You are not registered for any upcoming matches.</p>
-        </div>
+        <div id="player-upcoming-matches"><p class="placeholder">You are not registered for any upcoming matches.</p></div>
       </div>
-
       <div class="subsection">
         <h3>Past Matches</h3>
-        <div id="player-past-matches">
-          <p class="placeholder">No past matches found.</p>
-        </div>
+        <div id="player-past-matches"><p class="placeholder">No past matches found.</p></div>
       </div>
     </section>
 
@@ -119,13 +100,11 @@
     <section id="availability-section" class="card">
       <h2>Availability</h2>
       <div id="availability"></div>
-
       <form id="availability-form">
         <div class="form-group">
           <label for="availability-date">Date</label>
           <input type="date" id="availability-date" name="date" required />
         </div>
-
         <div class="form-group">
           <label for="availability-status">Status</label>
           <select id="availability-status" name="status">
@@ -133,17 +112,15 @@
             <option value="unavailable">Unavailable</option>
           </select>
         </div>
-
         <button type="submit" class="primary-btn">Set Availability</button>
       </form>
     </section>
   </main>
 
   <footer>
-    <p>&copy; 2025 Weplay. All Rights reserved.</p>
+    <p>&copy; 2025 Weplay. All Rights Reserved.</p>
   </footer>
 
-  <!-- Shared Modal -->
   <div class="modal-overlay" id="global-modal" aria-hidden="true">
     <div class="modal">
       <button class="modal-close secondary-btn" data-modal-close>&times;</button>
