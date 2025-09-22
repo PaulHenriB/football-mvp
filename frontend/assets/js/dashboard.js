@@ -15,11 +15,12 @@ document.addEventListener("DOMContentLoaded", async () => {
     // Load matches
     await loadUpcomingMatches();
 
-    // Load availability
-    renderAvailability(user.availability || []);
+    // Load availability (read-only)
+    await loadAvailability(user.id);
   } catch (err) {
-    console.error("Error loading dashboard:", err);
-    document.getElementById("dashboard").innerHTML = "<p class='alert alert--error'>Error loading dashboard.</p>";
+    console.error("❌ Error loading dashboard:", err);
+    const main = document.querySelector(".dashboard-page");
+    main.innerHTML = "<p>Error loading dashboard.</p>";
   }
 });
 
@@ -38,7 +39,7 @@ async function loadStats(userId) {
     document.getElementById("stat-rating").textContent =
       stats.avgRating ? stats.avgRating.toFixed(2) : "-";
   } catch (err) {
-    console.error("Error fetching stats:", err);
+    console.error("❌ Error fetching stats:", err);
   }
 }
 
@@ -66,22 +67,34 @@ async function loadUpcomingMatches() {
       )
       .join("");
   } catch (err) {
-    console.error("Error fetching upcoming matches:", err);
-    container.innerHTML = "<li class='text-muted'>Error loading matches.</li>";
+    console.error("❌ Error fetching upcoming matches:", err);
+    container.innerHTML = "<li>Error loading matches.</li>";
   }
 }
 
 /**
- * Render availability
+ * Load availability (read-only summary)
  */
-function renderAvailability(availability) {
+async function loadAvailability(userId) {
   const container = document.getElementById("availability-list");
-  if (!availability.length) {
-    container.innerHTML = "<li>No availability set.</li>";
-    return;
-  }
+  container.innerHTML = "<li>Loading...</li>";
 
-  container.innerHTML = availability
-    .map((a) => `<li>${a.date}: ${a.status}</li>`)
-    .join("");
+  try {
+    const availability = await apiRequest(
+      `${API_ENDPOINTS.PLAYERS}/${userId}/availability`,
+      { method: "GET" }
+    );
+
+    if (!availability.length) {
+      container.innerHTML = "<li>No availability set.</li>";
+      return;
+    }
+
+    container.innerHTML = availability
+      .map((a) => `<li>${a.date}: ${a.status}</li>`)
+      .join("");
+  } catch (err) {
+    console.error("❌ Error loading availability:", err);
+    container.innerHTML = "<li>Error loading availability.</li>";
+  }
 }
