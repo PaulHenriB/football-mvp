@@ -1,4 +1,4 @@
-// backend/routes/matches.js
+// backend/routes/matches.js 
 const express = require('express');
 const router = express.Router();
 const prisma = require('../prismaClient');
@@ -14,6 +14,7 @@ const {
   getBalancedTeams,
   finishMatch,      // new
   getPlayerRatings, // new
+  saveTeams,        // ✅ NEW
 } = require('../controllers/matchController');
 
 // ---------------- ROUTES ---------------- //
@@ -81,6 +82,19 @@ router.post('/:id/rate', authenticate, ratePlayer);
 
 // PUT set final result (only managers, authenticated)
 router.put('/:id/result', authenticate, finishMatch);
+
+// ✅ NEW: POST save teams (only managers, authenticated)
+router.post('/:id/save-teams', authenticate, async (req, res, next) => {
+  try {
+    if (req.user.role !== 'manager') {
+      return res.status(403).json({ error: 'Only managers can save teams' });
+    }
+    return saveTeams(req, res, next);
+  } catch (err) {
+    console.error('❌ Error saving teams:', err);
+    res.status(500).json({ error: 'Error saving teams' });
+  }
+});
 
 // GET ratings + average for a player
 router.get('/players/:id/ratings', getPlayerRatings);
