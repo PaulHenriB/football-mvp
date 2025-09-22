@@ -1,5 +1,5 @@
-// backend/controllers/matchController.js 
-const { PrismaClient } = require('@prisma/client'); 
+// backend/controllers/matchController.js
+const { PrismaClient } = require('@prisma/client');
 const prisma = new PrismaClient();
 const { balanceTeams } = require('../utils/teamBalancer');
 
@@ -9,7 +9,11 @@ const { balanceTeams } = require('../utils/teamBalancer');
 const getMatches = async (req, res) => {
   try {
     const matches = await prisma.match.findMany({
-      include: { players: { include: { player: true } }, teams: true, ratings: true },
+      include: {
+        players: { include: { player: true } },
+        teams: true,
+        ratings: true,
+      },
     });
     res.json(matches);
   } catch (error) {
@@ -76,19 +80,39 @@ const getMatchPlayers = async (req, res) => {
 
 // PUT /api/matches/:id/result
 const finishMatch = async (req, res) => {
-  const matchId = parseInt(req.params.id);
-  const { homeScore, awayScore } = req.body;
+  const matchId = parseInt(req.params.id, 10);
+  const { teamAScore, teamBScore } = req.body;
 
   try {
+    // ✅ Role enforcement
     if (req.user.role !== 'MANAGER') {
       return res.status(403).json({ error: 'Only managers can finish matches' });
     }
 
+    // ✅ Validate match exists
+    const match = await prisma.match.findUnique({ where: { id: matchId } });
+    if (!match) {
+      return res.status(404).json({ error: 'Match not found' });
+    }
+
+    // ✅ Validate inputs
+    if (
+      teamAScore === undefined ||
+      teamBScore === undefined ||
+      isNaN(teamAScore) ||
+      isNaN(teamBScore) ||
+      teamAScore < 0 ||
+      teamBScore < 0
+    ) {
+      return res.status(400).json({ error: 'Invalid scores provided' });
+    }
+
+    // ✅ Update match result
     const updated = await prisma.match.update({
       where: { id: matchId },
       data: {
-        homeScore,
-        awayScore,
+        teamAScore: parseInt(teamAScore, 10),
+        teamBScore: parseInt(teamBScore, 10),
         status: 'FINISHED',
       },
     });
@@ -218,27 +242,27 @@ const saveTeams = async (req, res) => {
   const { team1, team2 } = req.body;
 
   try {
+    if (req.user.role !== 'MANAGER') {
+      return res.status(403).json({ error: 'Only managers can save teams' });
+    }
+
     if (!matchId || !team1 || !team2) {
       return res.status(400).json({ error: 'Match ID, team1, and team2 are required' });
     }
 
-    // Ensure match exists
     const match = await prisma.match.findUnique({ where: { id: matchId } });
     if (!match) {
       return res.status(404).json({ error: 'Match not found' });
     }
 
-    // Remove any existing team assignments for this match
     await prisma.playerMatch.deleteMany({ where: { matchId } });
 
-    // Insert team1 assignments
     const team1Data = team1.map(player => ({
       matchId,
       playerId: player.id,
       team: 'TEAM1',
     }));
 
-    // Insert team2 assignments
     const team2Data = team2.map(player => ({
       matchId,
       playerId: player.id,
@@ -267,6 +291,6 @@ module.exports = {
   ratePlayer,
   getPlayerRatings,
   getBalancedTeams,
-  saveTeams, // ✅ new export
+  saveTeams,
 };
 
