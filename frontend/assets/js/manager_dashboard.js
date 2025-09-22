@@ -61,6 +61,9 @@ async function loadOpenMatches() {
   }
 }
 
+// ===========================
+// RENDER MATCH LIST
+// ===========================
 function renderMatchList(containerId, matches, options = {}) {
   const container = document.getElementById(containerId);
   container.innerHTML = "";
@@ -78,11 +81,14 @@ function renderMatchList(containerId, matches, options = {}) {
       <h4>${match.title}</h4>
       <p>${new Date(match.date).toLocaleString()}</p>
       <div class="match-actions">
-        <button class="btn primary-btn" data-action="join" data-id="${match.id}">Join</button>
-        <button class="btn secondary-btn" data-action="details" data-id="${match.id}">View Details</button>
+        <button class="btn secondary-btn" data-action="details" data-id="${match.id}">View</button>
         ${options.managerMatchIds?.has(match.id)
-          ? `<button class="btn danger-btn" data-action="cancel" data-id="${match.id}">Cancel</button>`
-          : ""}
+          ? `
+            <button class="btn primary-btn" data-action="manage-teams" data-id="${match.id}">Manage Teams</button>
+            <button class="btn danger-btn" data-action="record-result" data-id="${match.id}">Record Result</button>
+          `
+          : `<button class="btn primary-btn" data-action="join" data-id="${match.id}">Join</button>`
+        }
       </div>
     `;
 
@@ -104,6 +110,12 @@ function attachMatchEvents(container) {
         await joinMatch(matchId);
       } else if (action === "cancel") {
         await cancelMatch(matchId);
+      } else if (action === "manage-teams") {
+        document.querySelector(".tab-btn[data-tab='balancer']").click();
+        document.getElementById("match-select").value = matchId;
+        await loadBalancerPlayers(matchId);
+      } else if (action === "record-result") {
+        await showMatchDetails(matchId, { forceResultForm: true });
       }
     });
   });
@@ -112,8 +124,6 @@ function attachMatchEvents(container) {
 // ===========================
 // TEAM BALANCER INTEGRATION
 // ===========================
-
-// Load manager matches into dropdown
 async function loadManagerMatchesForBalancer() {
   try {
     const matches = await apiRequest(API_ENDPOINTS.MANAGER_UPCOMING_MATCHES, "GET");
@@ -139,12 +149,10 @@ async function loadManagerMatchesForBalancer() {
   }
 }
 
-// Load players into the team balancer
 async function loadBalancerPlayers(matchId) {
   try {
     const match = await apiRequest(API_ENDPOINTS.MATCH_DETAILS(matchId), "GET");
 
-    // Clear both team lists
     document.getElementById("team1-list").innerHTML = "";
     document.getElementById("team2-list").innerHTML = "";
 
@@ -154,7 +162,6 @@ async function loadBalancerPlayers(matchId) {
       return;
     }
 
-    // Default: put all players in Team 1 initially
     match.players.forEach(p => {
       const li = document.createElement("li");
       li.textContent = `${p.name} (rating: ${p.rating ?? "N/A"})`;
@@ -162,7 +169,6 @@ async function loadBalancerPlayers(matchId) {
       document.getElementById("team1-list").appendChild(li);
     });
 
-    // Hook buttons
     document.getElementById("auto-balance").onclick = () => autoBalanceTeams(matchId, match.players);
     document.getElementById("save-teams").onclick = () => saveTeams(matchId);
   } catch (err) {
@@ -170,7 +176,6 @@ async function loadBalancerPlayers(matchId) {
   }
 }
 
-// Auto balance via backend
 async function autoBalanceTeams(matchId, players) {
   try {
     const result = await apiRequest("/api/team-balance", "POST", { players });
@@ -202,7 +207,6 @@ async function autoBalanceTeams(matchId, players) {
   }
 }
 
-// Save teams to backend
 async function saveTeams(matchId) {
   const team1 = [...document.querySelectorAll("#team1-list li")].map(li => li.dataset.playerId);
   const team2 = [...document.querySelectorAll("#team2-list li")].map(li => li.dataset.playerId);
@@ -217,9 +221,9 @@ async function saveTeams(matchId) {
 }
 
 // ===========================
-// MATCH DETAILS MODAL
+// MATCH DETAILS & RESULTS
 // ===========================
-async function showMatchDetails(matchId) {
+async function showMatchDetails(matchId, options = {}) {
   try {
     const match = await apiRequest(API_ENDPOINTS.MATCH_DETAILS(matchId), "GET");
 
@@ -243,7 +247,7 @@ async function showMatchDetails(matchId) {
         </ul>
       </div>
 
-      ${match.isManager && match.status === "completed" ? `
+      ${(match.isManager && (options.forceResultForm || match.status !== "completed")) ? `
         <div class="section">
           <h6>Record Results & Ratings</h6>
           <form id="result-form">
@@ -255,7 +259,33 @@ async function showMatchDetails(matchId) {
     `;
 
     openModal("matchDetailsModal");
+
+    const resultForm = document.getElementById("result-form");
+    if (resultForm) {
+      resultForm.addEventListener("submit", async e => {
+        e.preventDefault();
+        await saveMatchResult(matchId);
+      });
+    }
   } catch (err) {
     console.error("Error showing match details", err);
+  }
+}
+
+async function saveMatchResult(matchId) {
+  const teamAScore = parseInt(document.getElementById("teamA-score").value, 10);
+  const teamBScore = parseInt(document.getElementById("teamB-score").value, 10);
+
+  try {
+    await apiRequest(API_ENDPOINTS.MATCH_RESULT(matchId), "PUT", {
+      teamAScore,
+      teamBScore,
+    });
+    alert("Result saved!");
+    closeModal("matchDetailsModal");
+    loadMatches();
+  } catch (err) {
+    console.error("Error saving match result", err);
+    alert("Failed to save result");
   }
 }
