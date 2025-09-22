@@ -63,6 +63,36 @@
     </section>
   </main>
 
+  <div class="tab-content" id="tab-balancer"> 
+    <h2>Team Balancer</h2> <div class="selector card"> 
+      <label for="match-select">Select a Match:</label> 
+      <select id="match-select" required> 
+      <option value="" disabled selected>Select a match</option> 
+        <!-- Matches populated dynamically --> 
+      </select> 
+  </div>   
+  
+    <section id="teams-display" class="teams-section"> 
+    <div class="team-container card" id="team-1"> 
+      <h3>Team 1</h3> 
+      <ul class="team-list" id="team1-list"></ul> 
+    </div> 
+    
+  <div class="team-container card" id="team-2"> 
+    <h3>Team 2</h3> 
+    <ul class="team-list" id="team2-list"></ul> 
+  </div> 
+    
+  </section> 
+    
+  <div class="actions"> 
+  <button id="auto-balance" class="btn secondary-btn">Auto Balance</button> 
+  <button id="save-teams" class="btn primary-btn">Save Teams</button> 
+  </div> 
+  </div> 
+</section> 
+</main>
+
   <!-- Floating Action Button -->
   <button class="fab primary-btn" id="fab-add">+</button>
 
