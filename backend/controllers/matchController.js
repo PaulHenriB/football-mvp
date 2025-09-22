@@ -1,4 +1,4 @@
-// backend/controllers/matchController.js
+// backend/controllers/matchController.js 
 const { PrismaClient } = require('@prisma/client'); 
 const prisma = new PrismaClient();
 const { balanceTeams } = require('../utils/teamBalancer');
@@ -212,6 +212,50 @@ const getBalancedTeams = async (req, res) => {
   }
 };
 
+// POST /api/matches/:id/save-teams
+const saveTeams = async (req, res) => {
+  const matchId = parseInt(req.params.id, 10);
+  const { team1, team2 } = req.body;
+
+  try {
+    if (!matchId || !team1 || !team2) {
+      return res.status(400).json({ error: 'Match ID, team1, and team2 are required' });
+    }
+
+    // Ensure match exists
+    const match = await prisma.match.findUnique({ where: { id: matchId } });
+    if (!match) {
+      return res.status(404).json({ error: 'Match not found' });
+    }
+
+    // Remove any existing team assignments for this match
+    await prisma.playerMatch.deleteMany({ where: { matchId } });
+
+    // Insert team1 assignments
+    const team1Data = team1.map(player => ({
+      matchId,
+      playerId: player.id,
+      team: 'TEAM1',
+    }));
+
+    // Insert team2 assignments
+    const team2Data = team2.map(player => ({
+      matchId,
+      playerId: player.id,
+      team: 'TEAM2',
+    }));
+
+    await prisma.playerMatch.createMany({
+      data: [...team1Data, ...team2Data],
+    });
+
+    res.json({ success: true, message: '✅ Teams saved successfully' });
+  } catch (err) {
+    console.error('❌ Error saving teams:', err);
+    res.status(500).json({ error: 'Error saving teams' });
+  }
+};
+
 // ---------------- EXPORTS ----------------
 
 module.exports = {
@@ -223,4 +267,6 @@ module.exports = {
   ratePlayer,
   getPlayerRatings,
   getBalancedTeams,
+  saveTeams, // ✅ new export
 };
+
