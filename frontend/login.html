@@ -19,8 +19,9 @@
   <script type="module" src="assets/js/modal.js" defer></script>
 </head>
 <body>
-  <main class="login-page">
-    <div class="card login-card">
+  
+  <main class="auth-container">
+    <div class="card auth-card">
       <h1 class="app-title">Weplay</h1>
       <h2 class="page-title">Login</h2>
 
@@ -28,27 +29,40 @@
         <div class="input-group">
           <label for="email">Email</label>
           <input type="email" id="email" placeholder="Enter your email" required />
-          <p class="error" id="email-error"></p>
         </div>
 
         <div class="input-group">
           <label for="password">Password</label>
           <input type="password" id="password" placeholder="Enter your password" required />
-          <p class="error" id="password-error"></p>
         </div>
 
         <button type="submit" class="primary-btn full-width">Login</button>
-        <p class="success" id="success-message"></p>
-
-        <p class="auth-switch">
-          Don’t have an account? <a href="signup.html">Sign Up</a>
-        </p>
+        <p class="error" id="login-error"></p>
       </form>
+
+      <p class="auth-switch">Don’t have an account? <a href="signup.html">Sign Up</a></p>
     </div>
   </main>
 
   <footer>
     <p>&copy; 2025 Weplay. All Rights Reserved.</p>
   </footer>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", async () => {
+      try {
+        const userStr = localStorage.getItem("user");
+        if (userStr) {
+          const user = JSON.parse(userStr);
+          if (user.role === "MANAGER") {
+            document.getElementById("manager-link").style.display = "inline-block";
+          }
+        }
+      } catch (err) {
+        console.warn("No user session available.");
+      }
+    });
+  </script>
 </body>
 </html>
+
