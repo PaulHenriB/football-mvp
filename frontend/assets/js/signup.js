@@ -26,6 +26,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const name = document.getElementById("name").value.trim();
     const email = document.getElementById("email").value.trim();
     const password = document.getElementById("password").value.trim();
+    const roleSelection = document.querySelector("input[name='role']:checked")?.value || "PLAYER";
 
     let hasError = false;
 
@@ -51,12 +52,12 @@ document.addEventListener("DOMContentLoaded", () => {
     try {
       const response = await apiRequest(API_ENDPOINTS.REGISTER, {
         method: "POST",
-        body: JSON.stringify({ name, email, password }),
+        body: JSON.stringify({ name, email, password, role: roleSelection }),
       });
 
       if (response?.token) {
         setToken(response.token);
-        successMessage.textContent = "Account created successfully! Redirecting...";
+        successMessage.textContent = "✅ Account created successfully! Redirecting...";
         successMessage.style.display = "block";
 
         setTimeout(() => {
@@ -68,7 +69,7 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     } catch (err) {
       console.error("Signup error:", err);
-      emailError.textContent = "Server error. Please try again later.";
+      emailError.textContent = "⚠️ Server error. Please try again later.";
       emailError.style.display = "block";
     }
   });
