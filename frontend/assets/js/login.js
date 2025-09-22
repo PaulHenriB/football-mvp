@@ -40,12 +40,21 @@ document.addEventListener("DOMContentLoaded", () => {
         body: JSON.stringify({ email, password }),
       });
 
-      if (response.token) {
+      if (response?.token) {
         setToken(response.token);
+
         successMessage.textContent = "✅ Login successful! Redirecting...";
         successMessage.style.display = "block";
+
+        // If backend returns user info (role)
+        const userRole = response.user?.role || "PLAYER";
+
         setTimeout(() => {
-          window.location.href = "dashboard.html";
+          if (userRole === "MANAGER") {
+            window.location.href = "manager_dashboard.html";
+          } else {
+            window.location.href = "dashboard.html";
+          }
         }, 1000);
       } else {
         passwordError.textContent = "Invalid email or password.";
