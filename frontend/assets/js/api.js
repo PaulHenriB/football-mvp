@@ -10,14 +10,14 @@ export const API_ENDPOINTS = {
   LOGIN: `${API_BASE_URL}/users/login`,
   ME: `${API_BASE_URL}/users/me`,
 
-  // --- Generic Matches (global scope, not tied to player/manager) ---
+  // --- Generic Matches ---
   MATCHES: `${API_BASE_URL}/matches`,
-  UPCOMING_MATCHES: `${API_BASE_URL}/matches/upcoming`,   // all upcoming matches
-  PAST_MATCHES: `${API_BASE_URL}/matches/past`,           // all past matches
-  OPEN_MATCHES: `${API_BASE_URL}/matches/open`,           // matches still open for join
+  UPCOMING_MATCHES: `${API_BASE_URL}/matches/upcoming`,
+  PAST_MATCHES: `${API_BASE_URL}/matches/past`,
+  OPEN_MATCHES: `${API_BASE_URL}/matches/open`,
 
   MATCH_BY_ID: (id) => `${API_BASE_URL}/matches/${id}`,
-  MATCH_DETAILS: (id) => `${API_BASE_URL}/matches/${id}`, // alias for clarity
+  MATCH_DETAILS: (id) => `${API_BASE_URL}/matches/${id}`,
   MATCH_PLAYERS: (id) => `${API_BASE_URL}/matches/${id}/players`,
   MATCH_RATE_PLAYER: (id) => `${API_BASE_URL}/matches/${id}/rate`,
   MATCH_AVAILABILITY: (id) => `${API_BASE_URL}/matches/${id}/availability`,
@@ -29,13 +29,14 @@ export const API_ENDPOINTS = {
 
   // --- Manager-specific ---
   MANAGER_UPCOMING_MATCHES: `${API_BASE_URL}/matches/manager/upcoming`,
-  SAVE_TEAMS: (id) => `${API_BASE_URL}/matches/${id}/save-teams`, // ✅ new endpoint for balancer integration
+  SAVE_TEAMS: (id) => `${API_BASE_URL}/matches/${id}/save-teams`, // ✅ save balancer output
+  MATCH_RESULT: (id) => `${API_BASE_URL}/matches/${id}/result`,   // ✅ new for recording final scores
 
-  // --- Player-specific (NEW) ---
-  PLAYER_MATCHES: (playerId) => `${API_BASE_URL}/players/${playerId}/matches`, 
-  PLAYER_UPCOMING_MATCHES: (playerId) => `${API_BASE_URL}/players/${playerId}/matches/upcoming`, 
-  PLAYER_REGISTERED_MATCHES: (playerId) => `${API_BASE_URL}/players/${playerId}/matches/registered`, 
-  PLAYER_PAST_MATCHES: (playerId) => `${API_BASE_URL}/players/${playerId}/matches/past`, 
+  // --- Player-specific ---
+  PLAYER_MATCHES: (playerId) => `${API_BASE_URL}/players/${playerId}/matches`,
+  PLAYER_UPCOMING_MATCHES: (playerId) => `${API_BASE_URL}/players/${playerId}/matches/upcoming`,
+  PLAYER_REGISTERED_MATCHES: (playerId) => `${API_BASE_URL}/players/${playerId}/matches/registered`,
+  PLAYER_PAST_MATCHES: (playerId) => `${API_BASE_URL}/players/${playerId}/matches/past`,
 
   // --- Players ---
   PLAYERS: `${API_BASE_URL}/players`,
@@ -68,4 +69,13 @@ export async function apiFetch(endpoint, options = {}) {
   }
 
   return response.json();
+}
+
+// --- Convenience wrapper for JSON-based requests ---
+export async function apiRequest(endpoint, method = "GET", body = null, headers = {}) {
+  return apiFetch(endpoint, {
+    method,
+    headers,
+    body: body ? JSON.stringify(body) : null,
+  });
 }
