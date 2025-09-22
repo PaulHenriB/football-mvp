@@ -1,4 +1,4 @@
-// frontend/assets/js/manager_dashboard.js 
+// frontend/assets/js/manager_dashboard.js
 
 import { API_ENDPOINTS, apiRequest } from "./api.js";
 import { openModal, closeModal } from "./modal.js";
@@ -19,9 +19,12 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   loadMatches();
+  loadManagerMatchesForBalancer();
 });
 
-// Load matches
+// ===========================
+// LOAD MATCHES (tabs)
+// ===========================
 async function loadMatches() {
   await loadUpcomingMatches();
   await loadPastMatches();
@@ -106,7 +109,116 @@ function attachMatchEvents(container) {
   });
 }
 
-// Show match details (with results & ratings)
+// ===========================
+// TEAM BALANCER INTEGRATION
+// ===========================
+
+// Load manager matches into dropdown
+async function loadManagerMatchesForBalancer() {
+  try {
+    const matches = await apiRequest(API_ENDPOINTS.MANAGER_UPCOMING_MATCHES, "GET");
+    const select = document.getElementById("match-select");
+
+    select.innerHTML = `<option value="">-- Select a Match --</option>`;
+
+    matches.forEach(m => {
+      const opt = document.createElement("option");
+      opt.value = m.id;
+      opt.textContent = `${m.title} (${new Date(m.date).toLocaleDateString()})`;
+      select.appendChild(opt);
+    });
+
+    select.addEventListener("change", async () => {
+      const matchId = select.value;
+      if (matchId) {
+        await loadBalancerPlayers(matchId);
+      }
+    });
+  } catch (err) {
+    console.error("Error loading manager matches for balancer", err);
+  }
+}
+
+// Load players into the team balancer
+async function loadBalancerPlayers(matchId) {
+  try {
+    const match = await apiRequest(API_ENDPOINTS.MATCH_DETAILS(matchId), "GET");
+
+    // Clear both team lists
+    document.getElementById("team1-list").innerHTML = "";
+    document.getElementById("team2-list").innerHTML = "";
+
+    if (!match.players || match.players.length === 0) {
+      document.getElementById("team1-list").innerHTML = "<li>No players</li>";
+      document.getElementById("team2-list").innerHTML = "<li>No players</li>";
+      return;
+    }
+
+    // Default: put all players in Team 1 initially
+    match.players.forEach(p => {
+      const li = document.createElement("li");
+      li.textContent = `${p.name} (rating: ${p.rating ?? "N/A"})`;
+      li.dataset.playerId = p.id;
+      document.getElementById("team1-list").appendChild(li);
+    });
+
+    // Hook buttons
+    document.getElementById("auto-balance").onclick = () => autoBalanceTeams(matchId, match.players);
+    document.getElementById("save-teams").onclick = () => saveTeams(matchId);
+  } catch (err) {
+    console.error("Error loading balancer players", err);
+  }
+}
+
+// Auto balance via backend
+async function autoBalanceTeams(matchId, players) {
+  try {
+    const result = await apiRequest("/api/team-balance", "POST", { players });
+
+    const team1 = document.getElementById("team1-list");
+    const team2 = document.getElementById("team2-list");
+    team1.innerHTML = "";
+    team2.innerHTML = "";
+
+    result.teamA.forEach(p => {
+      const li = document.createElement("li");
+      li.textContent = `${p.name} (rating: ${p.rating ?? "N/A"})`;
+      li.dataset.playerId = p.id;
+      team1.appendChild(li);
+    });
+
+    result.teamB.forEach(p => {
+      const li = document.createElement("li");
+      li.textContent = `${p.name} (rating: ${p.rating ?? "N/A"})`;
+      li.dataset.playerId = p.id;
+      team2.appendChild(li);
+    });
+
+    console.log("Balancer summary:", result.summary);
+    alert(`Balanced teams!\nAvg A: ${result.summary.averageRatingA}\nAvg B: ${result.summary.averageRatingB}\nDiff: ${result.summary.difference}`);
+  } catch (err) {
+    console.error("Error auto-balancing teams", err);
+    alert("Failed to balance teams");
+  }
+}
+
+// Save teams to backend
+async function saveTeams(matchId) {
+  const team1 = [...document.querySelectorAll("#team1-list li")].map(li => li.dataset.playerId);
+  const team2 = [...document.querySelectorAll("#team2-list li")].map(li => li.dataset.playerId);
+
+  try {
+    await apiRequest(API_ENDPOINTS.SAVE_TEAMS(matchId), "POST", { team1, team2 });
+    alert("Teams saved successfully!");
+  } catch (err) {
+    console.error("Error saving teams", err);
+    alert("Failed to save teams");
+  }
+}
+
+// ===========================
+// MATCH DETAILS MODAL
+// ===========================
 async function showMatchDetails(matchId) {
   try {
     const match = await apiRequest(API_ENDPOINTS.MATCH_DETAILS(matchId), "GET");
@@ -139,5 +251,11 @@ async function showMatchDetails(matchId) {
             <label>Team B Score <input type="number" id="teamB-score" min="0" value="${match.teamBScore ?? ""}"></label>
             <button type="submit" class="btn primary-btn">Save</button>
           </form>
-        </div>  
+        </div>` : ""}
+    `;
 
+    openModal("matchDetailsModal");
+  } catch (err) {
+    console.error("Error showing match details", err);
+  }
+}
